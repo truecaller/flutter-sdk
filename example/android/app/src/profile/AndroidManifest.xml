@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.truecaller_sdk_example">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+</manifest>
