@@ -6,6 +6,7 @@
 .pub/
 build/
 pubspec.lock
+truecaller_sdk.iml
 
 # example
 **/truecaller_sdk_example.iml
