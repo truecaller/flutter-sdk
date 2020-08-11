@@ -1,5 +1,5 @@
 name: truecaller_sdk
-description: A Flutter plugin that uses Truecaller Android SDK for signing in with Phone numbers
+description: Flutter plugin that uses Truecaller's Android SDK to provide mobile number verification service to verify users.
 version: 0.0.1
 homepage: https://github.com/truecaller/flutter-sdk
 
