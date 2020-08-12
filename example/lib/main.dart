@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TruecallerSdk.initiateSDK();
+                    TruecallerSdk.initializeSDK();
                     TruecallerSdk.isUsable.then((isUsable) {
                       isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
                     });
@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
                   height: 20.0,
                 ),
                 StreamBuilder<TruecallerUserCallback>(
-                    stream: TruecallerSdk.streamData,
+                    stream: TruecallerSdk.getProfileStreamData,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         switch (snapshot.data.result) {
