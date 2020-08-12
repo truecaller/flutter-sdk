@@ -13,9 +13,9 @@ class TruecallerSdk {
   /// This method has to be called before anything else. It initializes the SDK with the
   /// customizable options which are all optional and have default values as set below in the method
   ///
-  /// [sdkOptions] determines whether you want to use the SDK for verifying only Truecaller users
-  /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP]
-  /// or both Truecaller and Non-truecaller users[TruecallerSdkScope.SDK_OPTION_WITH_OTP]
+  /// [sdkOptions] determines whether you want to use the SDK for verifying -
+  /// 1. [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] i.e only Truecaller users
+  /// 2. [TruecallerSdkScope.SDK_OPTION_WITH_OTP] i.e both Truecaller and Non-truecaller users
   ///
   /// NOTE: As of truecaller_sdk 0.0.1, only
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] is supported
@@ -35,7 +35,7 @@ class TruecallerSdk {
   /// [buttonShapeOptions] to set login button shape
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
-  static initiateSDK(
+  static initializeSDK(
           {int sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
           int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
@@ -63,7 +63,7 @@ class TruecallerSdk {
         "buttonTextColor": buttonTextColor,
       });
 
-  /// Once you initialise the Truecaller SDK using the [initiateSDK] method, and if you are using
+  /// Once you initialise the Truecaller SDK using the [initializeSDK] method, and if you are using
   /// the SDK for verification of only Truecaller users ( by setting the sdkOptions scope as
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP], you can check if the Truecaller app is
   /// present on the user's device or whether the user has a valid account state or not by using 
@@ -83,7 +83,7 @@ class TruecallerSdk {
   /// [TruecallerUserCallbackResult.verification] will be returned only when using
   /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] which indicates to verify the user
   /// manually, so this is not applicable for truecaller_sdk 0.0.1
-  static Stream<TruecallerUserCallback> get streamData =>
+  static Stream<TruecallerUserCallback> get getProfileStreamData =>
       _eventChannel.receiveBroadcastStream().map((event) {
         TruecallerUserCallback callback = new TruecallerUserCallback();
         var resultHashMap = HashMap<String, String>.from(event);
