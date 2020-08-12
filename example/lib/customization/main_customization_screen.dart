@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
-import 'ConfigOptions.dart';
+import 'config_options.dart';
 import 'result_screen.dart';
 
 // This screen shows different customization options available in Truecaller SDK
