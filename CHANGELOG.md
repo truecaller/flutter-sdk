@@ -1,3 +1,5 @@
 ## 0.0.1
 
-* Flutter wrapper for Truecaller's Android SDK based on version 2.3.0
+* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.3.0
+* Only supports Android at the moment
+* Only supports verification of Truecaller users at the moment
