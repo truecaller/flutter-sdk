@@ -1,16 +1,15 @@
 # truecaller_sdk_example
 
-Demonstrates how to use the truecaller_sdk plugin.
+Demonstrates how to use the `truecaller_sdk` plugin.
 
-## Getting Started
+You can find 2 example implementations under [example/lib](lib) directory
 
-This project is a starting point for a Flutter application.
+1. [main.dart](https://github.com/truecaller/flutter-sdk/blob/master/example/lib/main.dart) - run this to see a very basic, crude implementation of
+ truecaller_sdk plugin which would look like the below screenshot
 
-A few resources to get you started if this is your first Flutter project:
+![Alt Text](screenshots/main.jpg)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+2. [main_customization_screen.dart](https://github.com/truecaller/flutter-sdk/blob/master/example/lib/customization/main_customization_screen.dart) - run
+ this to see different customization options available for truecaller_sdk plugin which would look like the below screenshot
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Alt Text](screenshots/main_customization_screen.jpg)
