@@ -17,7 +17,7 @@ dependencies:
 ### 2. Generate App key and add it to AndroidManifest.xml:
 * Register [here](https://developer.truecaller.com/sign-up) for Truecaller's developer account, or login to your already existing developer account.
 * Refer to the [official documentation](https://docs.truecaller.com/truecaller-sdk/android/generating-app-key) for generating app key.
-* Open your `AndroidManifest.xml` and add a `meta-data` element to the `application` element with your app key like this - 
+* Open your `AndroidManifest.xml` under /android module and add a `meta-data` element to the `application` element with your app key like this - 
 ```xml
 <application>  
 ...  
@@ -30,6 +30,7 @@ dependencies:
 ```
 
 ### 3. Make changes to `MainActivity.kt`:
+* Head to the `MainActivity.kt` under /android module
 * SDK requires the use of a FragmentActivity as opposed to Activity, so extend your `MainActivity.kt` with `FlutterFragmentActivity`.
 * Override function `configureFlutterEngine(flutterEngine: FlutterEngine)` in your `MainActivity.kt` like this -
 ```kotlin
@@ -88,7 +89,10 @@ StreamSubscription streamSubscription = TruecallerSdk.getProfileStreamData.liste
   }
 ```
 
-##### NOTE: For details on different kind of errorCodes refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios)
+##### NOTE #####
+* For details on different kind of errorCodes refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios)
+* For sample implementations, head over to [example](example) module
+
 
 ## Customization Options
 
