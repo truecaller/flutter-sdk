@@ -16,7 +16,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Plugin example app'),
+            title: const Text('Truecaller SDK example'),
           ),
           body: Center(
             child: Column(
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
                     });
                   },
                   child: Text(
-                    "Show Alert",
+                    "Initialize SDK & Get Profile",
                     style: TextStyle(color: Colors.white),
                   ),
                   color: Colors.blue,
