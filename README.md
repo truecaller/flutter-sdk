@@ -1,8 +1,8 @@
 # truecaller_sdk
 
-Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users. This plugin currently supports only Android and can be used to verify only the Truecaller users at the moment. Since these users have already verified mobile number, verification via Truecaller SDK enables you to quickly verify/ signup/login your users, basis their mobile number - without the need of any SMS based OTP, and at the time same capture their mapped user profile.
+Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users. This plugin currently supports **only Android** and can be used to verify **only the Truecaller users** at the moment. Since these users have already verified mobile number, verification via Truecaller SDK enables you to quickly verify/ signup/login your users, basis their mobile number - without the need of any SMS based OTP, and at the time same capture their mapped user profile.
 
-For more details, please refer https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app
+For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app)
 
 ## Steps to integrate
 
