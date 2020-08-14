@@ -1,6 +1,8 @@
-# truecaller_sdk
+# Truecaller Flutter SDK
 
-Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users. This plugin currently supports **only Android** and can be used to verify **only the Truecaller users** at the moment. Since these users have already verified mobile number, verification via Truecaller SDK enables you to quickly verify/ signup/login your users, basis their mobile number - without the need of any SMS based OTP, and at the time same capture their mapped user profile.
+Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
+
+This plugin currently supports **only Android** and can be used to verify **only the Truecaller users** at the moment. Since these users have already verified mobile number, verification via Truecaller SDK enables you to quickly verify/signup/login your users using their mobile number - without the need for SMS based OTP, and at the time same lets you capture their mapped user profile.
 
 For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app)
 
@@ -15,9 +17,9 @@ dependencies:
   ...
 ```
 ### 2. Generate App key and add it to AndroidManifest.xml:
-* Register [here](https://developer.truecaller.com/sign-up) for Truecaller's developer account, or login to your already existing developer account.
+* [Register](https://developer.truecaller.com/sign-up) for Truecaller's developer account, or [login](https://developer.truecaller.com/login) to your existing developer account.
 * Refer to the [official documentation](https://docs.truecaller.com/truecaller-sdk/android/generating-app-key) for generating app key.
-* Open your `AndroidManifest.xml` under /android module and add a `meta-data` element to the `application` element with your app key like this - 
+* Open your `AndroidManifest.xml` under /android module and add a `meta-data` element to the `application` element with your app key:
 ```xml
 <application>  
 ...  
@@ -31,8 +33,8 @@ dependencies:
 
 ### 3. Make changes to `MainActivity.kt`:
 * Head to the `MainActivity.kt` under /android module
-* SDK requires the use of a FragmentActivity as opposed to Activity, so extend your `MainActivity.kt` with `FlutterFragmentActivity`.
-* Override function `configureFlutterEngine(flutterEngine: FlutterEngine)` in your `MainActivity.kt` like this -
+* SDK requires the use of a `FragmentActivity` as opposed to `Activity`, so extend your `MainActivity.kt` with `FlutterFragmentActivity`.
+* Override function `configureFlutterEngine(flutterEngine: FlutterEngine)` in your `MainActivity.kt`:
 ```kotlin
 class MainActivity: FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -90,14 +92,14 @@ StreamSubscription streamSubscription = TruecallerSdk.getProfileStreamData.liste
 ```
 
 ##### NOTE #####
-* For details on different kind of errorCodes refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios)
-* For sample implementations, head over to [example](example) module
+* For details on different kinds of errorCodes, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios).
+* For sample implementations, head over to [example](example) module.
 
 
 ## Customization Options
 
 ### Language
-To customise the profile consent screen in any of the supported Indian languages, add the following line before calling `TruecallerSdk.getProfile()` like this -
+To customise the profile consent screen in any of the supported Indian languages, add the following line before calling `TruecallerSdk.getProfile()`:
 ```dart
 /// initialize the SDK and check isUsable first before calling this method
 /// Default value is "en" i.e English
@@ -105,12 +107,14 @@ TruecallerSdk.setLocale("hi") // this sets the language to Hindi
 ```
 
 ### Dark Theme
-You can also set the Dark Theme for consent screen by adding the following line before calling `TruecallerSdk.getProfile()` like this -
+You can also set the Dark Theme for consent screen by adding the following line before calling `TruecallerSdk.getProfile()`:
 ```dart
 /// initialize the SDK and check isUsable first before calling this method
 TruecallerSdk.setDarkTheme 
 ```
-##### Note: Dark Theme is not applicable for `TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET`
+
+##### Note
+Dark Theme is not applicable for `TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET`
 
 ### Consent screen UI
 You can customize the consent screen UI using the options available in class `TruecallerSdkScope` under `scope_options.dart` and pass them while initializing the SDK.
@@ -155,4 +159,5 @@ You can customize the consent screen UI using the options available in class `Tr
 
 By default, `initializeSDK()` has default argument values set as above, so if you don't pass any explicit values to it, it will initialize the SDK with these scope options.
 
-##### Note: For list of supported locales and details on different kind of customization refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/customisation-1)
+##### Note
+For list of supported locales and details on different kinds of customizations, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/customisation-1)
