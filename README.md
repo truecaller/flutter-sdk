@@ -1,4 +1,4 @@
-# Truecaller Flutter SDK
+# truecaller_sdk
 
 Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
 
