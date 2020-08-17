@@ -104,6 +104,27 @@ class TruecallerSdk {
           case TruecallerUserCallbackResult.verification:
             callback.result = TruecallerUserCallbackResult.verification;
             break;
+          case TruecallerUserCallbackResult.missedCallInitiated:
+            callback.result = TruecallerUserCallbackResult.missedCallInitiated;
+            break;
+          case TruecallerUserCallbackResult.missedCallReceived:
+            callback.result = TruecallerUserCallbackResult.missedCallReceived;
+            break;
+          case TruecallerUserCallbackResult.otpInitiated:
+            callback.result = TruecallerUserCallbackResult.otpInitiated;
+            break;
+          case TruecallerUserCallbackResult.otpReceived:
+            callback.result = TruecallerUserCallbackResult.otpReceived;
+            break;
+          case TruecallerUserCallbackResult.verifiedBefore:
+            callback.result = TruecallerUserCallbackResult.verifiedBefore;
+            break;
+          case TruecallerUserCallbackResult.verificationComplete:
+            callback.result = TruecallerUserCallbackResult.verificationComplete;
+            break;
+          case TruecallerUserCallbackResult.exception:
+            callback.result = TruecallerUserCallbackResult.exception;
+            break;
           default:
             throw ArgumentError('${resultHashMap["result"]} is not a valid result');
         }
@@ -120,4 +141,7 @@ class TruecallerSdk {
   /// NOTE: Default value is en
   static setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
+
+  static requestVerification(String phoneNumber) async =>
+      await _methodChannel.invokeMethod('requestVerification', {"ph": phoneNumber});
 }

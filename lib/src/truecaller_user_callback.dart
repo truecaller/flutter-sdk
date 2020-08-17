@@ -4,7 +4,8 @@ class TruecallerUserCallback {
   TruecallerError error;
 }
 
-enum TruecallerUserCallbackResult { success, failure, verification }
+enum TruecallerUserCallbackResult { success, failure, verification, missedCallInitiated,
+  missedCallReceived, otpInitiated, otpReceived, verifiedBefore, verificationComplete, exception}
 
 extension EnumParser on String {
   TruecallerUserCallbackResult enumValue() {

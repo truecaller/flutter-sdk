@@ -1,15 +1,20 @@
 package com.truecallersdk
 
 import android.app.Activity
+import android.os.Handler
+import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import com.truecaller.android.sdk.ITrueCallback
 import com.truecaller.android.sdk.SdkThemeOptions
 import com.truecaller.android.sdk.TrueError
+import com.truecaller.android.sdk.TrueException
 import com.truecaller.android.sdk.TrueProfile
 import com.truecaller.android.sdk.TruecallerSDK
 import com.truecaller.android.sdk.TruecallerSdkScope
+import com.truecaller.android.sdk.clients.VerificationCallback
+import com.truecaller.android.sdk.clients.VerificationDataBundle
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -27,6 +32,9 @@ const val IS_USABLE = "isUsable"
 const val SET_DARK_THEME = "setDarkTheme"
 const val SET_LOCALE = "setLocale"
 const val GET_PROFILE = "getProfile"
+const val REQUEST_VERIFICATION = "requestVerification"
+const val VERIFY_OTP = "verifyOtp"
+const val VERIFY_MISSED_CALL = "verifyMissedCall"
 const val TC_METHOD_CHANNEL = "tc_method_channel"
 const val TC_EVENT_CHANNEL = "tc_event_channel"
 
@@ -94,6 +102,38 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     null
                 )
             }
+            REQUEST_VERIFICATION -> {
+                val phoneNumber = call.argument<String>(Constants.PH_NO)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid phone", "Can't be null or empty", null)
+                activity?.let {
+                    TruecallerSDK.getInstance()
+                        .requestVerification("IN", phoneNumber, verificationCallback, it as FragmentActivity)
+                }
+                    ?: result.error("UNAVAILABLE", "Activity not available.", null)
+            }
+            VERIFY_OTP -> {
+                val firstName = call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid name", "Can't be null or empty", null)
+                val lastName = call.argument<String>(Constants.LAST_NAME) ?: ""
+                val trueProfile = TrueProfile.Builder(firstName, lastName).build()
+                val otp = call.argument<String>(Constants.OTP)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid otp", "Can't be null or empty", null)
+                TruecallerSDK.getInstance().verifyOtp(
+                    trueProfile,
+                    otp,
+                    verificationCallback
+                )
+            }
+            VERIFY_MISSED_CALL -> {
+                val firstName = call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid name", "Can't be null or empty", null)
+                val lastName = call.argument<String>(Constants.LAST_NAME) ?: ""
+                val trueProfile = TrueProfile.Builder(firstName, lastName).build()
+                TruecallerSDK.getInstance().verifyMissedCall(
+                    trueProfile,
+                    verificationCallback
+                )
+            }
             else -> {
                 result.notImplemented()
             }
@@ -140,6 +180,109 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
         override fun onVerificationRequired() {
             eventSink?.success(mapOf(Constants.RESULT to Constants.VERIFICATION))
+        }
+    }
+
+    private val verificationCallback: VerificationCallback = object : VerificationCallback {
+        override fun onRequestSuccess(requestCode: Int, bundle: VerificationDataBundle?) {
+            val trueProfile = TrueProfile.Builder("shubh", "ag").build()
+            when (requestCode) {
+                VerificationCallback.TYPE_MISSED_CALL_INITIATED -> {
+                    Toast.makeText(
+                        activity,
+                        "Missed call initiated",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.MISSED_CALL_INITIATED
+                        )
+                    )
+                }
+                VerificationCallback.TYPE_MISSED_CALL_RECEIVED -> {
+                    Toast.makeText(
+                        activity,
+                        "Missed call received",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.MISSED_CALL_RECEIVED
+                        )
+                    )
+                    Handler().postDelayed({
+                                              TruecallerSDK.getInstance().verifyMissedCall(trueProfile, this)
+                                          }, 5000)
+                }
+                VerificationCallback.TYPE_OTP_INITIATED -> {
+                    Toast.makeText(
+                        activity,
+                        "OTP initiated",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.OTP_INITIATED
+                        )
+                    )
+                }
+                VerificationCallback.TYPE_OTP_RECEIVED -> {
+                    Toast.makeText(
+                        activity,
+                        "OTP received",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.OTP_RECEIVED,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_OTP)
+                        )
+                    )
+                    Handler().postDelayed({
+                                              TruecallerSDK.getInstance().verifyOtp(
+                                                  trueProfile,
+                                                  bundle?.getString(VerificationDataBundle.KEY_OTP)!!,
+                                                  this
+                                              )
+                                          }, 5000)
+                }
+                VerificationCallback.TYPE_PROFILE_VERIFIED_BEFORE -> {
+                    Toast.makeText(
+                        activity,
+                        "Profile verified for your app before: " + bundle?.profile?.firstName
+                                + " and access token: " + bundle?.profile?.accessToken,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.VERIFIED_BEFORE,
+                            Constants.DATA to Gson().toJson(bundle?.profile)
+                        )
+                    )
+                }
+                else -> {
+                    Toast.makeText(
+                        activity,
+                        "Success: Verified with " + bundle?.getString(VerificationDataBundle.KEY_ACCESS_TOKEN),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.VERIFICATION_COMPLETE,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_ACCESS_TOKEN)
+                        )
+                    )
+                }
+            }
+        }
+
+        override fun onRequestFailure(callbackType: Int, trueException: TrueException) {
+            eventSink?.success(
+                mapOf(
+                    Constants.RESULT to Constants.EXCEPTION,
+                    Constants.DATA to Gson().toJson(trueException)
+                )
+            )
         }
     }
 

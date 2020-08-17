@@ -20,8 +20,25 @@ class Constants {
         //callback data
         const val RESULT = "result";
         const val DATA = "data";
+
+        //tc callback
         const val SUCCESS = "success"
         const val FAILURE = "failure"
         const val VERIFICATION = "verification"
+
+        //non-tc callback
+        const val MISSED_CALL_INITIATED = "missedCallInitiated"
+        const val MISSED_CALL_RECEIVED = "missedCallReceived"
+        const val OTP_INITIATED = "otpInitiated"
+        const val OTP_RECEIVED = "otpReceived"
+        const val VERIFIED_BEFORE = "verifiedBefore"
+        const val VERIFICATION_COMPLETE = "verificationComplete"
+        const val EXCEPTION = "exception"
+
+        //non-tc values
+        const val PH_NO = "ph"
+        const val FIRST_NAME = "fname"
+        const val LAST_NAME = "lname"
+        const val OTP = "otp"
     }
 }
