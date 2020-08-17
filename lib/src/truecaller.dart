@@ -66,7 +66,7 @@ class TruecallerSdk {
   /// Once you initialise the Truecaller SDK using the [initializeSDK] method, and if you are using
   /// the SDK for verification of only Truecaller users ( by setting the sdkOptions scope as
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP], you can check if the Truecaller app is
-  /// present on the user's device or whether the user has a valid account state or not by using 
+  /// present on the user's device or whether the user has a valid account state or not by using
   /// the following method
   static Future<bool> get isUsable async => _methodChannel.invokeMethod('isUsable');
 
@@ -87,21 +87,21 @@ class TruecallerSdk {
       _eventChannel.receiveBroadcastStream().map((event) {
         TruecallerUserCallback callback = new TruecallerUserCallback();
         var resultHashMap = HashMap<String, String>.from(event);
-        switch (resultHashMap["result"]) {
-          case "success":
+        switch (resultHashMap["result"].enumValue()) {
+          case TruecallerUserCallbackResult.success:
             callback.result = TruecallerUserCallbackResult.success;
             Map profileMap = jsonDecode(resultHashMap["data"]);
             TruecallerUserProfile truecallerUserProfile =
                 TruecallerUserProfile.fromJson(profileMap);
             callback.profile = truecallerUserProfile;
             break;
-          case "failure":
+          case TruecallerUserCallbackResult.failure:
             callback.result = TruecallerUserCallbackResult.failure;
             Map errorMap = jsonDecode(resultHashMap["data"]);
             TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
             callback.error = truecallerError;
             break;
-          case "verification":
+          case TruecallerUserCallbackResult.verification:
             callback.result = TruecallerUserCallbackResult.verification;
             break;
           default:
