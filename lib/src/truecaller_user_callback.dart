@@ -6,6 +6,14 @@ class TruecallerUserCallback {
 
 enum TruecallerUserCallbackResult { success, failure, verification }
 
+extension EnumParser on String {
+  TruecallerUserCallbackResult enumValue() {
+    return TruecallerUserCallbackResult.values.firstWhere(
+        (element) => element.toString().split(".")[1].toLowerCase() == this.toLowerCase(),
+        orElse: () => null);
+  }
+}
+
 class TruecallerUserProfile {
   String firstName;
   String lastName;
