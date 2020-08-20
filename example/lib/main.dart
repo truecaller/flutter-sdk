@@ -40,17 +40,17 @@ class _MyAppState extends State<MyApp> {
                   color: Colors.transparent,
                   height: 20.0,
                 ),
-                StreamBuilder<TruecallerUserCallback>(
+                StreamBuilder<TruecallerSdkCallback>(
                     stream: TruecallerSdk.getProfileStreamData,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         switch (snapshot.data.result) {
-                          case TruecallerUserCallbackResult.success:
+                          case TruecallerSdkCallbackResult.success:
                             return Text(
                                 "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}");
-                          case TruecallerUserCallbackResult.failure:
+                          case TruecallerSdkCallbackResult.failure:
                             return Text("Oops!! Error type ${snapshot.data.error.code}");
-                          case TruecallerUserCallbackResult.verification:
+                          case TruecallerSdkCallbackResult.verification:
                             return Text("Verification Required");
                           default:
                             return Text("Invalid result");

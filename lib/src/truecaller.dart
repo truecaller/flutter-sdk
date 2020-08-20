@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 import 'scope_options.dart';
-import 'truecaller_user_callback.dart';
+import 'truecaller_callback.dart';
 
 class TruecallerSdk {
   static const MethodChannel _methodChannel = const MethodChannel('tc_method_channel');
@@ -76,33 +76,33 @@ class TruecallerSdk {
 
   /// Once you call [getProfile], you can listen to this stream to determine the result of the
   /// action taken by the user.
-  /// [TruecallerUserCallbackResult.success] means the result is successful and you can now fetch
-  /// the user's profile from [TruecallerUserCallback.profile]
-  /// [TruecallerUserCallbackResult.failure] means the result is failure and you can now fetch
-  /// the result of failure from [TruecallerUserCallback.error]
-  /// [TruecallerUserCallbackResult.verification] will be returned only when using
+  /// [TruecallerSdkCallbackResult.success] means the result is successful and you can now fetch
+  /// the user's profile from [TruecallerSdkCallback.profile]
+  /// [TruecallerSdkCallbackResult.failure] means the result is failure and you can now fetch
+  /// the result of failure from [TruecallerSdkCallback.error]
+  /// [TruecallerSdkCallbackResult.verification] will be returned only when using
   /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] which indicates to verify the user
   /// manually, so this is not applicable for truecaller_sdk 0.0.1
-  static Stream<TruecallerUserCallback> get getProfileStreamData =>
+  static Stream<TruecallerSdkCallback> get getProfileStreamData =>
       _eventChannel.receiveBroadcastStream().map((event) {
-        TruecallerUserCallback callback = new TruecallerUserCallback();
+        TruecallerSdkCallback callback = new TruecallerSdkCallback();
         var resultHashMap = HashMap<String, String>.from(event);
         switch (resultHashMap["result"].enumValue()) {
-          case TruecallerUserCallbackResult.success:
-            callback.result = TruecallerUserCallbackResult.success;
+          case TruecallerSdkCallbackResult.success:
+            callback.result = TruecallerSdkCallbackResult.success;
             Map profileMap = jsonDecode(resultHashMap["data"]);
             TruecallerUserProfile truecallerUserProfile =
                 TruecallerUserProfile.fromJson(profileMap);
             callback.profile = truecallerUserProfile;
             break;
-          case TruecallerUserCallbackResult.failure:
-            callback.result = TruecallerUserCallbackResult.failure;
+          case TruecallerSdkCallbackResult.failure:
+            callback.result = TruecallerSdkCallbackResult.failure;
             Map errorMap = jsonDecode(resultHashMap["data"]);
             TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
             callback.error = truecallerError;
             break;
-          case TruecallerUserCallbackResult.verification:
-            callback.result = TruecallerUserCallbackResult.verification;
+          case TruecallerSdkCallbackResult.verification:
+            callback.result = TruecallerSdkCallbackResult.verification;
             break;
           default:
             throw ArgumentError('${resultHashMap["result"]} is not a valid result');
