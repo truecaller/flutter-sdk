@@ -64,16 +64,16 @@ TruecallerSdk.isUsable.then((isUsable) {
 });
                    
 //Step 4: Be informed about the getProfile callback result(success, failure, verification)
-StreamSubscription streamSubscription = TruecallerSdk.getProfileStreamData.listen((truecallerUserCallback) {
-  switch (truecallerUserCallback.result) {
-    case TruecallerUserCallbackResult.success:
-      print("First Name: ${truecallerUserCallback.profile.firstName}");
-      print("Last Name: ${truecallerUserCallback.profile.lastName}");
+StreamSubscription streamSubscription = TruecallerSdk.getProfileStreamData.listen((truecallerSdkCallback) {
+  switch (truecallerSdkCallback.result) {
+    case TruecallerSdkCallbackResult.success:
+      print("First Name: ${truecallerSdkCallback.profile.firstName}");
+      print("Last Name: ${truecallerSdkCallback.profile.lastName}");
       break;
-    case TruecallerUserCallbackResult.failure:
-      print("Error code : ${truecallerUserCallback.error.code}");
+    case TruecallerSdkCallbackResult.failure:
+      print("Error code : ${truecallerSdkCallback.error.code}");
       break;
-    case TruecallerUserCallbackResult.verification:
+    case TruecallerSdkCallbackResult.verification:
       print("Verification Required!!");
       break;
     default:
