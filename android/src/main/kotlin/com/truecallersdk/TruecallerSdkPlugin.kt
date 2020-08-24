@@ -1,7 +1,6 @@
 package com.truecallersdk
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
@@ -48,6 +47,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     private var eventChannel: EventChannel? = null
     private var eventSink: EventChannel.EventSink? = null
     private var activity: Activity? = null
+    private val gson = Gson()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         onAttachedToEngine(flutterPluginBinding.binaryMessenger)
@@ -163,7 +163,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             eventSink?.success(
                 mapOf(
                     Constants.RESULT to Constants.SUCCESS,
-                    Constants.DATA to Gson().toJson(trueProfile)
+                    Constants.DATA to gson.toJson(trueProfile)
                 )
             )
         }
@@ -172,7 +172,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             eventSink?.success(
                 mapOf(
                     Constants.RESULT to Constants.FAILURE,
-                    Constants.DATA to Gson().toJson(trueError)
+                    Constants.DATA to gson.toJson(trueError)
                 )
             )
         }
@@ -187,11 +187,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             val trueProfile = TrueProfile.Builder("shubh", "ag").build()
             when (requestCode) {
                 VerificationCallback.TYPE_MISSED_CALL_INITIATED -> {
-                    Toast.makeText(
-                        activity,
-                        "Missed call initiated",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.MISSED_CALL_INITIATED
@@ -199,11 +194,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     )
                 }
                 VerificationCallback.TYPE_MISSED_CALL_RECEIVED -> {
-                    Toast.makeText(
-                        activity,
-                        "Missed call received",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.MISSED_CALL_RECEIVED
@@ -211,11 +201,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     )
                 }
                 VerificationCallback.TYPE_OTP_INITIATED -> {
-                    Toast.makeText(
-                        activity,
-                        "OTP initiated",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.OTP_INITIATED
@@ -223,11 +208,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     )
                 }
                 VerificationCallback.TYPE_OTP_RECEIVED -> {
-                    Toast.makeText(
-                        activity,
-                        "OTP received",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.OTP_RECEIVED,
@@ -236,25 +216,14 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     )
                 }
                 VerificationCallback.TYPE_PROFILE_VERIFIED_BEFORE -> {
-                    Toast.makeText(
-                        activity,
-                        "Profile verified for your app before: " + bundle?.profile?.firstName
-                                + " and access token: " + bundle?.profile?.accessToken,
-                        Toast.LENGTH_SHORT
-                    ).show()
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.VERIFIED_BEFORE,
-                            Constants.DATA to Gson().toJson(bundle?.profile)
+                            Constants.DATA to gson.toJson(bundle?.profile)
                         )
                     )
                 }
                 else -> {
-                    Toast.makeText(
-                        activity,
-                        "Success: Verified with " + bundle?.getString(VerificationDataBundle.KEY_ACCESS_TOKEN),
-                        Toast.LENGTH_SHORT
-                    ).show()
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.VERIFICATION_COMPLETE,
@@ -269,7 +238,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             eventSink?.success(
                 mapOf(
                     Constants.RESULT to Constants.EXCEPTION,
-                    Constants.DATA to Gson().toJson(trueException)
+                    Constants.DATA to gson.toJson(trueException)
                 )
             )
         }
