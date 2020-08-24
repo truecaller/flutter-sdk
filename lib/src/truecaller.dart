@@ -4,11 +4,12 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 import 'scope_options.dart';
-import 'truecaller_user_callback.dart';
+import 'truecaller_callback.dart';
 
 class TruecallerSdk {
   static const MethodChannel _methodChannel = const MethodChannel('tc_method_channel');
   static const EventChannel _eventChannel = const EventChannel('tc_event_channel');
+  static Stream<TruecallerSdkCallback> _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
   /// customizable options which are all optional and have default values as set below in the method
@@ -72,64 +73,79 @@ class TruecallerSdk {
 
   /// After checking [isUsable], you can show the Truecaller profile verification dialog
   /// anywhere in your app flow by calling the following method
+  /// The result will be returned asynchronously via [getProfileStreamData] stream
   static get getProfile async => await _methodChannel.invokeMethod('getProfile');
 
   /// Once you call [getProfile], you can listen to this stream to determine the result of the
   /// action taken by the user.
   /// [TruecallerUserCallbackResult.success] means the result is successful and you can now fetch
-  /// the user's profile from [TruecallerUserCallback.profile]
+  /// the user's profile from [TruecallerSdkCallback.profile]
   /// [TruecallerUserCallbackResult.failure] means the result is failure and you can now fetch
-  /// the result of failure from [TruecallerUserCallback.error]
+  /// the result of failure from [TruecallerSdkCallback.error]
   /// [TruecallerUserCallbackResult.verification] will be returned only when using
   /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] which indicates to verify the user
   /// manually, so this is not applicable for truecaller_sdk 0.0.1
-  static Stream<TruecallerUserCallback> get getProfileStreamData =>
-      _eventChannel.receiveBroadcastStream().map((event) {
-        TruecallerUserCallback callback = new TruecallerUserCallback();
-        var resultHashMap = HashMap<String, String>.from(event);
+  static Stream<TruecallerSdkCallback> get getProfileStreamData {
+    if (_callbackStream == null) {
+      _callbackStream = _eventChannel.receiveBroadcastStream().map<TruecallerSdkCallback>((value) {
+        TruecallerSdkCallback callback = new TruecallerSdkCallback();
+        var resultHashMap = HashMap<String, String>.from(value);
         switch (resultHashMap["result"].enumValue()) {
-          case TruecallerUserCallbackResult.success:
-            callback.result = TruecallerUserCallbackResult.success;
-            Map profileMap = jsonDecode(resultHashMap["data"]);
-            TruecallerUserProfile truecallerUserProfile =
-                TruecallerUserProfile.fromJson(profileMap);
-            callback.profile = truecallerUserProfile;
+          case TruecallerSdkCallbackResult.success:
+            callback.result = TruecallerSdkCallbackResult.success;
+            _(callback, resultHashMap["data"]);
             break;
-          case TruecallerUserCallbackResult.failure:
-            callback.result = TruecallerUserCallbackResult.failure;
+          case TruecallerSdkCallbackResult.failure:
+            callback.result = TruecallerSdkCallbackResult.failure;
             Map errorMap = jsonDecode(resultHashMap["data"]);
             TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
             callback.error = truecallerError;
             break;
-          case TruecallerUserCallbackResult.verification:
-            callback.result = TruecallerUserCallbackResult.verification;
+          case TruecallerSdkCallbackResult.verification:
+            callback.result = TruecallerSdkCallbackResult.verification;
             break;
-          case TruecallerUserCallbackResult.missedCallInitiated:
-            callback.result = TruecallerUserCallbackResult.missedCallInitiated;
+          case TruecallerSdkCallbackResult.missedCallInitiated:
+            callback.result = TruecallerSdkCallbackResult.missedCallInitiated;
             break;
-          case TruecallerUserCallbackResult.missedCallReceived:
-            callback.result = TruecallerUserCallbackResult.missedCallReceived;
+          case TruecallerSdkCallbackResult.missedCallReceived:
+            callback.result = TruecallerSdkCallbackResult.missedCallReceived;
             break;
-          case TruecallerUserCallbackResult.otpInitiated:
-            callback.result = TruecallerUserCallbackResult.otpInitiated;
+          case TruecallerSdkCallbackResult.otpInitiated:
+            callback.result = TruecallerSdkCallbackResult.otpInitiated;
             break;
-          case TruecallerUserCallbackResult.otpReceived:
-            callback.result = TruecallerUserCallbackResult.otpReceived;
+          case TruecallerSdkCallbackResult.otpReceived:
+            callback.result = TruecallerSdkCallbackResult.otpReceived;
+            callback.otp = resultHashMap["data"];
             break;
-          case TruecallerUserCallbackResult.verifiedBefore:
-            callback.result = TruecallerUserCallbackResult.verifiedBefore;
+          case TruecallerSdkCallbackResult.verifiedBefore:
+            callback.result = TruecallerSdkCallbackResult.verifiedBefore;
+            _(callback, resultHashMap["data"]);
             break;
-          case TruecallerUserCallbackResult.verificationComplete:
-            callback.result = TruecallerUserCallbackResult.verificationComplete;
+          case TruecallerSdkCallbackResult.verificationComplete:
+            callback.result = TruecallerSdkCallbackResult.verificationComplete;
+            callback.accessToken = resultHashMap["data"];
             break;
-          case TruecallerUserCallbackResult.exception:
-            callback.result = TruecallerUserCallbackResult.exception;
+          case TruecallerSdkCallbackResult.exception:
+            callback.result = TruecallerSdkCallbackResult.exception;
+            Map exceptionMap = jsonDecode(resultHashMap["data"]);
+            TruecallerException exception = TruecallerException.fromJson(exceptionMap);
+            callback.exception = exception;
             break;
           default:
-            throw ArgumentError('${resultHashMap["result"]} is not a valid result');
+            throw PlatformException(
+                code: "1010", message: "${resultHashMap["result"]} is not a valid result");
         }
         return callback;
       });
+    }
+    return _callbackStream;
+  }
+
+  static _(TruecallerSdkCallback callback, String data) {
+    Map profileMap = jsonDecode(data);
+    TruecallerUserProfile profile = TruecallerUserProfile.fromJson(profileMap);
+    callback.profile = profile;
+  }
 
   /// To customise the look and feel of the verification consent screen as per your app theme, add
   /// the following lines before calling the [getProfile] method.
@@ -142,6 +158,29 @@ class TruecallerSdk {
   static setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
 
+  /// This method will initiate manual verification of [phoneNumber] asynchronously.
+  /// The result will be returned asynchronously via [getProfileStreamData] stream
+  /// Check [TruecallerSdkCallbackResult] to understand the different verifications states.
+  /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
+  /// or if the user is already verified on the device, will get the call back as
+  /// [TruecallerSdkCallbackResult.verifiedBefore] in [getProfileStreamData]
   static requestVerification(String phoneNumber) async =>
       await _methodChannel.invokeMethod('requestVerification', {"ph": phoneNumber});
+
+  /// Call this method after [requestVerification] to complete the verification if the number has
+  /// to be verified with a missed call.
+  /// i.e call this method only when you receive [TruecallerSdkCallbackResult.missedCallReceived]
+  /// in [getProfileStreamData].
+  /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
+  static verifyMissedCall(String firstName, String lastName) async => await _methodChannel
+      .invokeMethod('verifyMissedCall', {"fname": firstName, "lname": lastName});
+
+  /// Call this method after [requestVerification] to complete the verification if the number has
+  /// to be verified with an OTP.
+  /// i.e call this method when you receive either [TruecallerSdkCallbackResult.otpInitiated] or
+  /// [TruecallerSdkCallbackResult.otpReceived] in [getProfileStreamData].
+  /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
+  /// with the [otp] code received over SMS
+  static verifyOtp(String firstName, String lastName, String otp) async => await _methodChannel
+      .invokeMethod('verifyOtp', {"fname": firstName, "lname": lastName, "otp": otp});
 }

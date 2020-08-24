@@ -1,15 +1,47 @@
-class TruecallerUserCallback {
-  TruecallerUserCallbackResult result;
-  TruecallerUserProfile profile;
+class TruecallerSdkCallback {
+  TruecallerSdkCallbackResult result;
+
+  //for tc-flow
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.failure]
   TruecallerError error;
+
+  //for tc-flow and non-tc flow
+  /// received when [result] equals [TruecallerSdkCallbackResult.success] or
+  /// [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
+  TruecallerUserProfile profile;
+
+  //** for non-tc flow **//
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.otpReceived]
+  String otp;
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
+  String accessToken;
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.exception]
+  TruecallerException exception;
 }
 
-enum TruecallerUserCallbackResult { success, failure, verification, missedCallInitiated,
-  missedCallReceived, otpInitiated, otpReceived, verifiedBefore, verificationComplete, exception}
+enum TruecallerSdkCallbackResult {
+  //tc user callback results
+  success,
+  failure,
+  verification,
+
+  //non-tc user callback results
+  missedCallInitiated,
+  missedCallReceived,
+  otpInitiated,
+  otpReceived,
+  verifiedBefore,
+  verificationComplete,
+  exception
+}
 
 extension EnumParser on String {
-  TruecallerUserCallbackResult enumValue() {
-    return TruecallerUserCallbackResult.values.firstWhere(
+  TruecallerSdkCallbackResult enumValue() {
+    return TruecallerSdkCallbackResult.values.firstWhere(
         (element) => element.toString().split(".")[1].toLowerCase() == this.toLowerCase(),
         orElse: () => null);
   }
@@ -79,5 +111,20 @@ class TruecallerError {
   TruecallerError.fromJson(Map<String, dynamic> map) {
     code = map['mErrorType'];
     message = map['message'];
+  }
+}
+
+class TruecallerException {
+  int code;
+  String message;
+
+  TruecallerException.fromJson(Map<String, dynamic> map) {
+    code = map['mExceptionType'];
+    message = map['mExceptionMessage'];
+  }
+
+  @override
+  String toString() {
+    return "$code : $message";
   }
 }
