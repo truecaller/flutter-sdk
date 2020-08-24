@@ -1,7 +1,6 @@
 package com.truecallersdk
 
 import android.app.Activity
-import android.os.Handler
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
@@ -210,9 +209,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                             Constants.RESULT to Constants.MISSED_CALL_RECEIVED
                         )
                     )
-                    Handler().postDelayed({
-                                              TruecallerSDK.getInstance().verifyMissedCall(trueProfile, this)
-                                          }, 5000)
                 }
                 VerificationCallback.TYPE_OTP_INITIATED -> {
                     Toast.makeText(
@@ -238,13 +234,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                             Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_OTP)
                         )
                     )
-                    Handler().postDelayed({
-                                              TruecallerSDK.getInstance().verifyOtp(
-                                                  trueProfile,
-                                                  bundle?.getString(VerificationDataBundle.KEY_OTP)!!,
-                                                  this
-                                              )
-                                          }, 5000)
                 }
                 VerificationCallback.TYPE_PROFILE_VERIFIED_BEFORE -> {
                     Toast.makeText(
