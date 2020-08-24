@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
+import 'package:truecaller_sdk_example/non_tc_screen.dart';
 
 import 'config_options.dart';
 import 'result_screen.dart';
@@ -443,6 +444,7 @@ class _HomePageState extends State<HomePage> {
       selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_FULLSCREEN;
     }
     TruecallerSdk.initializeSDK(
+        sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP,
         consentMode: selectedConsentMode,
         consentTitleOptions:
             TitleOption.getTitleOptions().indexWhere((title) => title.name == selectedTitle.name),
@@ -476,21 +478,27 @@ class _HomePageState extends State<HomePage> {
   void createStreamBuilder() {
     streamSubscription = TruecallerSdk.getProfileStreamData.listen((truecallerUserCallback) {
       switch (truecallerUserCallback.result) {
-        case TruecallerUserCallbackResult.success:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ResultScreen(truecallerUserCallback.profile.firstName, 1),
-          ));
+        case TruecallerSdkCallbackResult.success:
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultScreen(truecallerUserCallback.profile.firstName, 1),
+              ));
           break;
-        case TruecallerUserCallbackResult.failure:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
-                ResultScreen("Error code : ${truecallerUserCallback.error.code}", -1),
-          ));
+        case TruecallerSdkCallbackResult.failure:
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ResultScreen("Error code : ${truecallerUserCallback.error.code}", -1),
+              ));
           break;
-        case TruecallerUserCallbackResult.verification:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ResultScreen("Verification Required!!", 0),
-          ));
+        case TruecallerSdkCallbackResult.verification:
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NonTcVerification(),
+              ));
           break;
         default:
           print("Invalid result");
@@ -500,9 +508,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    super.dispose();
+    privacyPolicyController.dispose();
+    termsOfServiceController.dispose();
+    localeController.dispose();
     if (streamSubscription != null) {
       streamSubscription.cancel();
     }
+    super.dispose();
   }
 }

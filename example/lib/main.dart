@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
+import 'package:truecaller_sdk_example/non_tc_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,7 +26,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TruecallerSdk.initializeSDK();
+                    TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
                       isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
                     });
@@ -40,18 +41,35 @@ class _MyAppState extends State<MyApp> {
                   color: Colors.transparent,
                   height: 20.0,
                 ),
-                StreamBuilder<TruecallerUserCallback>(
+                StreamBuilder<TruecallerSdkCallback>(
                     stream: TruecallerSdk.getProfileStreamData,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         switch (snapshot.data.result) {
-                          case TruecallerUserCallbackResult.success:
+                          case TruecallerSdkCallbackResult.success:
                             return Text(
                                 "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}");
-                          case TruecallerUserCallbackResult.failure:
+                          case TruecallerSdkCallbackResult.failure:
                             return Text("Oops!! Error type ${snapshot.data.error.code}");
-                          case TruecallerUserCallbackResult.verification:
-                            return Text("Verification Required");
+                          case TruecallerSdkCallbackResult.verification:
+                            return Column(
+                              children: [
+                                Text("Verification Required"),
+                                MaterialButton(
+                                  color: Colors.green,
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => NonTcVerification()));
+                                  },
+                                  child: Text(
+                                    "Do manual verification",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                )
+                              ],
+                            );
                           default:
                             return Text("Invalid result");
                         }
