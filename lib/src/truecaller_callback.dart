@@ -1,10 +1,43 @@
 class TruecallerSdkCallback {
   TruecallerSdkCallbackResult result;
-  TruecallerUserProfile profile;
+
+  //for tc-flow
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.failure]
   TruecallerError error;
+
+  //for tc-flow and non-tc flow
+  /// received when [result] equals [TruecallerSdkCallbackResult.success] or
+  /// [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
+  TruecallerUserProfile profile;
+
+  //** for non-tc flow **//
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.otpReceived]
+  String otp;
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
+  String accessToken;
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.exception]
+  TruecallerException exception;
 }
 
-enum TruecallerSdkCallbackResult { success, failure, verification }
+enum TruecallerSdkCallbackResult {
+  //tc user callback results
+  success,
+  failure,
+  verification,
+
+  //non-tc user callback results
+  missedCallInitiated,
+  missedCallReceived,
+  otpInitiated,
+  otpReceived,
+  verifiedBefore,
+  verificationComplete,
+  exception
+}
 
 extension EnumParser on String {
   TruecallerSdkCallbackResult enumValue() {
@@ -78,5 +111,20 @@ class TruecallerError {
   TruecallerError.fromJson(Map<String, dynamic> map) {
     code = map['mErrorType'];
     message = map['message'];
+  }
+}
+
+class TruecallerException {
+  int code;
+  String message;
+
+  TruecallerException.fromJson(Map<String, dynamic> map) {
+    code = map['mExceptionType'];
+    message = map['mExceptionMessage'];
+  }
+
+  @override
+  String toString() {
+    return "$code : $message";
   }
 }

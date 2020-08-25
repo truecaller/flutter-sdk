@@ -1,0 +1,290 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:truecaller_sdk/truecaller_sdk.dart';
+
+import 'customization/result_screen.dart';
+
+void main() {
+  runApp(NonTcVerification());
+}
+
+class NonTcVerification extends StatefulWidget {
+  @override
+  _NonTcVerificationState createState() => _NonTcVerificationState();
+}
+
+class _NonTcVerificationState extends State<NonTcVerification> {
+  @override
+  Widget build(BuildContext context) {
+    return HomePage();
+  }
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool invalidNumber = false;
+  bool invalidFName = false;
+  bool invalidLName = false;
+  bool invalidOtp = false;
+  bool showProgressBar = false;
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController fNameController = TextEditingController();
+  TextEditingController lNameController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
+  StreamSubscription streamSubscription;
+  TruecallerSdkCallbackResult tempResult;
+
+  @override
+  void initState() {
+    super.initState();
+    createStreamBuilder();
+  }
+
+  bool showInputNumberView() {
+    return tempResult == null || tempResult == TruecallerSdkCallbackResult.exception;
+  }
+
+  bool showInputNameView() {
+    return tempResult != null &&
+        (tempResult == TruecallerSdkCallbackResult.missedCallReceived || showInputOtpView());
+  }
+
+  bool showInputOtpView() {
+    return tempResult != null &&
+        ((tempResult == TruecallerSdkCallbackResult.otpInitiated) ||
+            (tempResult == TruecallerSdkCallbackResult.otpReceived));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    const double fontSize = 18.0;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Verify User Manually"),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Visibility(
+              visible: showProgressBar,
+              child: CircularProgressIndicator(
+                strokeWidth: 6.0,
+                backgroundColor: Colors.grey,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+              ),
+            ),
+            Visibility(
+              visible: showInputNumberView(),
+              child: TextField(
+                controller: phoneController,
+                maxLength: 10,
+                keyboardType: TextInputType.number,
+                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                style: TextStyle(color: Colors.green, fontSize: fontSize),
+                decoration: InputDecoration(
+                  prefixText: "+91",
+                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  labelText: "Enter Phone number",
+                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  hintText: "99999-99999",
+                  errorText: invalidNumber ? "Mobile Number must be of 10 digits" : null,
+                  hintStyle: TextStyle(
+                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.transparent,
+              height: 20.0,
+            ),
+            Visibility(
+              visible: showInputNameView(),
+              child: TextField(
+                controller: fNameController,
+                maxLength: 64,
+                keyboardType: TextInputType.text,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))],
+                style: TextStyle(color: Colors.green, fontSize: fontSize),
+                decoration: InputDecoration(
+                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  labelText: "Enter First Name",
+                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  hintText: "John",
+                  errorText: invalidFName ? "Invalid first name. Enter min 3 characters" : null,
+                  hintStyle: TextStyle(
+                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.transparent,
+              height: 20.0,
+            ),
+            Visibility(
+              visible: showInputNameView(),
+              child: TextField(
+                controller: lNameController,
+                maxLength: 64,
+                keyboardType: TextInputType.text,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))],
+                style: TextStyle(color: Colors.green, fontSize: fontSize),
+                decoration: InputDecoration(
+                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  labelText: "Enter Last Name",
+                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  hintText: "Doe",
+                  errorText: invalidLName ? "Invalid last name. Enter min 3 characters" : null,
+                  hintStyle: TextStyle(
+                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.transparent,
+              height: 20.0,
+            ),
+            Visibility(
+              visible: showInputOtpView(),
+              child: TextField(
+                controller: otpController,
+                maxLength: 6,
+                keyboardType: TextInputType.number,
+                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                style: TextStyle(color: Colors.green, fontSize: fontSize),
+                decoration: InputDecoration(
+                  labelText: "Enter OTP",
+                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  hintText: "123-456",
+                  errorText: invalidOtp ? "OTP must be 6 digits" : null,
+                  hintStyle: TextStyle(
+                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.transparent,
+              height: 20.0,
+            ),
+            Visibility(
+              visible: !showProgressBar,
+              child: MaterialButton(
+                minWidth: width - 50.0,
+                height: 45.0,
+                onPressed: () => onProceedClick(),
+                child: Text("Proceed",
+                    style: TextStyle(
+                      color: Colors.white,
+                    )),
+                color: Colors.blue,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void createStreamBuilder() {
+    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerUserCallback) {
+      setState(() {
+        tempResult = truecallerUserCallback.result;
+        showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
+        if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
+          otpController.text = truecallerUserCallback.otp;
+        }
+      });
+
+      if (tempResult == TruecallerSdkCallbackResult.verifiedBefore) {
+        _(truecallerUserCallback.profile.firstName);
+      } else if (tempResult == TruecallerSdkCallbackResult.verificationComplete) {
+        _(fNameController.text);
+      } else if (tempResult == TruecallerSdkCallbackResult.exception) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultScreen(
+                  "Exception : ${truecallerUserCallback.exception.code}, "
+                  "${{truecallerUserCallback.exception.message}}",
+                  -1),
+            ));
+      }
+    });
+  }
+
+  _(String firstName) {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(firstName, 1),
+        ));
+  }
+
+  void onProceedClick() {
+    if (showInputNumberView() && validateNumber()) {
+      setProgressBarToActive();
+      TruecallerSdk.requestVerification(phoneController.text);
+    } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
+      setProgressBarToActive();
+      TruecallerSdk.verifyMissedCall(fNameController.text, lNameController.text);
+    } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
+            tempResult == TruecallerSdkCallbackResult.otpReceived) &&
+        validateName() &&
+        validateOtp()) {
+      setProgressBarToActive();
+      TruecallerSdk.verifyOtp(fNameController.text, lNameController.text, otpController.text);
+    }
+  }
+
+  void setProgressBarToActive() {
+    setState(() {
+      showProgressBar = true;
+    });
+  }
+
+  bool validateNumber() {
+    String phoneNumber = phoneController.text;
+    setState(() {
+      phoneNumber.length != 10 ? invalidNumber = true : invalidNumber = false;
+    });
+    return !invalidNumber;
+  }
+
+  bool validateOtp() {
+    String otp = otpController.text;
+    setState(() {
+      otp.length != 6 ? invalidOtp = true : invalidOtp = false;
+    });
+    return !invalidOtp;
+  }
+
+  bool validateName() {
+    String fName = fNameController.text;
+    String lName = lNameController.text;
+    setState(() {
+      fName.length < 2 ? invalidFName = true : invalidFName = false;
+      lName.length < 2 ? invalidLName = true : invalidLName = false;
+    });
+    return !invalidFName && !invalidLName;
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    fNameController.dispose();
+    lNameController.dispose();
+    otpController.dispose();
+    if (streamSubscription != null) {
+      streamSubscription.cancel();
+    }
+    super.dispose();
+  }
+}
