@@ -436,6 +436,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void initializeSdk() {
+    _hideKeyboard();
     int selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET;
     if (selectedConsentType[1] == true) {
       selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_POPUP;
@@ -502,6 +503,10 @@ class _HomePageState extends State<HomePage> {
           print("Invalid result");
       }
     });
+  }
+
+  _hideKeyboard() {
+    FocusManager.instance.primaryFocus.unfocus();
   }
 
   @override
