@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   List<TitleOption> titleOptions;
   TitleOption selectedTitle;
   int selectedFooter;
-  bool darkMode, rectangularBtn;
+  bool darkMode, rectangularBtn, withOtp;
   List<DropdownMenuItem<int>> colorMenuItemList = List();
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = List();
   List<DropdownMenuItem<int>> loginPrefixMenuItemList = List();
@@ -59,6 +59,7 @@ class _HomePageState extends State<HomePage> {
     selectedFooter = FooterOption.getFooterOptionsMap().keys.first;
     darkMode = false;
     rectangularBtn = false;
+    withOtp = false;
     ctaColor = Colors.blue.value;
     ctaTextColor = Colors.white.value;
     ctaPrefixOption = 0;
@@ -246,6 +247,17 @@ class _HomePageState extends State<HomePage> {
                         hintStyle: TextStyle(
                             fontStyle: FontStyle.italic, color: Colors.green, fontSize: 14.0)),
                   ),
+                ),
+                SwitchListTile(
+                  title: Text("With OTP"),
+                  value: withOtp,
+                  onChanged: (value) {
+                    setState(() {
+                      withOtp = value;
+                    });
+                  },
+                  selected: withOtp,
+                  activeColor: Colors.green,
                 ),
                 Divider(
                   color: Colors.transparent,
@@ -445,7 +457,9 @@ class _HomePageState extends State<HomePage> {
       selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_FULLSCREEN;
     }
     TruecallerSdk.initializeSDK(
-        sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP,
+        sdkOptions: withOtp
+            ? TruecallerSdkScope.SDK_OPTION_WITH_OTP
+            : TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
         consentMode: selectedConsentMode,
         consentTitleOptions:
             TitleOption.getTitleOptions().indexWhere((title) => title.name == selectedTitle.name),
