@@ -475,7 +475,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TruecallerSdk.getProfileStreamData.listen((truecallerSdkCallback) {
+    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
       switch (truecallerSdkCallback.result) {
         case TruecallerSdkCallbackResult.success:
           Navigator.push(

@@ -15,7 +15,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    _stream = TruecallerSdk.getProfileStreamData;
+    _stream = TruecallerSdk.streamCallbackData;
     super.initState();
   }
 

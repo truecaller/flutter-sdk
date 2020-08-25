@@ -83,7 +83,7 @@ class TruecallerSdk {
   /// [TruecallerSdkCallbackResult.verification] will be returned only when using
   /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] which indicates to verify the user
   /// manually, so this is not applicable for truecaller_sdk 0.0.1
-  static Stream<TruecallerSdkCallback> get getProfileStreamData =>
+  static Stream<TruecallerSdkCallback> get streamCallbackData =>
       _eventChannel.receiveBroadcastStream().map((event) {
         TruecallerSdkCallback callback = new TruecallerSdkCallback();
         var resultHashMap = HashMap<String, String>.from(event);
