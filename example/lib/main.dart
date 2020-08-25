@@ -11,6 +11,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Stream<TruecallerSdkCallback> _stream;
+
+  @override
+  void initState() {
+    _stream = TruecallerSdk.getProfileStreamData;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -41,7 +49,7 @@ class _MyAppState extends State<MyApp> {
                   height: 20.0,
                 ),
                 StreamBuilder<TruecallerSdkCallback>(
-                    stream: TruecallerSdk.getProfileStreamData,
+                    stream: _stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         switch (snapshot.data.result) {
@@ -62,5 +70,11 @@ class _MyAppState extends State<MyApp> {
             ),
           )),
     );
+  }
+
+  @override
+  void dispose() {
+    _stream = null;
+    super.dispose();
   }
 }
