@@ -8,7 +8,7 @@ For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk
 
 ## Steps to integrate
 
-### 1. Update your pubspec.yaml
+### 1. Update `pubspec.yaml`:
 Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
@@ -16,7 +16,7 @@ dependencies:
   truecaller_sdk: ^0.0.1
   ...
 ```
-### 2. Generate App key and add it to AndroidManifest.xml:
+### 2. Generate App key and add it to `AndroidManifest.xml`:
 * [Register](https://developer.truecaller.com/sign-up) for Truecaller's developer account, or [login](https://developer.truecaller.com/login) to your existing developer account.
 * Refer to the [official documentation](https://docs.truecaller.com/truecaller-sdk/android/generating-app-key) for generating app key.
 * Open your `AndroidManifest.xml` under /android module and add a `meta-data` element to the `application` element with your app key:
@@ -41,6 +41,16 @@ class MainActivity: FlutterFragmentActivity() {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
     }
 }
+```
+* Update `launchMode` of `MainActivity.kt` to `singleTask` in `AndroidManifest.xml`(found under /android module) :
+```xml
+<application>  
+...  
+<activity android:name=".MainActivity"
+          android:launchMode="singleTask">
+.. </activity>
+...  
+</application>  
 ```
 
 ## Example
