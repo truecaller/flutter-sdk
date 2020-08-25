@@ -1,14 +1,14 @@
-class TruecallerUserCallback {
-  TruecallerUserCallbackResult result;
+class TruecallerSdkCallback {
+  TruecallerSdkCallbackResult result;
   TruecallerUserProfile profile;
   TruecallerError error;
 }
 
-enum TruecallerUserCallbackResult { success, failure, verification }
+enum TruecallerSdkCallbackResult { success, failure, verification }
 
 extension EnumParser on String {
-  TruecallerUserCallbackResult enumValue() {
-    return TruecallerUserCallbackResult.values.firstWhere(
+  TruecallerSdkCallbackResult enumValue() {
+    return TruecallerSdkCallbackResult.values.firstWhere(
         (element) => element.toString().split(".")[1].toLowerCase() == this.toLowerCase(),
         orElse: () => null);
   }

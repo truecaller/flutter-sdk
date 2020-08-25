@@ -11,6 +11,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Stream<TruecallerSdkCallback> _stream;
+
+  @override
+  void initState() {
+    _stream = TruecallerSdk.streamCallbackData;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,17 +48,17 @@ class _MyAppState extends State<MyApp> {
                   color: Colors.transparent,
                   height: 20.0,
                 ),
-                StreamBuilder<TruecallerUserCallback>(
-                    stream: TruecallerSdk.getProfileStreamData,
+                StreamBuilder<TruecallerSdkCallback>(
+                    stream: _stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         switch (snapshot.data.result) {
-                          case TruecallerUserCallbackResult.success:
+                          case TruecallerSdkCallbackResult.success:
                             return Text(
                                 "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}");
-                          case TruecallerUserCallbackResult.failure:
+                          case TruecallerSdkCallbackResult.failure:
                             return Text("Oops!! Error type ${snapshot.data.error.code}");
-                          case TruecallerUserCallbackResult.verification:
+                          case TruecallerSdkCallbackResult.verification:
                             return Text("Verification Required");
                           default:
                             return Text("Invalid result");
@@ -62,5 +70,11 @@ class _MyAppState extends State<MyApp> {
             ),
           )),
     );
+  }
+
+  @override
+  void dispose() {
+    _stream = null;
+    super.dispose();
   }
 }

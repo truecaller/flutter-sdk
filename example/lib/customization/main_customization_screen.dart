@@ -436,6 +436,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void initializeSdk() {
+    _hideKeyboard();
     int selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET;
     if (selectedConsentType[1] == true) {
       selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_POPUP;
@@ -474,28 +475,38 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TruecallerSdk.getProfileStreamData.listen((truecallerUserCallback) {
-      switch (truecallerUserCallback.result) {
-        case TruecallerUserCallbackResult.success:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ResultScreen(truecallerUserCallback.profile.firstName, 1),
-          ));
+    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
+      switch (truecallerSdkCallback.result) {
+        case TruecallerSdkCallbackResult.success:
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultScreen(truecallerSdkCallback.profile.firstName, 1),
+              ));
           break;
-        case TruecallerUserCallbackResult.failure:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
-                ResultScreen("Error code : ${truecallerUserCallback.error.code}", -1),
-          ));
+        case TruecallerSdkCallbackResult.failure:
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ResultScreen("Error code : ${truecallerSdkCallback.error.code}", -1),
+              ));
           break;
-        case TruecallerUserCallbackResult.verification:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ResultScreen("Verification Required!!", 0),
-          ));
+        case TruecallerSdkCallbackResult.verification:
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultScreen("Verification Required!!", 0),
+              ));
           break;
         default:
           print("Invalid result");
       }
     });
+  }
+
+  _hideKeyboard() {
+    FocusManager.instance.primaryFocus.unfocus();
   }
 
   @override
