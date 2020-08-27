@@ -511,9 +511,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    super.dispose();
+    privacyPolicyController.dispose();
+    termsOfServiceController.dispose();
+    localeController.dispose();
     if (streamSubscription != null) {
       streamSubscription.cancel();
     }
+    super.dispose();
   }
 }
