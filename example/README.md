@@ -23,4 +23,4 @@ To run this file, just execute the following command after navigating to `/examp
 ```flutter run --target=lib/customization/main_customization_screen.dart```
 
 
-##### Note : If you run these examples from your IDE and press the button, it will initialize the SDK and show a consent screen. If you then proceed with verification, SDK would give you error code 3 which indicates an incorrect app key. So you need to replace the partnerKey in [AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) with your own app key as mentioned in [step 2](/README.md) of `Steps to integrate` section.
+##### Note : If you run these examples and proceed with user verification, SDK would give you error code 3 which indicates an incorrect app key. So you need to replace the partnerKey in [AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) with your own app key as mentioned in [step 2](/README.md) of `Steps to integrate` section.
