@@ -42,7 +42,7 @@ class MainActivity: FlutterFragmentActivity() {
     }
 }
 ```
-* Update `launchMode` of `MainActivity.kt` to `singleTask` in `AndroidManifest.xml`(found under /android module) :
+* Update `launchMode` of `MainActivity.kt` to `singleTask` in `AndroidManifest.xml` :
 ```xml
 <application>  
 ...  
@@ -73,7 +73,7 @@ TruecallerSdk.isUsable.then((isUsable) {
  isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
 });
                    
-//Step 4: Be informed about the getProfile callback result(success, failure, verification)
+//Step 4: Be informed about the TruecallerSdk.getProfile callback result(success, failure, verification)
 StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
   switch (truecallerSdkCallback.result) {
     case TruecallerSdkCallbackResult.success:
@@ -109,7 +109,7 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
 ## Customization Options
 
 ### Language
-To customise the profile consent screen in any of the supported Indian languages, add the following line before calling `TruecallerSdk.getProfile()`:
+To customise the profile consent screen in any of the supported Indian languages, add the following line before calling `TruecallerSdk.getProfile`:
 ```dart
 /// initialize the SDK and check isUsable first before calling this method
 /// Default value is "en" i.e English
@@ -117,7 +117,7 @@ TruecallerSdk.setLocale("hi") // this sets the language to Hindi
 ```
 
 ### Dark Theme
-You can also set the Dark Theme for consent screen by adding the following line before calling `TruecallerSdk.getProfile()`:
+You can also set the Dark Theme for consent screen by adding the following line before calling `TruecallerSdk.getProfile`:
 ```dart
 /// initialize the SDK and check isUsable first before calling this method
 TruecallerSdk.setDarkTheme 
