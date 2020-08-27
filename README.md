@@ -93,12 +93,12 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
 
 //Step 5: Dispose streamSubscription
 @override
-  void dispose() {
-    super.dispose();
-    if (streamSubscription != null) {
-      streamSubscription.cancel();
-    }
+void dispose() {
+  if (streamSubscription != null) {
+    streamSubscription.cancel();
   }
+  super.dispose();
+}
 ```
 
 ##### NOTE #####
