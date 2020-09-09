@@ -197,21 +197,27 @@ class _HomePageState extends State<HomePage> {
 
   void createStreamBuilder() {
     streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerUserCallback) {
-      setState(() {
-        tempResult = truecallerUserCallback.result;
-        showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
-        if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
-          otpController.text = truecallerUserCallback.otp;
-        }
-      });
+      // make sure you're changing state only after number has been entered. there could be case
+      // where user initiated missed call, pressed back, and came to this screen again after
+      // which the call was received and hence it would directly open input name screen.
+      if (phoneController.text.length == 10) {
+        setState(() {
+          tempResult = truecallerUserCallback.result;
+          showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
+          if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
+            otpController.text = truecallerUserCallback.otp;
+          }
+        });
+      }
 
       if (tempResult == TruecallerSdkCallbackResult.verifiedBefore) {
         _(truecallerUserCallback.profile.firstName);
       } else if (tempResult == TruecallerSdkCallbackResult.verificationComplete) {
         _(fNameController.text);
       } else if (tempResult == TruecallerSdkCallbackResult.exception) {
-        final snackBar = SnackBar(content: Text("Exception : ${truecallerUserCallback.exception.code}, "
-            "${truecallerUserCallback.exception.message}"), behavior: SnackBarBehavior.fixed,);
+        final snackBar = SnackBar(
+            content: Text("Exception : ${truecallerUserCallback.exception.code}, "
+                "${truecallerUserCallback.exception.message}"));
         _scaffoldKey.currentState.showSnackBar(snackBar);
         /*Navigator.pushReplacement(
             context,
