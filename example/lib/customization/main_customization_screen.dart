@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
       TextEditingController(text: "https://www.truecaller.com/");
   final TextEditingController localeController = TextEditingController();
   StreamSubscription streamSubscription;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -153,6 +154,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Configure SDK options"),
       ),
@@ -501,12 +503,15 @@ class _HomePageState extends State<HomePage> {
               ));
           break;
         case TruecallerSdkCallbackResult.failure:
-          Navigator.push(
+          final snackBar = SnackBar(content: Text("Error code : ${truecallerSdkCallback.error
+              .code}"));
+          _scaffoldKey.currentState.showSnackBar(snackBar);
+          /*Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) =>
                     ResultScreen("Error code : ${truecallerSdkCallback.error.code}", -1),
-              ));
+              ));*/
           break;
         case TruecallerSdkCallbackResult.verification:
           Navigator.push(

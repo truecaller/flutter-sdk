@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController otpController = TextEditingController();
   StreamSubscription streamSubscription;
   TruecallerSdkCallbackResult tempResult;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -66,6 +67,7 @@ class _HomePageState extends State<HomePage> {
     final double width = MediaQuery.of(context).size.width;
     const double fontSize = 18.0;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Verify User Manually"),
       ),
@@ -208,14 +210,17 @@ class _HomePageState extends State<HomePage> {
       } else if (tempResult == TruecallerSdkCallbackResult.verificationComplete) {
         _(fNameController.text);
       } else if (tempResult == TruecallerSdkCallbackResult.exception) {
-        Navigator.push(
+        final snackBar = SnackBar(content: Text("Exception : ${truecallerUserCallback.exception.code}, "
+            "${truecallerUserCallback.exception.message}"), behavior: SnackBarBehavior.fixed,);
+        _scaffoldKey.currentState.showSnackBar(snackBar);
+        /*Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => ResultScreen(
                   "Exception : ${truecallerUserCallback.exception.code}, "
-                  "${{truecallerUserCallback.exception.message}}",
+                  "${truecallerUserCallback.exception.message}",
                   -1),
-            ));
+            ));*/
       }
     });
   }
