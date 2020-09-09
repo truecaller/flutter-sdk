@@ -171,3 +171,8 @@ By default, `initializeSDK()` has default argument values set as above, so if yo
 
 ##### Note
 For list of supported locales and details on different kinds of customizations, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/customisation-1)
+
+
+## License
+
+[`truecaller_sdk` is MIT-licensed](LICENSE).
