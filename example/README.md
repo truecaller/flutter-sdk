@@ -24,3 +24,8 @@ To run this file, just execute the following command after navigating to `/examp
 
 
 ##### Note : If you run these examples and proceed with user verification, SDK would give you error code 3 which indicates an incorrect app key. So you need to replace the partnerKey in [AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) with your own app key as mentioned in [step 2](/README.md) of `Steps to integrate` section.
+
+
+## License
+
+[MIT-licensed](../LICENSE).
