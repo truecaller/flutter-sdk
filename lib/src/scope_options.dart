@@ -37,7 +37,6 @@ class TruecallerSdkScope {
 
   /// sdk options
   static const int SDK_OPTION_WITHOUT_OTP = 16;
-  static const int SDK_OPTION_WITH_OTP = 32;
 
   /// title options (applicable for [CONSENT_MODE_POPUP] and [CONSENT_MODE_FULLSCREEN])
   static const int SDK_CONSENT_TITLE_LOG_IN = 0;
