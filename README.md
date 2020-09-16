@@ -64,7 +64,7 @@ class MainActivity: FlutterFragmentActivity() {
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
 //Step 1: Initialize the SDK
-TruecallerSdk.initializeSDK();
+TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP);
 
 //Step 2: Check if SDK is usable
 bool isUsable = await TruecallerSdk.isUsable;
