@@ -24,13 +24,10 @@
 import 'package:flutter/material.dart';
 
 class ResultScreen extends StatelessWidget {
-  String result;
-  int resultCode;
+  final String result;
+  final int resultCode;
 
-  ResultScreen(String result, int resultCode) {
-    this.result = result;
-    this.resultCode = resultCode;
-  }
+  ResultScreen(this.result, this.resultCode);
 
   @override
   Widget build(BuildContext context) {
