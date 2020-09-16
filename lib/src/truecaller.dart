@@ -24,6 +24,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'scope_options.dart';
@@ -59,7 +60,7 @@ class TruecallerSdk {
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {int sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
+          {@required int sdkOptions,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
           int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
           int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,

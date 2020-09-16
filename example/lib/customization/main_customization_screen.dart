@@ -467,6 +467,7 @@ class _HomePageState extends State<HomePage> {
       selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_FULLSCREEN;
     }
     TruecallerSdk.initializeSDK(
+        sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
         consentMode: selectedConsentMode,
         consentTitleOptions:
             TitleOption.getTitleOptions().indexWhere((title) => title.name == selectedTitle.name),

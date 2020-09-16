@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TruecallerSdk.initializeSDK();
+                    TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
                       isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
                     });
