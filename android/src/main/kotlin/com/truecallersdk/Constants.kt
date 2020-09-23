@@ -67,6 +67,7 @@ class Constants {
 
         //non-tc values
         const val PH_NO = "ph"
+        const val COUNTRY_ISO = "ci"
         const val FIRST_NAME = "fname"
         const val LAST_NAME = "lname"
         const val OTP = "otp"

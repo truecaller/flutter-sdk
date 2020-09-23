@@ -272,7 +272,7 @@ class _HomePageState extends State<HomePage> {
   void onProceedClick() {
     if (showInputNumberView() && validateNumber()) {
       setProgressBarToActive();
-      TruecallerSdk.requestVerification(phoneController.text);
+      TruecallerSdk.requestVerification(phoneNumber: phoneController.text);
     } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
       setProgressBarToActive();
       TruecallerSdk.verifyMissedCall(fNameController.text, lNameController.text);

@@ -189,14 +189,16 @@ class TruecallerSdk {
   static setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
 
-  /// This method will initiate manual verification of [phoneNumber] asynchronously.
+  /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
+  /// numbers only as of truecaller_sdk 0.0.2 so that's why default countryISO is set to "IN".
   /// The result will be returned asynchronously via [streamCallbackData] stream
   /// Check [TruecallerSdkCallbackResult] to understand the different verifications states.
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
   /// or if the user is already verified on the device, will get the call back as
   /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
-  static requestVerification(String phoneNumber) async =>
-      await _methodChannel.invokeMethod('requestVerification', {"ph": phoneNumber});
+  static requestVerification({@required String phoneNumber, String countryISO: "IN"}) async =>
+      await _methodChannel
+          .invokeMethod('requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with a missed call.

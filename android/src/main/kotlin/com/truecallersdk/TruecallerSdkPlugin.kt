@@ -134,9 +134,10 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             REQUEST_VERIFICATION -> {
                 val phoneNumber = call.argument<String>(Constants.PH_NO)?.takeUnless(String::isBlank)
                     ?: return result.error("Invalid phone", "Can't be null or empty", null)
+                val countryISO = call.argument<String>(Constants.COUNTRY_ISO) ?: "IN"
                 activity?.let {
                     TruecallerSDK.getInstance()
-                        .requestVerification("IN", phoneNumber, verificationCallback, it as FragmentActivity)
+                        .requestVerification(countryISO, phoneNumber, verificationCallback, it as FragmentActivity)
                 }
                     ?: result.error("UNAVAILABLE", "Activity not available.", null)
             }
