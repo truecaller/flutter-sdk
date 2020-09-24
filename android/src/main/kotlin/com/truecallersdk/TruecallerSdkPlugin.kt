@@ -208,8 +208,13 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             )
         }
 
-        override fun onVerificationRequired() {
-            eventSink?.success(mapOf(Constants.RESULT to Constants.VERIFICATION))
+        override fun onVerificationRequired(trueError: TrueError?) {
+            eventSink?.success(
+                mapOf(
+                    Constants.RESULT to Constants.VERIFICATION,
+                    Constants.DATA to gson.toJson(trueError)
+                )
+            )
         }
     }
 
@@ -219,7 +224,8 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 VerificationCallback.TYPE_MISSED_CALL_INITIATED -> {
                     eventSink?.success(
                         mapOf(
-                            Constants.RESULT to Constants.MISSED_CALL_INITIATED
+                            Constants.RESULT to Constants.MISSED_CALL_INITIATED,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_TTL)
                         )
                     )
                 }
@@ -233,7 +239,8 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 VerificationCallback.TYPE_OTP_INITIATED -> {
                     eventSink?.success(
                         mapOf(
-                            Constants.RESULT to Constants.OTP_INITIATED
+                            Constants.RESULT to Constants.OTP_INITIATED,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_TTL)
                         )
                     )
                 }

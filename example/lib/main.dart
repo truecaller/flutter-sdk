@@ -92,7 +92,8 @@ class _MyAppState extends State<MyApp> {
                           case TruecallerSdkCallbackResult.verification:
                             return Column(
                               children: [
-                                Text("Verification Required"),
+                                Text("Verification Required : "
+                                    "${snapshot.data.error != null ? snapshot.data.error.code : ""}"),
                                 MaterialButton(
                                   color: Colors.green,
                                   onPressed: () {

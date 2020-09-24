@@ -125,25 +125,26 @@ class TruecallerSdk {
         switch (resultHashMap["result"].enumValue()) {
           case TruecallerSdkCallbackResult.success:
             callback.result = TruecallerSdkCallbackResult.success;
-            _(callback, resultHashMap["data"]);
+            _insertProfile(callback, resultHashMap["data"]);
             break;
           case TruecallerSdkCallbackResult.failure:
             callback.result = TruecallerSdkCallbackResult.failure;
-            Map errorMap = jsonDecode(resultHashMap["data"]);
-            TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
-            callback.error = truecallerError;
+            _insertError(callback, resultHashMap["data"]);
             break;
           case TruecallerSdkCallbackResult.verification:
             callback.result = TruecallerSdkCallbackResult.verification;
+            _insertError(callback, resultHashMap["data"]);
             break;
           case TruecallerSdkCallbackResult.missedCallInitiated:
             callback.result = TruecallerSdkCallbackResult.missedCallInitiated;
+            callback.ttl = resultHashMap["data"];
             break;
           case TruecallerSdkCallbackResult.missedCallReceived:
             callback.result = TruecallerSdkCallbackResult.missedCallReceived;
             break;
           case TruecallerSdkCallbackResult.otpInitiated:
             callback.result = TruecallerSdkCallbackResult.otpInitiated;
+            callback.ttl = resultHashMap["data"];
             break;
           case TruecallerSdkCallbackResult.otpReceived:
             callback.result = TruecallerSdkCallbackResult.otpReceived;
@@ -151,7 +152,7 @@ class TruecallerSdk {
             break;
           case TruecallerSdkCallbackResult.verifiedBefore:
             callback.result = TruecallerSdkCallbackResult.verifiedBefore;
-            _(callback, resultHashMap["data"]);
+            _insertProfile(callback, resultHashMap["data"]);
             break;
           case TruecallerSdkCallbackResult.verificationComplete:
             callback.result = TruecallerSdkCallbackResult.verificationComplete;
@@ -173,10 +174,19 @@ class TruecallerSdk {
     return _callbackStream;
   }
 
-  static _(TruecallerSdkCallback callback, String data) {
+  static _insertProfile(TruecallerSdkCallback callback, String data) {
     Map profileMap = jsonDecode(data);
     TruecallerUserProfile profile = TruecallerUserProfile.fromJson(profileMap);
     callback.profile = profile;
+  }
+
+  static _insertError(TruecallerSdkCallback callback, String data) {
+    // onVerificationRequired has nullable error, hence null check
+    if (data != "null") {
+      Map errorMap = jsonDecode(data);
+      TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
+      callback.error = truecallerError;
+    }
   }
 
   /// To customise the look and feel of the verification consent screen as per your app theme, add

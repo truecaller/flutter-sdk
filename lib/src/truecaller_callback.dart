@@ -33,7 +33,8 @@ class TruecallerSdkCallback {
 
   //for tc-flow
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.failure]
+  /// received when [result] equals [TruecallerSdkCallbackResult.failure] or
+  /// [result] equals [TruecallerSdkCallbackResult.verification]
   TruecallerError error;
 
   //for tc-flow and non-tc flow
@@ -48,6 +49,10 @@ class TruecallerSdkCallback {
 
   /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
   String accessToken;
+
+  /// TTL(in sec) received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
+  /// or [result] equals [TruecallerSdkCallbackResult.missedCallInitiated]
+  String ttl;
 
   /// received when [result] equals [TruecallerSdkCallbackResult.exception]
   TruecallerException exception;
