@@ -7,9 +7,9 @@
 Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
 
 This plugin currently supports **only Android** at the moment. It can be used to verify **only the Truecaller users** as of ^0.0.1 and both **Truecaller as
- well as non-Truecaller users** for ^0.0.2 onwards. Since these users have already verified mobile number, verification via Truecaller SDK enables you to
+ well as non-Truecaller users** for ^0.0.2 onwards. ~~Since these users have already verified mobile number, verification via Truecaller SDK enables you to
   quickly verify/signup/login your users using their mobile number - without the need for SMS based OTP, and at the time same lets you capture their mapped
-   user profile.
+   user profile.~~
 
 For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app)
 
@@ -139,8 +139,9 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
       print("Error code : ${truecallerSdkCallback.error.code}");
       break;
     case TruecallerSdkCallbackResult.verification:
-      //If the callback comes here, it indicates that user has to manually verified, so follow step 4 
-      print("Manual Verification Required!!");
+      //If the callback comes here, it indicates that user has to manually verified, so follow step 4
+      //You'd receive nullable error which can be used to determine user action that led to verification 
+      print("Manual Verification Required!! ${snapshot.data.error != null ? snapshot.data.error.code : ""}");
       break;
     default:
       print("Invalid result");
@@ -157,12 +158,20 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
   switch (truecallerSdkCallback.result) {
     case TruecallerSdkCallbackResult.missedCallInitiated:
       //Number Verification would happen via Missed call, so you can show a loader till you receive the call
+      //You'd also receive ttl (in seconds) that determines time left to complete the user verification
+      //Once TTL expires, you need to start from step 4. So you can either ask the user to input another number
+      //or you can also auto-retry the verification on the same number by giving a retry button
+      print("${truecallerUserCallback.ttl}");
       break;
     case TruecallerSdkCallbackResult.missedCallReceived:
       //Missed call received and now you can complete the verification as mentioned in step 6a
       break;
     case TruecallerSdkCallbackResult.otpInitiated:
       //Number Verification would happen via OTP
+      //You'd also receive ttl (in seconds) that determines time left to complete the user verification
+      //Once TTL expires, you need to start from step 4. So you can either ask the user to input another number
+      //or you can also auto-retry the verification on the same number by giving a retry button
+      print("${truecallerUserCallback.ttl}");
       break;
     case TruecallerSdkCallbackResult.otpReceived:
       //OTP received and now you can complete the verification as mentioned in step 6b
