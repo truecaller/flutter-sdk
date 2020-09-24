@@ -6,7 +6,10 @@
 
 Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
 
-This plugin currently supports **only Android** and can be used to verify **only the Truecaller users** at the moment. Since these users have already verified mobile number, verification via Truecaller SDK enables you to quickly verify/signup/login your users using their mobile number - without the need for SMS based OTP, and at the time same lets you capture their mapped user profile.
+This plugin currently supports **only Android** at the moment. It can be used to verify **only the Truecaller users** as of ^0.0.1 and both **Truecaller as
+ well as non-Truecaller users** for ^0.0.2 onwards. Since these users have already verified mobile number, verification via Truecaller SDK enables you to
+  quickly verify/signup/login your users using their mobile number - without the need for SMS based OTP, and at the time same lets you capture their mapped
+   user profile.
 
 For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app)
 
@@ -17,7 +20,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^0.0.1
+  truecaller_sdk: ^0.0.2
   ...
 ```
 ### 2. Generate App key and add it to `AndroidManifest.xml`:
@@ -57,13 +60,15 @@ class MainActivity: FlutterFragmentActivity() {
 </application>  
 ```
 
-## Example
+## Example 1 (to verify only Truecaller users having Truecaller app on their device)
 
 ```dart
-// Import package
+// This Example is valid for truecaller_sdk 0.0.1 onwards 
+
+//Import package
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
-//Step 1: Initialize the SDK
+//Step 1: Initialize the SDK with SDK_OPTION_WITHOUT_OTP
 TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP);
 
 //Step 2: Check if SDK is usable
@@ -105,8 +110,104 @@ void dispose() {
 }
 ```
 
+## Example 2 (to verify both Truecaller users (Example 1) and non-Truecaller users via manual verification)
+
+```dart
+// This Example is valid for truecaller_sdk 0.0.2 onwards 
+
+//Import package
+import 'package:truecaller_sdk/truecaller_sdk.dart';
+
+//Step 1: Initialize the SDK with SDK_OPTION_WITH_OTP
+TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
+
+//Step 2: Call getProfile to show consent screen to verify user's number  
+TruecallerSdk.isUsable.then((isUsable) {
+ isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
+});
+                   
+//Step 3: Be informed about the TruecallerSdk.getProfile callback result via [streamCallbackData] stream 
+//result could be either of (success, failure, verification)
+StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
+  switch (truecallerSdkCallback.result) {
+    case TruecallerSdkCallbackResult.success:
+    //If Truecaller user and has Truecaller app on his device, you'd directly get the Profile
+      print("First Name: ${truecallerSdkCallback.profile.firstName}");
+      print("Last Name: ${truecallerSdkCallback.profile.lastName}");
+      break;
+    case TruecallerSdkCallbackResult.failure:
+      print("Error code : ${truecallerSdkCallback.error.code}");
+      break;
+    case TruecallerSdkCallbackResult.verification:
+      //If the callback comes here, it indicates that user has to manually verified, so follow step 4 
+      print("Manual Verification Required!!");
+      break;
+    default:
+      print("Invalid result");
+  }
+});
+
+//Step 4: Initiate manual verification by asking user for his number
+TruecallerSdk.requestVerification(phoneNumber: "PHONE_NUMBER");
+
+//Step 5: Be informed about the TruecallerSdk.requestVerification callback result via [streamCallbackData] stream
+//result could be either of (missedCallInitiated, missedCallReceived, otpInitiated, otpReceived, 
+//verifiedBefore, verificationComplete, exception)
+StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
+  switch (truecallerSdkCallback.result) {
+    case TruecallerSdkCallbackResult.missedCallInitiated:
+      //Number Verification would happen via Missed call, so you can show a loader till you receive the call
+      break;
+    case TruecallerSdkCallbackResult.missedCallReceived:
+      //Missed call received and now you can complete the verification as mentioned in step 6a
+      break;
+    case TruecallerSdkCallbackResult.otpInitiated:
+      //Number Verification would happen via OTP
+      break;
+    case TruecallerSdkCallbackResult.otpReceived:
+      //OTP received and now you can complete the verification as mentioned in step 6b
+      //If SMS Retriever hashcode is configured on Truecaller's developer dashboard, get the OTP from callback
+      print("${truecallerUserCallback.otp}");
+      break;
+    case TruecallerSdkCallbackResult.verificationComplete:
+      //Number verification has been completed successfully and you can get the accessToken from callback
+      print("${truecallerUserCallback.accessToken}");
+      break;
+    case TruecallerSdkCallbackResult.verifiedBefore:
+      //Number has already been verified before, hence no need to verify. Retrieve the Profile data from callback
+      print("${truecallerUserCallback.profile.firstName}");
+      print("${truecallerUserCallback.profile.lastName}");
+      print("${truecallerUserCallback.profile.accessToken}");
+      break;
+    case TruecallerSdkCallbackResult.exception:
+      //Handle the exception
+      print("${truecallerUserCallback.exception.code}, ${truecallerUserCallback.exception.message}");
+      break;
+    default:
+      print("Invalid result");
+  }
+});
+
+//Step 6: Complete user verification
+//6a: If Missed call has been received on the same device, call this method with user's name
+TruecallerSdk.verifyMissedCall("FIRST_NAME", "LAST_NAME");
+
+//6b: If OTP has been initiated OR received on any device, call this method with the user's name & OTP received
+TruecallerSdk.verifyOtp("FIRST_NAME", "LAST_NAME", "OTP");
+
+//Step 7: Dispose streamSubscription
+@override
+void dispose() {
+  if (streamSubscription != null) {
+    streamSubscription.cancel();
+  }
+  super.dispose();
+}
+```
+
 ##### NOTE #####
 * For details on different kinds of errorCodes, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios).
+* For details on different kinds of exceptions, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/verifying-non-truecaller-users/verificationcallback).
 * For sample implementations, head over to [example](example) module.
 
 
@@ -136,10 +237,12 @@ You can customize the consent screen UI using the options available in class `Tr
 ```dart
   /// [sdkOptions] determines whether you want to use the SDK for verifying - 
   /// 1. [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] i.e only Truecaller users
-  /// 2. [TruecallerSdkScope.SDK_OPTION_WITH_OTP] i.e both Truecaller and Non-truecaller users
+  /// 2. [TruecallerSdkScope.SDK_OPTION_WITH_OTP] i.e both Truecaller and Non-Truecaller users
   ///
-  /// NOTE: As of truecaller_sdk 0.0.1, only
+  /// NOTE: In truecaller_sdk 0.0.1, only
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] is supported
+  /// In truecaller_sdk 0.0.2 and onwards, both
+  /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] and [TruecallerSdkScope.SDK_OPTION_WITH_OTP] are supported
   ///
   /// [consentMode] determines which kind of consent screen you want to show to the user.
   /// [consentTitleOptions] is applicable only for [TruecallerSdkScope.CONSENT_MODE_POPUP]
@@ -157,7 +260,7 @@ You can customize the consent screen UI using the options available in class `Tr
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {int sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
+          {@required int sdkOptions,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
           int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
           int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
@@ -171,7 +274,8 @@ You can customize the consent screen UI using the options available in class `Tr
           int buttonTextColor})
 ```
 
-By default, `initializeSDK()` has default argument values set as above, so if you don't pass any explicit values to it, it will initialize the SDK with these scope options.
+By default, `initializeSDK()` has default argument values for all the arguments except the `sdkOptions` which is a required argument, so if you
+ don't pass any explicit values to the other arguments, this method will initialize the SDK with default values as above.
 
 ##### Note
 For list of supported locales and details on different kinds of customizations, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/customisation-1)

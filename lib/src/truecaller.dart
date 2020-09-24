@@ -49,9 +49,10 @@ class TruecallerSdk {
   /// 1. [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] i.e only Truecaller users
   /// 2. [TruecallerSdkScope.SDK_OPTION_WITH_OTP] i.e both Truecaller and Non-truecaller users
   ///
-  /// NOTE: As of truecaller_sdk 0.0.1, only
+  /// NOTE: In truecaller_sdk 0.0.1, only
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] is supported
-  ///
+  /// In truecaller_sdk 0.0.2 and onwards, both [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] and
+  /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] are supported
   /// [consentMode] determines which kind of consent screen you want to show to the user.
   /// [consentTitleOptions] is applicable only for [TruecallerSdkScope.CONSENT_MODE_POPUP]
   /// and [TruecallerSdkScope.CONSENT_MODE_FULLSCREEN] and it sets the title prefix
