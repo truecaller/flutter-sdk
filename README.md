@@ -6,10 +6,8 @@
 
 Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
 
-This plugin currently supports **only Android** at the moment. It can be used to verify **only the Truecaller users** as of ^0.0.1 and both **Truecaller as
- well as non-Truecaller users** for ^0.0.2 onwards. ~~Since these users have already verified mobile number, verification via Truecaller SDK enables you to
-  quickly verify/signup/login your users using their mobile number - without the need for SMS based OTP, and at the time same lets you capture their mapped
-   user profile.~~
+This plugin currently supports **only Android** at the moment. **v0.0.2 & above** will allow you to verify both Truecaller as well as non-Truecaller users on your application. (**v0.0.1** only allows you to verify users who have Truecaller Android app on their device and are logged-in).
+Verification via Truecaller SDK enables you to quickly verify/signup/login your users using their mobile number.
 
 For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app)
 
@@ -121,7 +119,9 @@ import 'package:truecaller_sdk/truecaller_sdk.dart';
 //Step 1: Initialize the SDK with SDK_OPTION_WITH_OTP
 TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
 
-//Step 2: Call getProfile to show consent screen to verify user's number  
+//Step 2: Call getProfile to show consent screen to verify user's number
+//NOTE: isUsable will always return TRUE when using SDK_OPTION_WITH_OTP, so you can also call
+//getProfile directly
 TruecallerSdk.isUsable.then((isUsable) {
  isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
 });
@@ -139,7 +139,7 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
       print("Error code : ${truecallerSdkCallback.error.code}");
       break;
     case TruecallerSdkCallbackResult.verification:
-      //If the callback comes here, it indicates that user has to manually verified, so follow step 4
+      //If the callback comes here, it indicates that user has to be manually verified, so follow step 4
       //You'd receive nullable error which can be used to determine user action that led to verification 
       print("Manual Verification Required!! ${snapshot.data.error != null ? snapshot.data.error.code : ""}");
       break;
@@ -217,8 +217,8 @@ void dispose() {
 ##### NOTE #####
 * For details on different kinds of errorCodes, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios).
 * For details on different kinds of exceptions, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/verifying-non-truecaller-users/verificationcallback).
+* For details on Server Side Response Validation, refer [here](https://docs.truecaller.com/truecaller-sdk/android/server-side-response-validation).
 * For sample implementations, head over to [example](example) module.
-
 
 ## Customization Options
 
