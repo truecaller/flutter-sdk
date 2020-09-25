@@ -38,6 +38,7 @@ class TruecallerSdkCallback {
 
   /// received when [result] equals [TruecallerSdkCallbackResult.failure] or
   /// [result] equals [TruecallerSdkCallbackResult.verification]
+  /// It indicates reason why truecaller user verification failed
   TruecallerError error;
 
   //for tc-flow and non-tc flow
@@ -51,13 +52,16 @@ class TruecallerSdkCallback {
   String otp;
 
   /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
+  /// It can be used for server-side response validation
   String accessToken;
 
   /// TTL(in sec) received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
   /// or [result] equals [TruecallerSdkCallbackResult.missedCallInitiated]
+  /// It indicates time left to complete the user verification process
   String ttl;
 
   /// received when [result] equals [TruecallerSdkCallbackResult.exception]
+  /// It indicates reason why non-truecaller user verification failed
   TruecallerException exception;
 }
 
