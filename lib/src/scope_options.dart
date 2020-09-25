@@ -28,6 +28,7 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
+/// scope options that are used to customize the consent screen UI
 class TruecallerSdkScope {
   /// footer options
   static const int FOOTER_TYPE_SKIP = 1;

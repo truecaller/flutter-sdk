@@ -28,6 +28,9 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
+import 'truecaller.dart';
+
+/// callback stream that gets returned from [TruecallerSdk.streamCallbackData]
 class TruecallerSdkCallback {
   TruecallerSdkCallbackResult result;
 
@@ -58,6 +61,7 @@ class TruecallerSdkCallback {
   TruecallerException exception;
 }
 
+/// enum with callback results that corresponds to the [TruecallerSdkCallback.result]
 enum TruecallerSdkCallbackResult {
   //tc user callback results
   success,
@@ -74,6 +78,7 @@ enum TruecallerSdkCallbackResult {
   exception
 }
 
+/// extension method that converts String to corresponding enum value
 extension EnumParser on String {
   TruecallerSdkCallbackResult enumValue() {
     return TruecallerSdkCallbackResult.values.firstWhere(
@@ -84,6 +89,7 @@ extension EnumParser on String {
   }
 }
 
+/// user profile that corresponds to [TruecallerSdkCallback.profile]
 class TruecallerUserProfile {
   String firstName;
   String lastName;
@@ -112,6 +118,7 @@ class TruecallerUserProfile {
   String userLocale;
   String accessToken;
 
+  /// get the [TruecallerUserProfile] values from Json
   TruecallerUserProfile.fromJson(Map<String, dynamic> map)
       : firstName = map['firstName'],
         lastName = map['lastName'],
@@ -141,20 +148,24 @@ class TruecallerUserProfile {
         accessToken = map['accessToken'];
 }
 
+/// error that corresponds to [TruecallerSdkCallback.error]
 class TruecallerError {
   int code;
   String message;
 
+  /// get the [TruecallerError] values from Json
   TruecallerError.fromJson(Map<String, dynamic> map) {
     code = map['mErrorType'];
     message = map['message'];
   }
 }
 
+/// exception that corresponds to [TruecallerSdkCallback.exception]
 class TruecallerException {
   int code;
   String message;
 
+  /// get the [TruecallerException] values from Json
   TruecallerException.fromJson(Map<String, dynamic> map) {
     code = map['mExceptionType'];
     message = map['mExceptionMessage'];
