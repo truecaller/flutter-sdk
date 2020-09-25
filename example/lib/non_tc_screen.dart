@@ -240,28 +240,44 @@ class _HomePageState extends State<HomePage> {
         });
       }
 
-      if (tempResult == TruecallerSdkCallbackResult.verifiedBefore) {
-        _(truecallerUserCallback.profile.firstName);
-      } else if (tempResult == TruecallerSdkCallbackResult.verificationComplete) {
-        _(fNameController.text);
-      } else if (tempResult == TruecallerSdkCallbackResult.exception) {
-        final snackBar = SnackBar(
-            content: Text("Exception : ${truecallerUserCallback.exception.code}, "
-                "${truecallerUserCallback.exception.message}"));
-        _scaffoldKey.currentState.showSnackBar(snackBar);
-        /*Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ResultScreen(
-                  "Exception : ${truecallerUserCallback.exception.code}, "
-                  "${truecallerUserCallback.exception.message}",
-                  -1),
-            ));*/
+      switch (tempResult) {
+        case TruecallerSdkCallbackResult.missedCallInitiated:
+          showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
+          break;
+        case TruecallerSdkCallbackResult.missedCallReceived:
+          showSnackBar("Missed call Received");
+          break;
+        case TruecallerSdkCallbackResult.otpInitiated:
+          showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl}");
+          break;
+        case TruecallerSdkCallbackResult.otpReceived:
+          showSnackBar("OTP Received : ${truecallerUserCallback.otp}");
+          break;
+        case TruecallerSdkCallbackResult.verificationComplete:
+          showSnackBar("Verification Completed : ${truecallerUserCallback.accessToken}");
+          _navigateToResult(fNameController.text);
+          break;
+        case TruecallerSdkCallbackResult.verifiedBefore:
+          showSnackBar("Verified Before : ${truecallerUserCallback.profile.accessToken}");
+          _navigateToResult(truecallerUserCallback.profile.firstName);
+          break;
+        case TruecallerSdkCallbackResult.exception:
+          showSnackBar("Exception : ${truecallerUserCallback.exception.code}, "
+              "${truecallerUserCallback.exception.message}");
+          break;
+        default:
+          print(tempResult.toString());
+          break;
       }
     });
   }
 
-  _(String firstName) {
+  void showSnackBar(String message) {
+    final snackBar = SnackBar(content: Text(message));
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+  _navigateToResult(String firstName) {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
