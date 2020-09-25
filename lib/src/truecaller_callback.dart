@@ -77,7 +77,9 @@ enum TruecallerSdkCallbackResult {
 extension EnumParser on String {
   TruecallerSdkCallbackResult enumValue() {
     return TruecallerSdkCallbackResult.values.firstWhere(
-        (element) => element.toString().split(".")[1].toLowerCase() == this.toLowerCase(),
+        (element) =>
+            element.toString().split(".")[1].toLowerCase() ==
+            this.toLowerCase(),
         orElse: () => null);
   }
 }
