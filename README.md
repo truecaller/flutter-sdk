@@ -24,7 +24,7 @@ dependencies:
 ### 2. Generate App key and add it to `AndroidManifest.xml`:
 * [Register](https://developer.truecaller.com/sign-up) for Truecaller's developer account, or [login](https://developer.truecaller.com/login) to your existing developer account.
 * Refer to the [official documentation](https://docs.truecaller.com/truecaller-sdk/android/generating-app-key) for generating app key.
-* Open your `AndroidManifest.xml` under /android module and add a `meta-data` element to the `application` element with your app key:
+* Open your [AndroidManifest.xml](/example/android/app/src/main/AndroidManifest.xml) under /android module and add a `meta-data` element to the `application` element with your app key:
 ```xml
 <application>  
 ...  
@@ -37,7 +37,7 @@ dependencies:
 ```
 
 ### 3. Make changes to `MainActivity.kt`:
-* Head to the `MainActivity.kt` under /android module
+* Head to the [MainActivity.kt](/example/android/app/src/main/kotlin/com/example/truecaller_sdk_example/MainActivity.kt) under /android module
 * SDK requires the use of a `FragmentActivity` as opposed to `Activity`, so extend your `MainActivity.kt` with `FlutterFragmentActivity`.
 * Override function `configureFlutterEngine(flutterEngine: FlutterEngine)` in your `MainActivity.kt`:
 ```kotlin
@@ -57,6 +57,27 @@ class MainActivity: FlutterFragmentActivity() {
 ...  
 </application>  
 ```
+
+### 4. Add required Permissions to `AndroidManifest.xml`:
+Permissions are mandatory only if you are initializing the SDK with `TruecallerSdkScope.SDK_OPTION_WITH_OTP` in order to verify the non-Truecaller users.
+
+For Android 8 and above :
+```xml
+<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+<uses-permission android:name="android.permission.READ_CALL_LOG"/>
+<uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
+```
+
+For Android 7 and below :
+```xml
+<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+<uses-permission android:name="android.permission.READ_CALL_LOG"/>
+<uses-permission android:name="android.permission.CALL_PHONE"/>
+```
+
+These permissions are required for the SDK to be able to automatically detect the drop call and complete the verification flow.
+
+To read more about different scenarios for user verifications, [click here](https://docs.truecaller.com/truecaller-sdk/android/user-flows-for-verification-truecaller-+-non-truecaller-users).
 
 ## Example 1 (to verify only Truecaller users having Truecaller app on their device)
 
