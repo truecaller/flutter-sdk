@@ -31,6 +31,7 @@
 package com.truecallersdk
 
 import android.app.Activity
+import android.content.Intent
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
@@ -52,9 +53,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.Locale
 
+const val PROFILE_REQUEST_CODE = 100
 const val INITIATE_SDK = "initiateSDK"
 const val IS_USABLE = "isUsable"
 const val SET_DARK_THEME = "setDarkTheme"
@@ -67,7 +70,8 @@ const val TC_METHOD_CHANNEL = "tc_method_channel"
 const val TC_EVENT_CHANNEL = "tc_event_channel"
 
 /** TruecallerSdkPlugin */
-public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler, ActivityAware {
+public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler,
+    ActivityAware, PluginRegistry.ActivityResultListener {
 
     /** The MethodChannel that will the communication between Flutter and native Android
      * This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -290,33 +294,39 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        cleanUp()
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+        binding.addActivityResultListener(this)
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+        binding.addActivityResultListener(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return if (requestCode == PROFILE_REQUEST_CODE) {
+            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
+        } else false
+    }
+
+    override fun onDetachedFromActivity() {
+        cleanUp()
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        cleanUp()
+    }
+
+    private fun cleanUp() {
         activity = null
         methodChannel?.setMethodCallHandler(null)
         methodChannel = null
         eventChannel?.setStreamHandler(null)
         eventChannel = null
         eventSink = null
-    }
-
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener { _, resultCode, data ->
-            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
-        }
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener { _, resultCode, data ->
-            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
-        }
-    }
-
-    override fun onDetachedFromActivity() {
-        this.activity = null
-    }
-
-    override fun onDetachedFromActivityForConfigChanges() {
-        this.activity = null
     }
 }
