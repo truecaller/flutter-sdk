@@ -28,22 +28,72 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
+import 'truecaller.dart';
+
+/// callback stream that gets returned from [TruecallerSdk.streamCallbackData]
 class TruecallerSdkCallback {
   TruecallerSdkCallbackResult result;
-  TruecallerUserProfile profile;
+
+  //for tc-flow
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.failure] or
+  /// [result] equals [TruecallerSdkCallbackResult.verification]
+  /// It indicates reason why truecaller user verification failed
   TruecallerError error;
+
+  //for tc-flow and non-tc flow
+  /// received when [result] equals [TruecallerSdkCallbackResult.success] or
+  /// [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
+  TruecallerUserProfile profile;
+
+  //** for non-tc flow **//
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.otpReceived]
+  String otp;
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
+  /// It can be used for server-side response validation
+  String accessToken;
+
+  /// TTL(in sec) received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
+  /// or [result] equals [TruecallerSdkCallbackResult.missedCallInitiated]
+  /// It indicates time left to complete the user verification process
+  String ttl;
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.exception]
+  /// It indicates reason why non-truecaller user verification failed
+  TruecallerException exception;
 }
 
-enum TruecallerSdkCallbackResult { success, failure, verification }
+/// enum with callback results that corresponds to the [TruecallerSdkCallback.result]
+enum TruecallerSdkCallbackResult {
+  //tc user callback results
+  success,
+  failure,
+  verification,
 
+  //non-tc user callback results
+  missedCallInitiated,
+  missedCallReceived,
+  otpInitiated,
+  otpReceived,
+  verifiedBefore,
+  verificationComplete,
+  exception
+}
+
+/// extension method that converts String to corresponding enum value
 extension EnumParser on String {
   TruecallerSdkCallbackResult enumValue() {
     return TruecallerSdkCallbackResult.values.firstWhere(
-        (element) => element.toString().split(".")[1].toLowerCase() == this.toLowerCase(),
+        (element) =>
+            element.toString().split(".")[1].toLowerCase() ==
+            this.toLowerCase(),
         orElse: () => null);
   }
 }
 
+/// user profile that corresponds to [TruecallerSdkCallback.profile]
 class TruecallerUserProfile {
   String firstName;
   String lastName;
@@ -72,6 +122,7 @@ class TruecallerUserProfile {
   String userLocale;
   String accessToken;
 
+  /// get the [TruecallerUserProfile] values from Json
   TruecallerUserProfile.fromJson(Map<String, dynamic> map)
       : firstName = map['firstName'],
         lastName = map['lastName'],
@@ -101,12 +152,31 @@ class TruecallerUserProfile {
         accessToken = map['accessToken'];
 }
 
+/// error that corresponds to [TruecallerSdkCallback.error]
 class TruecallerError {
   int code;
   String message;
 
+  /// get the [TruecallerError] values from Json
   TruecallerError.fromJson(Map<String, dynamic> map) {
     code = map['mErrorType'];
     message = map['message'];
+  }
+}
+
+/// exception that corresponds to [TruecallerSdkCallback.exception]
+class TruecallerException {
+  int code;
+  String message;
+
+  /// get the [TruecallerException] values from Json
+  TruecallerException.fromJson(Map<String, dynamic> map) {
+    code = map['mExceptionType'];
+    message = map['mExceptionMessage'];
+  }
+
+  @override
+  String toString() {
+    return "$code : $message";
   }
 }

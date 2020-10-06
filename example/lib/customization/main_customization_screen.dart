@@ -32,6 +32,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
+import 'package:truecaller_sdk_example/non_tc_screen.dart';
 
 import 'config_options.dart';
 import 'result_screen.dart';
@@ -64,7 +65,7 @@ class _HomePageState extends State<HomePage> {
   List<TitleOption> titleOptions;
   TitleOption selectedTitle;
   int selectedFooter;
-  bool darkMode, rectangularBtn;
+  bool darkMode, rectangularBtn, withOtp;
   List<DropdownMenuItem<int>> colorMenuItemList = List();
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = List();
   List<DropdownMenuItem<int>> loginPrefixMenuItemList = List();
@@ -77,6 +78,7 @@ class _HomePageState extends State<HomePage> {
       TextEditingController(text: "https://www.truecaller.com/");
   final TextEditingController localeController = TextEditingController();
   StreamSubscription streamSubscription;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -88,6 +90,7 @@ class _HomePageState extends State<HomePage> {
     selectedFooter = FooterOption.getFooterOptionsMap().keys.first;
     darkMode = false;
     rectangularBtn = false;
+    withOtp = false;
     ctaColor = Colors.blue.value;
     ctaTextColor = Colors.white.value;
     ctaPrefixOption = 0;
@@ -181,6 +184,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Configure SDK options"),
       ),
@@ -275,6 +279,17 @@ class _HomePageState extends State<HomePage> {
                         hintStyle: TextStyle(
                             fontStyle: FontStyle.italic, color: Colors.green, fontSize: 14.0)),
                   ),
+                ),
+                SwitchListTile(
+                  title: Text("With OTP"),
+                  value: withOtp,
+                  onChanged: (value) {
+                    setState(() {
+                      withOtp = value;
+                    });
+                  },
+                  selected: withOtp,
+                  activeColor: Colors.green,
                 ),
                 Divider(
                   color: Colors.transparent,
@@ -474,7 +489,9 @@ class _HomePageState extends State<HomePage> {
       selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_FULLSCREEN;
     }
     TruecallerSdk.initializeSDK(
-        sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
+        sdkOptions: withOtp
+            ? TruecallerSdkScope.SDK_OPTION_WITH_OTP
+            : TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
         consentMode: selectedConsentMode,
         consentTitleOptions:
             TitleOption.getTitleOptions().indexWhere((title) => title.name == selectedTitle.name),
@@ -516,18 +533,21 @@ class _HomePageState extends State<HomePage> {
               ));
           break;
         case TruecallerSdkCallbackResult.failure:
-          Navigator.push(
+          final snackBar = SnackBar(content: Text("Error code : ${truecallerSdkCallback.error
+              .code}"));
+          _scaffoldKey.currentState.showSnackBar(snackBar);
+          /*Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) =>
                     ResultScreen("Error code : ${truecallerSdkCallback.error.code}", -1),
-              ));
+              ));*/
           break;
         case TruecallerSdkCallbackResult.verification:
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ResultScreen("Verification Required!!", 0),
+                builder: (context) => NonTcVerification(),
               ));
           break;
         default:

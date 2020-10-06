@@ -30,6 +30,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
+import 'package:truecaller_sdk_example/non_tc_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -63,8 +64,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TruecallerSdk.initializeSDK(
-                        sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP);
+                    TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
                       isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
                     });
@@ -90,7 +90,25 @@ class _MyAppState extends State<MyApp> {
                           case TruecallerSdkCallbackResult.failure:
                             return Text("Oops!! Error type ${snapshot.data.error.code}");
                           case TruecallerSdkCallbackResult.verification:
-                            return Text("Verification Required");
+                            return Column(
+                              children: [
+                                Text("Verification Required : "
+                                    "${snapshot.data.error != null ? snapshot.data.error.code : ""}"),
+                                MaterialButton(
+                                  color: Colors.green,
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => NonTcVerification()));
+                                  },
+                                  child: Text(
+                                    "Do manual verification",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                )
+                              ],
+                            );
                           default:
                             return Text("Invalid result");
                         }

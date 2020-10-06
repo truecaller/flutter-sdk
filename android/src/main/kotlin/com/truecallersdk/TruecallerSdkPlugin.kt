@@ -31,15 +31,19 @@
 package com.truecallersdk
 
 import android.app.Activity
+import android.content.Intent
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import com.truecaller.android.sdk.ITrueCallback
 import com.truecaller.android.sdk.SdkThemeOptions
 import com.truecaller.android.sdk.TrueError
+import com.truecaller.android.sdk.TrueException
 import com.truecaller.android.sdk.TrueProfile
 import com.truecaller.android.sdk.TruecallerSDK
 import com.truecaller.android.sdk.TruecallerSdkScope
+import com.truecaller.android.sdk.clients.VerificationCallback
+import com.truecaller.android.sdk.clients.VerificationDataBundle
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -49,19 +53,25 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.Locale
 
+const val PROFILE_REQUEST_CODE = 100
 const val INITIATE_SDK = "initiateSDK"
 const val IS_USABLE = "isUsable"
 const val SET_DARK_THEME = "setDarkTheme"
 const val SET_LOCALE = "setLocale"
 const val GET_PROFILE = "getProfile"
+const val REQUEST_VERIFICATION = "requestVerification"
+const val VERIFY_OTP = "verifyOtp"
+const val VERIFY_MISSED_CALL = "verifyMissedCall"
 const val TC_METHOD_CHANNEL = "tc_method_channel"
 const val TC_EVENT_CHANNEL = "tc_event_channel"
 
 /** TruecallerSdkPlugin */
-public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler, ActivityAware {
+public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler,
+    ActivityAware, PluginRegistry.ActivityResultListener {
 
     /** The MethodChannel that will the communication between Flutter and native Android
      * This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -71,6 +81,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     private var eventChannel: EventChannel? = null
     private var eventSink: EventChannel.EventSink? = null
     private var activity: Activity? = null
+    private val gson = Gson()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         onAttachedToEngine(flutterPluginBinding.binaryMessenger)
@@ -124,6 +135,39 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     null
                 )
             }
+            REQUEST_VERIFICATION -> {
+                val phoneNumber = call.argument<String>(Constants.PH_NO)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid phone", "Can't be null or empty", null)
+                val countryISO = call.argument<String>(Constants.COUNTRY_ISO) ?: "IN"
+                activity?.let {
+                    TruecallerSDK.getInstance()
+                        .requestVerification(countryISO, phoneNumber, verificationCallback, it as FragmentActivity)
+                }
+                    ?: result.error("UNAVAILABLE", "Activity not available.", null)
+            }
+            VERIFY_OTP -> {
+                val firstName = call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid name", "Can't be null or empty", null)
+                val lastName = call.argument<String>(Constants.LAST_NAME) ?: ""
+                val trueProfile = TrueProfile.Builder(firstName, lastName).build()
+                val otp = call.argument<String>(Constants.OTP)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid otp", "Can't be null or empty", null)
+                TruecallerSDK.getInstance().verifyOtp(
+                    trueProfile,
+                    otp,
+                    verificationCallback
+                )
+            }
+            VERIFY_MISSED_CALL -> {
+                val firstName = call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
+                    ?: return result.error("Invalid name", "Can't be null or empty", null)
+                val lastName = call.argument<String>(Constants.LAST_NAME) ?: ""
+                val trueProfile = TrueProfile.Builder(firstName, lastName).build()
+                TruecallerSDK.getInstance().verifyMissedCall(
+                    trueProfile,
+                    verificationCallback
+                )
+            }
             else -> {
                 result.notImplemented()
             }
@@ -154,7 +198,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             eventSink?.success(
                 mapOf(
                     Constants.RESULT to Constants.SUCCESS,
-                    Constants.DATA to Gson().toJson(trueProfile)
+                    Constants.DATA to gson.toJson(trueProfile)
                 )
             )
         }
@@ -163,13 +207,81 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             eventSink?.success(
                 mapOf(
                     Constants.RESULT to Constants.FAILURE,
-                    Constants.DATA to Gson().toJson(trueError)
+                    Constants.DATA to gson.toJson(trueError)
                 )
             )
         }
 
-        override fun onVerificationRequired() {
-            eventSink?.success(mapOf(Constants.RESULT to Constants.VERIFICATION))
+        override fun onVerificationRequired(trueError: TrueError?) {
+            eventSink?.success(
+                mapOf(
+                    Constants.RESULT to Constants.VERIFICATION,
+                    Constants.DATA to gson.toJson(trueError)
+                )
+            )
+        }
+    }
+
+    private val verificationCallback: VerificationCallback = object : VerificationCallback {
+        override fun onRequestSuccess(requestCode: Int, bundle: VerificationDataBundle?) {
+            when (requestCode) {
+                VerificationCallback.TYPE_MISSED_CALL_INITIATED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.MISSED_CALL_INITIATED,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_TTL)
+                        )
+                    )
+                }
+                VerificationCallback.TYPE_MISSED_CALL_RECEIVED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.MISSED_CALL_RECEIVED
+                        )
+                    )
+                }
+                VerificationCallback.TYPE_OTP_INITIATED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.OTP_INITIATED,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_TTL)
+                        )
+                    )
+                }
+                VerificationCallback.TYPE_OTP_RECEIVED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.OTP_RECEIVED,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_OTP)
+                        )
+                    )
+                }
+                VerificationCallback.TYPE_PROFILE_VERIFIED_BEFORE -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.VERIFIED_BEFORE,
+                            Constants.DATA to gson.toJson(bundle?.profile)
+                        )
+                    )
+                }
+                else -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.VERIFICATION_COMPLETE,
+                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_ACCESS_TOKEN)
+                        )
+                    )
+                }
+            }
+        }
+
+        override fun onRequestFailure(callbackType: Int, trueException: TrueException) {
+            eventSink?.success(
+                mapOf(
+                    Constants.RESULT to Constants.EXCEPTION,
+                    Constants.DATA to gson.toJson(trueException)
+                )
+            )
         }
     }
 
@@ -182,33 +294,39 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        cleanUp()
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+        binding.addActivityResultListener(this)
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+        binding.addActivityResultListener(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return if (requestCode == PROFILE_REQUEST_CODE) {
+            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
+        } else false
+    }
+
+    override fun onDetachedFromActivity() {
+        cleanUp()
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        cleanUp()
+    }
+
+    private fun cleanUp() {
         activity = null
         methodChannel?.setMethodCallHandler(null)
         methodChannel = null
         eventChannel?.setStreamHandler(null)
         eventChannel = null
         eventSink = null
-    }
-
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener { _, resultCode, data ->
-            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
-        }
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener { _, resultCode, data ->
-            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
-        }
-    }
-
-    override fun onDetachedFromActivity() {
-        this.activity = null
-    }
-
-    override fun onDetachedFromActivityForConfigChanges() {
-        this.activity = null
     }
 }

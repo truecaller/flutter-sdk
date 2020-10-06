@@ -28,6 +28,7 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
+/// scope options that are used to customize the consent screen UI
 class TruecallerSdkScope {
   /// footer options
   static const int FOOTER_TYPE_SKIP = 1;
@@ -44,6 +45,7 @@ class TruecallerSdkScope {
 
   /// sdk options
   static const int SDK_OPTION_WITHOUT_OTP = 16;
+  static const int SDK_OPTION_WITH_OTP = 32;
 
   /// title options (applicable for [CONSENT_MODE_POPUP] and [CONSENT_MODE_FULLSCREEN])
   static const int SDK_CONSENT_TITLE_LOG_IN = 0;
