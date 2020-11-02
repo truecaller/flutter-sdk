@@ -233,7 +233,12 @@ class _HomePageState extends State<HomePage> {
               visible: showRetryTextView(),
               child: _ttl == 0
                   ? FlatButton(
-                      child: Text("retry again"),
+                      child: Text(
+                        "verification timed out, retry again",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                       textColor: Colors.blue,
                       onPressed: () => setState(() => tempResult = null))
                   : Text("Retry again in $_ttl seconds"),
