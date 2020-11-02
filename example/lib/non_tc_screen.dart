@@ -69,6 +69,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController otpController = TextEditingController();
   StreamSubscription streamSubscription;
   TruecallerSdkCallbackResult tempResult;
+  Timer _timer;
+  int _ttl;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -90,6 +92,10 @@ class _HomePageState extends State<HomePage> {
     return tempResult != null &&
         ((tempResult == TruecallerSdkCallbackResult.otpInitiated) ||
             (tempResult == TruecallerSdkCallbackResult.otpReceived));
+  }
+
+  bool showRetryTextView() {
+    return _ttl != null && !showInputNumberView();
   }
 
   @override
@@ -218,9 +224,39 @@ class _HomePageState extends State<HomePage> {
                     )),
                 color: Colors.blue,
               ),
-            )
+            ),
+            Divider(
+              color: Colors.transparent,
+              height: 30.0,
+            ),
+            Visibility(
+              visible: showRetryTextView(),
+              child: _ttl == 0
+                  ? FlatButton(
+                      child: Text("retry again"),
+                      textColor: Colors.blue,
+                      onPressed: () => setState(() => tempResult = null))
+                  : Text("Retry again in $_ttl seconds"),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  void startCountdownTimer(int ttl) {
+    _ttl = ttl;
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) => setState(
+        () {
+          if (_ttl < 1) {
+            timer.cancel();
+          } else {
+            _ttl = _ttl - 1;
+          }
+        },
       ),
     );
   }
@@ -242,12 +278,14 @@ class _HomePageState extends State<HomePage> {
 
       switch (tempResult) {
         case TruecallerSdkCallbackResult.missedCallInitiated:
+          startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
           showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
           break;
         case TruecallerSdkCallbackResult.missedCallReceived:
           showSnackBar("Missed call Received");
           break;
         case TruecallerSdkCallbackResult.otpInitiated:
+          startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
           showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl}");
           break;
         case TruecallerSdkCallbackResult.otpReceived:
@@ -342,6 +380,7 @@ class _HomePageState extends State<HomePage> {
     if (streamSubscription != null) {
       streamSubscription.cancel();
     }
+    _timer.cancel();
     super.dispose();
   }
 }
