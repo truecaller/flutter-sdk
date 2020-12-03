@@ -1,7 +1,7 @@
 # truecaller_sdk
 
 <p align="center">
-<img src="https://github.com/truecaller/flutter-sdk/blob/tc/images/truecaller_logo.png" height="200">
+<img src="https://raw.githubusercontent.com/truecaller/flutter-sdk/tc/images/truecaller_logo.png" height="200">
 </p>
 
 Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
@@ -162,7 +162,8 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
     case TruecallerSdkCallbackResult.verification:
       //If the callback comes here, it indicates that user has to be manually verified, so follow step 4
       //You'd receive nullable error which can be used to determine user action that led to verification 
-      print("Manual Verification Required!! ${snapshot.data.error != null ? snapshot.data.error.code : ""}");
+      print("Manual Verification Required!! ${truecallerSdkCallback.error != null ? 
+            truecallerSdkCallback.error.code : ""}");
       break;
     default:
       print("Invalid result");
