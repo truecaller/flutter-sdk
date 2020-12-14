@@ -54,6 +54,9 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+def sdkVariant = "flutter"
+def sdkVariantVersion = "0.0.3"
+
 android {
     compileSdkVersion 28
 
@@ -62,6 +65,8 @@ android {
     }
     defaultConfig {
         minSdkVersion 16
+        resValue("string", "sdk_variant", "${sdkVariant}")
+        resValue("string", "sdk_variant_version", "${sdkVariantVersion}")
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -70,5 +75,5 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.truecaller.android.sdk:truecaller-sdk:2.4.0'
+    implementation 'com.truecaller.android.sdk:truecaller-sdk:2.5.0'
 }
