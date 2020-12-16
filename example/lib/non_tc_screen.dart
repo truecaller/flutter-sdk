@@ -60,7 +60,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool invalidNumber = false;
   bool invalidFName = false;
-  bool invalidLName = false;
   bool invalidOtp = false;
   bool showProgressBar = false;
   TextEditingController phoneController = TextEditingController();
@@ -80,7 +79,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool showInputNumberView() {
-    return tempResult == null || tempResult == TruecallerSdkCallbackResult.exception;
+    return tempResult == null;
   }
 
   bool showInputNameView() {
@@ -148,16 +147,14 @@ class _HomePageState extends State<HomePage> {
               visible: showInputNameView(),
               child: TextField(
                 controller: fNameController,
-                maxLength: 64,
                 keyboardType: TextInputType.text,
-                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))],
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter First Name",
                   labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "John",
-                  errorText: invalidFName ? "Invalid first name. Enter min 3 characters" : null,
+                  errorText: invalidFName ? "Invalid first name. Enter min 2 characters" : null,
                   hintStyle: TextStyle(
                       fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
                 ),
@@ -171,16 +168,13 @@ class _HomePageState extends State<HomePage> {
               visible: showInputNameView(),
               child: TextField(
                 controller: lNameController,
-                maxLength: 64,
                 keyboardType: TextInputType.text,
-                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))],
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter Last Name",
                   labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "Doe",
-                  errorText: invalidLName ? "Invalid last name. Enter min 3 characters" : null,
                   hintStyle: TextStyle(
                       fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
                 ),
@@ -213,7 +207,7 @@ class _HomePageState extends State<HomePage> {
               height: 20.0,
             ),
             Visibility(
-              visible: !showProgressBar,
+              visible: showInputNumberView() || showInputNameView() || showInputOtpView(),
               child: MaterialButton(
                 minWidth: width - 50.0,
                 height: 45.0,
@@ -258,6 +252,7 @@ class _HomePageState extends State<HomePage> {
         () {
           if (_ttl < 1) {
             timer.cancel();
+            showProgressBar = false;
           } else {
             _ttl = _ttl - 1;
           }
@@ -273,7 +268,9 @@ class _HomePageState extends State<HomePage> {
       // which the call was received and hence it would directly open input name screen.
       if (phoneController.text.length == 10) {
         setState(() {
-          tempResult = truecallerUserCallback.result;
+          if (truecallerUserCallback.result != TruecallerSdkCallbackResult.exception) {
+            tempResult = truecallerUserCallback.result;
+          }
           showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
           if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
             otpController.text = truecallerUserCallback.otp;
@@ -281,7 +278,7 @@ class _HomePageState extends State<HomePage> {
         });
       }
 
-      switch (tempResult) {
+      switch (truecallerUserCallback.result) {
         case TruecallerSdkCallbackResult.missedCallInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
           showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
@@ -368,12 +365,10 @@ class _HomePageState extends State<HomePage> {
 
   bool validateName() {
     String fName = fNameController.text;
-    String lName = lNameController.text;
     setState(() {
       fName.length < 2 ? invalidFName = true : invalidFName = false;
-      lName.length < 2 ? invalidLName = true : invalidLName = false;
     });
-    return !invalidFName && !invalidLName;
+    return !invalidFName;
   }
 
   @override

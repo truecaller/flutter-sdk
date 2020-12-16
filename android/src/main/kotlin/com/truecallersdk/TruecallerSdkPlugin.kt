@@ -322,6 +322,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     private fun cleanUp() {
+        TruecallerSDK.clear()
         activity = null
         methodChannel?.setMethodCallHandler(null)
         methodChannel = null

@@ -18,7 +18,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^0.0.2
+  truecaller_sdk: ^0.0.3
   ...
 ```
 ### 2. Generate App key and add it to `AndroidManifest.xml`:
@@ -235,6 +235,10 @@ void dispose() {
   super.dispose();
 }
 ```
+
+As mentioned in Step 5 above, when `TruecallerSdkCallbackResult` equals `TruecallerSdkCallbackResult.missedCallInitiated` or `TruecallerSdkCallbackResult
+.otpInitiated`, you will receive an additional parameter for the time to live i.e TTL (in seconds) which is passed as String extra and can be retrieved from
+ the callback using `truecallerUserCallback.ttl`. This value determines amount of time left to complete the user verification. You can use this value to show a waiting message to your user before they can try for another attempt i.e fresh verification for same number cannot be re-initiated till the TTL expires. Once the TTL expires, you need to start the verification process again from step 4.
 
 ##### NOTE #####
 * For details on different kinds of errorCodes, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios).

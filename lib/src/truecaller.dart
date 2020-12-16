@@ -213,7 +213,7 @@ class TruecallerSdk {
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
 
   /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
-  /// numbers only as of truecaller_sdk 0.0.2 so that's why default countryISO is set to "IN".
+  /// numbers only so that's why default countryISO is set to "IN".
   /// The result will be returned asynchronously via [streamCallbackData] stream
   /// Check [TruecallerSdkCallbackResult] to understand the different verifications states.
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
