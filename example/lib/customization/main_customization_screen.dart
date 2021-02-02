@@ -529,7 +529,8 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ResultScreen(truecallerSdkCallback.profile.firstName, 1),
+                builder: (context) => ResultScreen("${truecallerSdkCallback.profile.firstName}"
+                    "\nBusiness Profile: ${truecallerSdkCallback.profile.isBusiness}", 1),
               ));
           break;
         case TruecallerSdkCallbackResult.failure:

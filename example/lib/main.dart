@@ -93,7 +93,8 @@ class _MyAppState extends State<MyApp> {
                         switch (snapshot.data.result) {
                           case TruecallerSdkCallbackResult.success:
                             return Text(
-                                "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}");
+                                "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}"
+                                "\nBusiness Profile: ${snapshot.data.profile.isBusiness}");
                           case TruecallerSdkCallbackResult.failure:
                             return Text("Oops!! Error type ${snapshot.data.error.code}");
                           case TruecallerSdkCallbackResult.verification:
