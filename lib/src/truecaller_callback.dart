@@ -121,6 +121,7 @@ class TruecallerUserProfile {
   int verificationTimestamp;
   String userLocale;
   String accessToken;
+  bool isBusiness;
 
   /// get the [TruecallerUserProfile] values from Json
   TruecallerUserProfile.fromJson(Map<String, dynamic> map)
@@ -149,7 +150,8 @@ class TruecallerUserProfile {
         verificationMode = map['verificationMode'],
         verificationTimestamp = map['verificationTimestamp'],
         userLocale = map['userLocale'],
-        accessToken = map['accessToken'];
+        accessToken = map['accessToken'],
+        isBusiness = map['isBusiness'];
 }
 
 /// error that corresponds to [TruecallerSdkCallback.error]
