@@ -43,6 +43,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Stream<TruecallerSdkCallback> _stream;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -66,7 +67,13 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
-                      isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
+                      if (isUsable) {
+                        TruecallerSdk.getProfile;
+                      } else {
+                        final snackBar = SnackBar(content: Text("Not Usable"));
+                        _scaffoldKey.currentState.showSnackBar(snackBar);
+                        print("***Not usable***");
+                      }
                     });
                   },
                   child: Text(
