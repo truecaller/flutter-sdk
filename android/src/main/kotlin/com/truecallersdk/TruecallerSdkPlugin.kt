@@ -57,7 +57,6 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.Locale
 
-const val PROFILE_REQUEST_CODE = 100
 const val INITIATE_SDK = "initiateSDK"
 const val IS_USABLE = "isUsable"
 const val SET_DARK_THEME = "setDarkTheme"
@@ -308,8 +307,8 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return if (requestCode == PROFILE_REQUEST_CODE) {
-            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, resultCode, data)
+        return if (requestCode == TruecallerSDK.SHARE_PROFILE_REQUEST_CODE) {
+            TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, requestCode, resultCode, data)
         } else false
     }
 
