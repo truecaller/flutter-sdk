@@ -18,7 +18,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^0.0.3
+  truecaller_sdk: ^0.0.4
   ...
 ```
 ### 2. Generate App key and add it to `AndroidManifest.xml`:
@@ -315,6 +315,8 @@ By default, `initializeSDK()` has default argument values for all the arguments 
 ##### Note
 For list of supported locales and details on different kinds of customizations, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/customisation-1)
 
+##### Support
+For any technical/flow related questions, please feel free to reach out via our [support channel](https://developer.truecaller.com/support) for a fast and dedicated response.
 
 ## License
 

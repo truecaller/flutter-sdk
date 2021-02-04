@@ -29,3 +29,8 @@ handle the time out logic at your own end which can be retrieved from `Truecalle
 `TruecallerSdkCallbackResult.missedCallInitiated` or `TruecallerSdkCallbackResult.otpInitiated`. This means that as soon as you initiate the number
 verification flow by OTP or Missed call, you will receive a TTL value which you can use appropriately to show a countdown timer and once it expires you
 need to restart the verification process.
+
+## 0.0.4
+
+* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.6.0
+* More optimisations, bug fixes and support for targetSdkVersion 30
