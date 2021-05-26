@@ -39,11 +39,15 @@ dependencies:
 ### 3. Make changes to `MainActivity.kt`:
 * Head to the [MainActivity.kt](/example/android/app/src/main/kotlin/com/example/truecaller_sdk_example/MainActivity.kt) under /android module
 * SDK requires the use of a `FragmentActivity` as opposed to `Activity`, so extend your `MainActivity.kt` with `FlutterFragmentActivity`.
-* Override function `configureFlutterEngine(flutterEngine: FlutterEngine)` in your `MainActivity.kt`:
+* Override the two functions `configureFlutterEngine(flutterEngine: FlutterEngine)` and `getBackgroundMode()` in your `MainActivity.kt`:
 ```kotlin
 class MainActivity: FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
+    }
+
+    override fun getBackgroundMode(): FlutterActivityLaunchConfigs.BackgroundMode {
+        return FlutterActivityLaunchConfigs.BackgroundMode.transparent
     }
 }
 ```
