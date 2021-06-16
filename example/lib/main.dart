@@ -43,7 +43,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Stream<TruecallerSdkCallback> _stream;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -65,13 +64,14 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
+                    TruecallerSdk.initializeSDK(
+                        sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
                       if (isUsable) {
                         TruecallerSdk.getProfile;
                       } else {
                         final snackBar = SnackBar(content: Text("Not Usable"));
-                        _scaffoldKey.currentState.showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         print("***Not usable***");
                       }
                     });
@@ -96,7 +96,8 @@ class _MyAppState extends State<MyApp> {
                                 "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}"
                                 "\nBusiness Profile: ${snapshot.data.profile.isBusiness}");
                           case TruecallerSdkCallbackResult.failure:
-                            return Text("Oops!! Error type ${snapshot.data.error.code}");
+                            return Text(
+                                "Oops!! Error type ${snapshot.data.error.code}");
                           case TruecallerSdkCallbackResult.verification:
                             return Column(
                               children: [
@@ -108,7 +109,8 @@ class _MyAppState extends State<MyApp> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => NonTcVerification()));
+                                            builder: (context) =>
+                                                NonTcVerification()));
                                   },
                                   child: Text(
                                     "Do manual verification",

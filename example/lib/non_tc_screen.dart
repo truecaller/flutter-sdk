@@ -84,7 +84,8 @@ class _HomePageState extends State<HomePage> {
 
   bool showInputNameView() {
     return tempResult != null &&
-        (tempResult == TruecallerSdkCallbackResult.missedCallReceived || showInputOtpView());
+        (tempResult == TruecallerSdkCallbackResult.missedCallReceived ||
+            showInputOtpView());
   }
 
   bool showInputOtpView() {
@@ -125,17 +126,23 @@ class _HomePageState extends State<HomePage> {
                 controller: phoneController,
                 maxLength: 10,
                 keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   prefixText: "+91",
-                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  prefixStyle:
+                      TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter Phone number",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "99999-99999",
-                  errorText: invalidNumber ? "Mobile Number must be of 10 digits" : null,
+                  errorText: invalidNumber
+                      ? "Mobile Number must be of 10 digits"
+                      : null,
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -150,13 +157,19 @@ class _HomePageState extends State<HomePage> {
                 keyboardType: TextInputType.text,
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
-                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  prefixStyle:
+                      TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter First Name",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "John",
-                  errorText: invalidFName ? "Invalid first name. Enter min 2 characters" : null,
+                  errorText: invalidFName
+                      ? "Invalid first name. Enter min 2 characters"
+                      : null,
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -171,12 +184,16 @@ class _HomePageState extends State<HomePage> {
                 keyboardType: TextInputType.text,
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
-                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  prefixStyle:
+                      TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter Last Name",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "Doe",
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -190,15 +207,18 @@ class _HomePageState extends State<HomePage> {
                 controller: otpController,
                 maxLength: 6,
                 keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   labelText: "Enter OTP",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "123-456",
                   errorText: invalidOtp ? "OTP must be 6 digits" : null,
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -207,7 +227,9 @@ class _HomePageState extends State<HomePage> {
               height: 20.0,
             ),
             Visibility(
-              visible: showInputNumberView() || showInputNameView() || showInputOtpView(),
+              visible: showInputNumberView() ||
+                  showInputNameView() ||
+                  showInputOtpView(),
               child: MaterialButton(
                 minWidth: width - 50.0,
                 height: 45.0,
@@ -226,15 +248,15 @@ class _HomePageState extends State<HomePage> {
             Visibility(
               visible: showRetryTextView(),
               child: _ttl == 0
-                  ? FlatButton(
+                  ? TextButton(
                       child: Text(
                         "verification timed out, retry again",
                         style: TextStyle(
-                          decoration: TextDecoration.underline,
-                        ),
+                            decoration: TextDecoration.underline,
+                            color: Colors.blue),
                       ),
-                      textColor: Colors.blue,
-                      onPressed: () => setState(() => tempResult = null))
+                      onPressed: () => setState(() => tempResult = null),
+                    )
                   : Text("Retry again in $_ttl seconds"),
             ),
           ],
@@ -262,16 +284,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerUserCallback) {
+    streamSubscription =
+        TruecallerSdk.streamCallbackData.listen((truecallerUserCallback) {
       // make sure you're changing state only after number has been entered. there could be case
       // where user initiated missed call, pressed back, and came to this screen again after
       // which the call was received and hence it would directly open input name screen.
       if (phoneController.text.length == 10) {
         setState(() {
-          if (truecallerUserCallback.result != TruecallerSdkCallbackResult.exception) {
+          if (truecallerUserCallback.result !=
+              TruecallerSdkCallbackResult.exception) {
             tempResult = truecallerUserCallback.result;
           }
-          showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
+          showProgressBar =
+              tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
           if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
             otpController.text = truecallerUserCallback.otp;
           }
@@ -281,24 +306,28 @@ class _HomePageState extends State<HomePage> {
       switch (truecallerUserCallback.result) {
         case TruecallerSdkCallbackResult.missedCallInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
-          showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
+          showSnackBar(
+              "Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
           break;
         case TruecallerSdkCallbackResult.missedCallReceived:
           showSnackBar("Missed call Received");
           break;
         case TruecallerSdkCallbackResult.otpInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
-          showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl}");
+          showSnackBar(
+              "OTP Initiated with TTL : ${truecallerUserCallback.ttl}");
           break;
         case TruecallerSdkCallbackResult.otpReceived:
           showSnackBar("OTP Received : ${truecallerUserCallback.otp}");
           break;
         case TruecallerSdkCallbackResult.verificationComplete:
-          showSnackBar("Verification Completed : ${truecallerUserCallback.accessToken}");
+          showSnackBar(
+              "Verification Completed : ${truecallerUserCallback.accessToken}");
           _navigateToResult(fNameController.text);
           break;
         case TruecallerSdkCallbackResult.verifiedBefore:
-          showSnackBar("Verified Before : ${truecallerUserCallback.profile.accessToken}");
+          showSnackBar(
+              "Verified Before : ${truecallerUserCallback.profile.accessToken}");
           _navigateToResult(truecallerUserCallback.profile.firstName);
           break;
         case TruecallerSdkCallbackResult.exception:
@@ -314,7 +343,7 @@ class _HomePageState extends State<HomePage> {
 
   void showSnackBar(String message) {
     final snackBar = SnackBar(content: Text(message));
-    _scaffoldKey.currentState.showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   _navigateToResult(String firstName) {
@@ -329,15 +358,18 @@ class _HomePageState extends State<HomePage> {
     if (showInputNumberView() && validateNumber()) {
       setProgressBarToActive();
       TruecallerSdk.requestVerification(phoneNumber: phoneController.text);
-    } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
+    } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived &&
+        validateName()) {
       setProgressBarToActive();
-      TruecallerSdk.verifyMissedCall(fNameController.text, lNameController.text);
+      TruecallerSdk.verifyMissedCall(
+          fNameController.text, lNameController.text);
     } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
             tempResult == TruecallerSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();
-      TruecallerSdk.verifyOtp(fNameController.text, lNameController.text, otpController.text);
+      TruecallerSdk.verifyOtp(
+          fNameController.text, lNameController.text, otpController.text);
     }
   }
 

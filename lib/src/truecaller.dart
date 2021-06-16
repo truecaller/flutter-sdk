@@ -31,7 +31,6 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'scope_options.dart';
@@ -42,7 +41,7 @@ class TruecallerSdk {
       const MethodChannel('tc_method_channel');
   static const EventChannel _eventChannel =
       const EventChannel('tc_event_channel');
-  static Stream<TruecallerSdkCallback> _callbackStream;
+  static Stream<TruecallerSdkCallback>? _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
   /// customizable options which are all optional and have default values as set below in the method
@@ -71,7 +70,7 @@ class TruecallerSdk {
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {@required int sdkOptions,
+          {required int sdkOptions,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
           int consentTitleOptions:
               TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
@@ -84,8 +83,8 @@ class TruecallerSdk {
           String privacyPolicyUrl: "",
           String termsOfServiceUrl: "",
           int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
-          int buttonColor,
-          int buttonTextColor}) async =>
+          int? buttonColor,
+          int? buttonTextColor}) async =>
       await _methodChannel.invokeMethod('initiateSDK', {
         "sdkOptions": sdkOptions,
         "consentMode": consentMode,
@@ -106,7 +105,7 @@ class TruecallerSdk {
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP], you can check if the Truecaller app is
   /// present on the user's device or whether the user has a valid account state or not by using
   /// the following method
-  static Future<bool> get isUsable async =>
+  static Future<bool?> get isUsable async =>
       _methodChannel.invokeMethod('isUsable');
 
   /// After checking [isUsable], you can show the Truecaller profile verification dialog
@@ -124,7 +123,7 @@ class TruecallerSdk {
   /// [TruecallerSdkCallbackResult.verification] will be returned only when using
   /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] which indicates to verify the user
   /// manually, so this is not applicable for truecaller_sdk 0.0.1
-  static Stream<TruecallerSdkCallback> get streamCallbackData {
+  static Stream<TruecallerSdkCallback>? get streamCallbackData {
     if (_callbackStream == null) {
       _callbackStream = _eventChannel
           .receiveBroadcastStream()
@@ -134,7 +133,7 @@ class TruecallerSdk {
         switch (resultHashMap["result"].enumValue()) {
           case TruecallerSdkCallbackResult.success:
             callback.result = TruecallerSdkCallbackResult.success;
-            _insertProfile(callback, resultHashMap["data"]);
+            _insertProfile(callback, resultHashMap["data"]!);
             break;
           case TruecallerSdkCallbackResult.failure:
             callback.result = TruecallerSdkCallbackResult.failure;
@@ -161,7 +160,7 @@ class TruecallerSdk {
             break;
           case TruecallerSdkCallbackResult.verifiedBefore:
             callback.result = TruecallerSdkCallbackResult.verifiedBefore;
-            _insertProfile(callback, resultHashMap["data"]);
+            _insertProfile(callback, resultHashMap["data"]!);
             break;
           case TruecallerSdkCallbackResult.verificationComplete:
             callback.result = TruecallerSdkCallbackResult.verificationComplete;
@@ -169,9 +168,9 @@ class TruecallerSdk {
             break;
           case TruecallerSdkCallbackResult.exception:
             callback.result = TruecallerSdkCallbackResult.exception;
-            Map exceptionMap = jsonDecode(resultHashMap["data"]);
-            TruecallerException exception =
-                TruecallerException.fromJson(exceptionMap);
+            Map exceptionMap = jsonDecode(resultHashMap["data"]!);
+            TruecallerException exception = TruecallerException.fromJson(
+                exceptionMap as Map<String, dynamic>);
             callback.exception = exception;
             break;
           default:
@@ -187,15 +186,17 @@ class TruecallerSdk {
 
   static _insertProfile(TruecallerSdkCallback callback, String data) {
     Map profileMap = jsonDecode(data);
-    TruecallerUserProfile profile = TruecallerUserProfile.fromJson(profileMap);
+    TruecallerUserProfile profile =
+        TruecallerUserProfile.fromJson(profileMap as Map<String, dynamic>);
     callback.profile = profile;
   }
 
-  static _insertError(TruecallerSdkCallback callback, String data) {
+  static _insertError(TruecallerSdkCallback callback, String? data) {
     // onVerificationRequired has nullable error, hence null check
     if (data != "null") {
-      Map errorMap = jsonDecode(data);
-      TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
+      Map errorMap = jsonDecode(data!);
+      TruecallerError truecallerError =
+          TruecallerError.fromJson(errorMap as Map<String, dynamic>);
       callback.error = truecallerError;
     }
   }
@@ -220,7 +221,7 @@ class TruecallerSdk {
   /// or if the user is already verified on the device, will get the call back as
   /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
   static requestVerification(
-          {@required String phoneNumber, String countryISO: "IN"}) async =>
+          {required String phoneNumber, String countryISO: "IN"}) async =>
       await _methodChannel.invokeMethod(
           'requestVerification', {"ph": phoneNumber, "ci": countryISO});
 

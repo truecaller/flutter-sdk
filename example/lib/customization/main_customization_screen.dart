@@ -51,7 +51,10 @@ class OptionsConfiguration extends StatefulWidget {
 class _OptionsConfigurationState extends State<OptionsConfiguration> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: "TC SDK Demo", debugShowCheckedModeBanner: false, home: HomePage());
+    return MaterialApp(
+        title: "TC SDK Demo",
+        debugShowCheckedModeBanner: false,
+        home: HomePage());
   }
 }
 
@@ -66,10 +69,10 @@ class _HomePageState extends State<HomePage> {
   TitleOption selectedTitle;
   int selectedFooter;
   bool darkMode, rectangularBtn, withOtp;
-  List<DropdownMenuItem<int>> colorMenuItemList = List();
-  List<DropdownMenuItem<int>> ctaPrefixMenuItemList = List();
-  List<DropdownMenuItem<int>> loginPrefixMenuItemList = List();
-  List<DropdownMenuItem<int>> loginSuffixMenuItemList = List();
+  List<DropdownMenuItem<int>> colorMenuItemList = [];
+  List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
+  List<DropdownMenuItem<int>> loginPrefixMenuItemList = [];
+  List<DropdownMenuItem<int>> loginSuffixMenuItemList = [];
   int ctaColor, ctaTextColor;
   int ctaPrefixOption, loginPrefixOption, loginSuffixOption;
   final TextEditingController privacyPolicyController =
@@ -203,7 +206,8 @@ class _HomePageState extends State<HomePage> {
                   height: 20.0,
                 ),
                 ToggleButtons(
-                  constraints: BoxConstraints(minHeight: 50, minWidth: (width - 48) / 3),
+                  constraints:
+                      BoxConstraints(minHeight: 50, minWidth: (width - 48) / 3),
                   children: <Widget>[
                     Text("Bottomsheet"),
                     Text("Popup"),
@@ -216,7 +220,8 @@ class _HomePageState extends State<HomePage> {
                       for (int buttonIndex = 0;
                           buttonIndex < selectedConsentType.length;
                           buttonIndex++) {
-                        selectedConsentType[buttonIndex] = buttonIndex == index ? true : false;
+                        selectedConsentType[buttonIndex] =
+                            buttonIndex == index ? true : false;
                       }
                     });
                   },
@@ -227,7 +232,9 @@ class _HomePageState extends State<HomePage> {
                   height: 20.0,
                 ),
                 Text(
-                  isBottomSheetSelected() ? "Bottomsheet customization Options" : "Title Options",
+                  isBottomSheetSelected()
+                      ? "Bottomsheet customization Options"
+                      : "Title Options",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
                 ),
                 Visibility(
@@ -265,7 +272,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10.0, bottom: 10.0),
+                  padding: const EdgeInsets.only(
+                      left: 16.0, right: 16.0, top: 10.0, bottom: 10.0),
                   child: TextField(
                     controller: localeController,
                     maxLength: 2,
@@ -274,10 +282,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                     decoration: InputDecoration(
                         labelText: "Enter Locale",
-                        labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
-                        hintText: "Example: en(default), hi, kn, ta, te, mr, etc.",
+                        labelStyle:
+                            TextStyle(color: Colors.black, fontSize: 16.0),
+                        hintText:
+                            "Example: en(default), hi, kn, ta, te, mr, etc.",
                         hintStyle: TextStyle(
-                            fontStyle: FontStyle.italic, color: Colors.green, fontSize: 14.0)),
+                            fontStyle: FontStyle.italic,
+                            color: Colors.green,
+                            fontSize: 14.0)),
                   ),
                 ),
                 SwitchListTile(
@@ -493,8 +505,8 @@ class _HomePageState extends State<HomePage> {
             ? TruecallerSdkScope.SDK_OPTION_WITH_OTP
             : TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
         consentMode: selectedConsentMode,
-        consentTitleOptions:
-            TitleOption.getTitleOptions().indexWhere((title) => title.name == selectedTitle.name),
+        consentTitleOptions: TitleOption.getTitleOptions()
+            .indexWhere((title) => title.name == selectedTitle.name),
         footerType: selectedFooter,
         loginTextPrefix: loginPrefixOption,
         loginTextSuffix: loginSuffixOption,
@@ -523,20 +535,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
+    streamSubscription =
+        TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
       switch (truecallerSdkCallback.result) {
         case TruecallerSdkCallbackResult.success:
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ResultScreen("${truecallerSdkCallback.profile.firstName}"
-                    "\nBusiness Profile: ${truecallerSdkCallback.profile.isBusiness}", 1),
-              ));
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultScreen(
+                  "${truecallerSdkCallback.profile.firstName}"
+                  "\nBusiness Profile: ${truecallerSdkCallback.profile.isBusiness}",
+                  1),
+            ),
+          );
           break;
         case TruecallerSdkCallbackResult.failure:
-          final snackBar = SnackBar(content: Text("Error code : ${truecallerSdkCallback.error
-              .code}"));
-          _scaffoldKey.currentState.showSnackBar(snackBar);
+          final snackBar = SnackBar(
+            content: Text("Error code : ${truecallerSdkCallback.error.code}"),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
           /*Navigator.push(
               context,
               MaterialPageRoute(
@@ -546,10 +563,11 @@ class _HomePageState extends State<HomePage> {
           break;
         case TruecallerSdkCallbackResult.verification:
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NonTcVerification(),
-              ));
+            context,
+            MaterialPageRoute(
+              builder: (context) => NonTcVerification(),
+            ),
+          );
           break;
         default:
           print("Invalid result");
