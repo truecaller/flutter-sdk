@@ -32,37 +32,37 @@ import 'truecaller.dart';
 
 /// callback stream that gets returned from [TruecallerSdk.streamCallbackData]
 class TruecallerSdkCallback {
-  TruecallerSdkCallbackResult result;
+  TruecallerSdkCallbackResult? result;
 
   //for tc-flow
 
   /// received when [result] equals [TruecallerSdkCallbackResult.failure] or
   /// [result] equals [TruecallerSdkCallbackResult.verification]
   /// It indicates reason why truecaller user verification failed
-  TruecallerError error;
+  TruecallerError? error;
 
   //for tc-flow and non-tc flow
   /// received when [result] equals [TruecallerSdkCallbackResult.success] or
   /// [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
-  TruecallerUserProfile profile;
+  TruecallerUserProfile? profile;
 
   //** for non-tc flow **//
 
   /// received when [result] equals [TruecallerSdkCallbackResult.otpReceived]
-  String otp;
+  String? otp;
 
   /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
   /// It can be used for server-side response validation
-  String accessToken;
+  String? accessToken;
 
   /// TTL(in sec) received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
   /// or [result] equals [TruecallerSdkCallbackResult.missedCallInitiated]
   /// It indicates time left to complete the user verification process
-  String ttl;
+  String? ttl;
 
   /// received when [result] equals [TruecallerSdkCallbackResult.exception]
   /// It indicates reason why non-truecaller user verification failed
-  TruecallerException exception;
+  TruecallerException? exception;
 }
 
 /// enum with callback results that corresponds to the [TruecallerSdkCallback.result]
@@ -89,7 +89,7 @@ extension EnumParser on String {
         (element) =>
             element.toString().split(".")[1].toLowerCase() ==
             this.toLowerCase(),
-        orElse: () => null);
+        orElse: () => TruecallerSdkCallbackResult.exception);
   }
 }
 
@@ -156,8 +156,8 @@ class TruecallerUserProfile {
 
 /// error that corresponds to [TruecallerSdkCallback.error]
 class TruecallerError {
-  int code;
-  String message;
+  int? code;
+  String? message;
 
   /// get the [TruecallerError] values from Json
   TruecallerError.fromJson(Map<String, dynamic> map) {
@@ -168,8 +168,8 @@ class TruecallerError {
 
 /// exception that corresponds to [TruecallerSdkCallback.exception]
 class TruecallerException {
-  int code;
-  String message;
+  int? code;
+  String? message;
 
   /// get the [TruecallerException] values from Json
   TruecallerException.fromJson(Map<String, dynamic> map) {

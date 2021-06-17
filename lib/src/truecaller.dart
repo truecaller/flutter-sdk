@@ -42,7 +42,7 @@ class TruecallerSdk {
       const MethodChannel('tc_method_channel');
   static const EventChannel _eventChannel =
       const EventChannel('tc_event_channel');
-  static Stream<TruecallerSdkCallback> _callbackStream;
+  static Stream<TruecallerSdkCallback>? _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
   /// customizable options which are all optional and have default values as set below in the method
@@ -71,7 +71,7 @@ class TruecallerSdk {
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {@required int sdkOptions,
+          {@required int? sdkOptions,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
           int consentTitleOptions:
               TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
@@ -84,8 +84,8 @@ class TruecallerSdk {
           String privacyPolicyUrl: "",
           String termsOfServiceUrl: "",
           int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
-          int buttonColor,
-          int buttonTextColor}) async =>
+          int? buttonColor,
+          int? buttonTextColor}) async =>
       await _methodChannel.invokeMethod('initiateSDK', {
         "sdkOptions": sdkOptions,
         "consentMode": consentMode,
@@ -107,7 +107,7 @@ class TruecallerSdk {
   /// present on the user's device or whether the user has a valid account state or not by using
   /// the following method
   static Future<bool> get isUsable async =>
-      _methodChannel.invokeMethod('isUsable');
+      _methodChannel.invokeMethod('isUsable') as bool;
 
   /// After checking [isUsable], you can show the Truecaller profile verification dialog
   /// anywhere in your app flow by calling the following method
@@ -131,33 +131,33 @@ class TruecallerSdk {
           .map<TruecallerSdkCallback>((value) {
         TruecallerSdkCallback callback = new TruecallerSdkCallback();
         var resultHashMap = HashMap<String, String>.from(value);
-        switch (resultHashMap["result"].enumValue()) {
+        switch (resultHashMap["result"]!.enumValue()) {
           case TruecallerSdkCallbackResult.success:
             callback.result = TruecallerSdkCallbackResult.success;
             _insertProfile(callback, resultHashMap["data"]);
             break;
           case TruecallerSdkCallbackResult.failure:
             callback.result = TruecallerSdkCallbackResult.failure;
-            _insertError(callback, resultHashMap["data"]);
+            _insertError(callback, resultHashMap["data"]!);
             break;
           case TruecallerSdkCallbackResult.verification:
             callback.result = TruecallerSdkCallbackResult.verification;
-            _insertError(callback, resultHashMap["data"]);
+            _insertError(callback, resultHashMap["data"]!);
             break;
           case TruecallerSdkCallbackResult.missedCallInitiated:
             callback.result = TruecallerSdkCallbackResult.missedCallInitiated;
-            callback.ttl = resultHashMap["data"];
+            callback.ttl = resultHashMap["data"]!;
             break;
           case TruecallerSdkCallbackResult.missedCallReceived:
             callback.result = TruecallerSdkCallbackResult.missedCallReceived;
             break;
           case TruecallerSdkCallbackResult.otpInitiated:
             callback.result = TruecallerSdkCallbackResult.otpInitiated;
-            callback.ttl = resultHashMap["data"];
+            callback.ttl = resultHashMap["data"]!;
             break;
           case TruecallerSdkCallbackResult.otpReceived:
             callback.result = TruecallerSdkCallbackResult.otpReceived;
-            callback.otp = resultHashMap["data"];
+            callback.otp = resultHashMap["data"]!;
             break;
           case TruecallerSdkCallbackResult.verifiedBefore:
             callback.result = TruecallerSdkCallbackResult.verifiedBefore;
@@ -165,11 +165,12 @@ class TruecallerSdk {
             break;
           case TruecallerSdkCallbackResult.verificationComplete:
             callback.result = TruecallerSdkCallbackResult.verificationComplete;
-            callback.accessToken = resultHashMap["data"];
+            callback.accessToken = resultHashMap["data"]!;
             break;
           case TruecallerSdkCallbackResult.exception:
             callback.result = TruecallerSdkCallbackResult.exception;
-            Map exceptionMap = jsonDecode(resultHashMap["data"]);
+            Map<String, dynamic> exceptionMap =
+                jsonDecode(resultHashMap["data"]!);
             TruecallerException exception =
                 TruecallerException.fromJson(exceptionMap);
             callback.exception = exception;
@@ -182,19 +183,19 @@ class TruecallerSdk {
         return callback;
       });
     }
-    return _callbackStream;
+    return _callbackStream!;
   }
 
-  static _insertProfile(TruecallerSdkCallback callback, String data) {
-    Map profileMap = jsonDecode(data);
+  static _insertProfile(TruecallerSdkCallback? callback, String? data) {
+    Map<String, dynamic> profileMap = jsonDecode(data!);
     TruecallerUserProfile profile = TruecallerUserProfile.fromJson(profileMap);
-    callback.profile = profile;
+    callback!.profile = profile;
   }
 
   static _insertError(TruecallerSdkCallback callback, String data) {
     // onVerificationRequired has nullable error, hence null check
     if (data != "null") {
-      Map errorMap = jsonDecode(data);
+      Map<String, dynamic> errorMap = jsonDecode(data);
       TruecallerError truecallerError = TruecallerError.fromJson(errorMap);
       callback.error = truecallerError;
     }
@@ -220,7 +221,7 @@ class TruecallerSdk {
   /// or if the user is already verified on the device, will get the call back as
   /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
   static requestVerification(
-          {@required String phoneNumber, String countryISO: "IN"}) async =>
+          {@required String? phoneNumber, String countryISO: "IN"}) async =>
       await _methodChannel.invokeMethod(
           'requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
