@@ -1,7 +1,7 @@
-name: truecaller_sdk
-description: Flutter plugin that uses Truecaller's Android SDK to provide mobile number verification service to verify users.
-version: 0.0.5-nullsafety
-homepage: https://github.com/truecaller/flutter-sdk
+name: truecaller_sdk_fork_ns
+description: this is a fork of the actual truecaller sdk to add 0.0.5-nullsafety
+version: 0.0.6-nullsafety
+homepage: https://github.com/rgplvr/flutter-sdk
 
 environment:
   sdk: ">=2.12.0-0 <3.0.0"
