@@ -66,11 +66,10 @@ class _HomePageState extends State<HomePage> {
   TextEditingController fNameController = TextEditingController();
   TextEditingController lNameController = TextEditingController();
   TextEditingController otpController = TextEditingController();
-  StreamSubscription streamSubscription;
-  TruecallerSdkCallbackResult tempResult;
-  Timer _timer;
-  int _ttl;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late StreamSubscription? streamSubscription;
+  TruecallerSdkCallbackResult? tempResult;
+  Timer? _timer;
+  int? _ttl;
 
   @override
   void initState() {
@@ -102,7 +101,6 @@ class _HomePageState extends State<HomePage> {
     final double width = MediaQuery.of(context).size.width;
     const double fontSize = 18.0;
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Verify User Manually"),
       ),
@@ -125,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                 controller: phoneController,
                 maxLength: 10,
                 keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   prefixText: "+91",
@@ -190,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                 controller: otpController,
                 maxLength: 6,
                 keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   labelText: "Enter OTP",
@@ -226,14 +224,11 @@ class _HomePageState extends State<HomePage> {
             Visibility(
               visible: showRetryTextView(),
               child: _ttl == 0
-                  ? FlatButton(
+                  ? TextButton(
                       child: Text(
                         "verification timed out, retry again",
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                        ),
+                        style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
                       ),
-                      textColor: Colors.blue,
                       onPressed: () => setState(() => tempResult = null))
                   : Text("Retry again in $_ttl seconds"),
             ),
@@ -250,11 +245,11 @@ class _HomePageState extends State<HomePage> {
       oneSec,
       (Timer timer) => setState(
         () {
-          if (_ttl < 1) {
+          if (_ttl! < 1) {
             timer.cancel();
             showProgressBar = false;
           } else {
-            _ttl = _ttl - 1;
+            _ttl = _ttl! - 1;
           }
         },
       ),
@@ -273,21 +268,21 @@ class _HomePageState extends State<HomePage> {
           }
           showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
           if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
-            otpController.text = truecallerUserCallback.otp;
+            otpController.text = truecallerUserCallback.otp!;
           }
         });
       }
 
       switch (truecallerUserCallback.result) {
         case TruecallerSdkCallbackResult.missedCallInitiated:
-          startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
+          startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
           showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
           break;
         case TruecallerSdkCallbackResult.missedCallReceived:
           showSnackBar("Missed call Received");
           break;
         case TruecallerSdkCallbackResult.otpInitiated:
-          startCountdownTimer(double.parse(truecallerUserCallback.ttl).floor());
+          startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
           showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl}");
           break;
         case TruecallerSdkCallbackResult.otpReceived:
@@ -298,12 +293,12 @@ class _HomePageState extends State<HomePage> {
           _navigateToResult(fNameController.text);
           break;
         case TruecallerSdkCallbackResult.verifiedBefore:
-          showSnackBar("Verified Before : ${truecallerUserCallback.profile.accessToken}");
-          _navigateToResult(truecallerUserCallback.profile.firstName);
+          showSnackBar("Verified Before : ${truecallerUserCallback.profile!.accessToken}");
+          _navigateToResult(truecallerUserCallback.profile!.firstName);
           break;
         case TruecallerSdkCallbackResult.exception:
-          showSnackBar("Exception : ${truecallerUserCallback.exception.code}, "
-              "${truecallerUserCallback.exception.message}");
+          showSnackBar("Exception : ${truecallerUserCallback.exception!.code}, "
+              "${truecallerUserCallback.exception!.message}");
           break;
         default:
           print(tempResult.toString());
@@ -314,7 +309,7 @@ class _HomePageState extends State<HomePage> {
 
   void showSnackBar(String message) {
     final snackBar = SnackBar(content: Text(message));
-    _scaffoldKey.currentState.showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   _navigateToResult(String firstName) {
@@ -331,13 +326,15 @@ class _HomePageState extends State<HomePage> {
       TruecallerSdk.requestVerification(phoneNumber: phoneController.text);
     } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
       setProgressBarToActive();
-      TruecallerSdk.verifyMissedCall(fNameController.text, lNameController.text);
+      TruecallerSdk.verifyMissedCall(
+          firstName: fNameController.text, lastName: lNameController.text);
     } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
             tempResult == TruecallerSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();
-      TruecallerSdk.verifyOtp(fNameController.text, lNameController.text, otpController.text);
+      TruecallerSdk.verifyOtp(
+          firstName: fNameController.text, lastName: lNameController.text, otp: otpController.text);
     }
   }
 
@@ -377,12 +374,8 @@ class _HomePageState extends State<HomePage> {
     fNameController.dispose();
     lNameController.dispose();
     otpController.dispose();
-    if (streamSubscription != null) {
-      streamSubscription.cancel();
-    }
-    if (_timer != null) {
-      _timer.cancel();
-    }
+    streamSubscription!.cancel();
+    _timer!.cancel();
     super.dispose();
   }
 }

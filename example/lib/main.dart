@@ -42,8 +42,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Stream<TruecallerSdkCallback> _stream;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late Stream<TruecallerSdkCallback>? _stream;
 
   @override
   void initState() {
@@ -67,11 +66,11 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
-                      if (isUsable) {
+                      if (isUsable!) {
                         TruecallerSdk.getProfile;
                       } else {
                         final snackBar = SnackBar(content: Text("Not Usable"));
-                        _scaffoldKey.currentState.showSnackBar(snackBar);
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         print("***Not usable***");
                       }
                     });
@@ -90,18 +89,18 @@ class _MyAppState extends State<MyApp> {
                     stream: _stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        switch (snapshot.data.result) {
+                        switch (snapshot.data!.result) {
                           case TruecallerSdkCallbackResult.success:
                             return Text(
-                                "Hi, ${snapshot.data.profile.firstName} ${snapshot.data.profile.lastName}"
-                                "\nBusiness Profile: ${snapshot.data.profile.isBusiness}");
+                                "Hi, ${snapshot.data!.profile!.firstName} ${snapshot.data!.profile!.lastName}"
+                                "\nBusiness Profile: ${snapshot.data!.profile!.isBusiness}");
                           case TruecallerSdkCallbackResult.failure:
-                            return Text("Oops!! Error type ${snapshot.data.error.code}");
+                            return Text("Oops!! Error type ${snapshot.data!.error!.code}");
                           case TruecallerSdkCallbackResult.verification:
                             return Column(
                               children: [
                                 Text("Verification Required : "
-                                    "${snapshot.data.error != null ? snapshot.data.error.code : ""}"),
+                                    "${snapshot.data!.error != null ? snapshot.data!.error!.code : ""}"),
                                 MaterialButton(
                                   color: Colors.green,
                                   onPressed: () {

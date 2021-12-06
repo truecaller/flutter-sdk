@@ -61,24 +61,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<bool> selectedConsentType;
-  List<TitleOption> titleOptions;
-  TitleOption selectedTitle;
-  int selectedFooter;
-  bool darkMode, rectangularBtn, withOtp;
-  List<DropdownMenuItem<int>> colorMenuItemList = List();
-  List<DropdownMenuItem<int>> ctaPrefixMenuItemList = List();
-  List<DropdownMenuItem<int>> loginPrefixMenuItemList = List();
-  List<DropdownMenuItem<int>> loginSuffixMenuItemList = List();
-  int ctaColor, ctaTextColor;
-  int ctaPrefixOption, loginPrefixOption, loginSuffixOption;
+  late List<bool> selectedConsentType;
+  late List<TitleOption> titleOptions;
+  late TitleOption selectedTitle;
+  late int selectedFooter;
+  late bool darkMode, rectangularBtn, withOtp;
+  List<DropdownMenuItem<int>> colorMenuItemList = [];
+  List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
+  List<DropdownMenuItem<int>> loginPrefixMenuItemList = [];
+  List<DropdownMenuItem<int>> loginSuffixMenuItemList = [];
+  late int ctaColor, ctaTextColor;
+  late int ctaPrefixOption, loginPrefixOption, loginSuffixOption;
   final TextEditingController privacyPolicyController =
       TextEditingController(text: "https://www.example.com");
   final TextEditingController termsOfServiceController =
       TextEditingController(text: "https://www.truecaller.com/");
   final TextEditingController localeController = TextEditingController();
-  StreamSubscription streamSubscription;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late StreamSubscription? streamSubscription;
 
   @override
   void initState() {
@@ -134,7 +133,7 @@ class _HomePageState extends State<HomePage> {
           value: titleOption,
           groupValue: selectedTitle,
           title: Text(titleOption.name),
-          onChanged: (currentOption) {
+          onChanged: (dynamic currentOption) {
             setSelectedTitle(currentOption);
           },
           selected: selectedTitle == titleOption,
@@ -159,7 +158,7 @@ class _HomePageState extends State<HomePage> {
           value: key,
           groupValue: selectedFooter,
           title: Text("${FooterOption.getFooterOptionsMap()[key]}"),
-          onChanged: (currentOption) {
+          onChanged: (dynamic currentOption) {
             setSelectedFooter(currentOption);
           },
           selected: selectedFooter == key,
@@ -184,7 +183,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Configure SDK options"),
       ),
@@ -351,7 +349,7 @@ class _HomePageState extends State<HomePage> {
             items: colorMenuItemList,
             onChanged: (value) {
               setState(() {
-                ctaColor = value;
+                ctaColor = value!;
               });
             }),
       ),
@@ -372,7 +370,7 @@ class _HomePageState extends State<HomePage> {
             items: colorMenuItemList,
             onChanged: (value) {
               setState(() {
-                ctaTextColor = value;
+                ctaTextColor = value!;
               });
             }),
       ),
@@ -393,7 +391,7 @@ class _HomePageState extends State<HomePage> {
             items: ctaPrefixMenuItemList,
             onChanged: (value) {
               setState(() {
-                ctaPrefixOption = value;
+                ctaPrefixOption = value!;
               });
             }),
       ),
@@ -414,7 +412,7 @@ class _HomePageState extends State<HomePage> {
             items: loginPrefixMenuItemList,
             onChanged: (value) {
               setState(() {
-                loginPrefixOption = value;
+                loginPrefixOption = value!;
               });
             }),
       ),
@@ -435,7 +433,7 @@ class _HomePageState extends State<HomePage> {
             items: loginSuffixMenuItemList,
             onChanged: (value) {
               setState(() {
-                loginSuffixOption = value;
+                loginSuffixOption = value!;
               });
             }),
       ),
@@ -508,7 +506,7 @@ class _HomePageState extends State<HomePage> {
         buttonTextColor: ctaTextColor);
 
     TruecallerSdk.isUsable.then((isUsable) {
-      if (isUsable) {
+      if (isUsable!) {
         if (darkMode) {
           TruecallerSdk.setDarkTheme;
         }
@@ -529,14 +527,16 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ResultScreen("${truecallerSdkCallback.profile.firstName}"
-                    "\nBusiness Profile: ${truecallerSdkCallback.profile.isBusiness}", 1),
+                builder: (context) => ResultScreen(
+                    "${truecallerSdkCallback.profile!.firstName}"
+                    "\nBusiness Profile: ${truecallerSdkCallback.profile!.isBusiness}",
+                    1),
               ));
           break;
         case TruecallerSdkCallbackResult.failure:
-          final snackBar = SnackBar(content: Text("Error code : ${truecallerSdkCallback.error
-              .code}"));
-          _scaffoldKey.currentState.showSnackBar(snackBar);
+          final snackBar =
+              SnackBar(content: Text("Error code : ${truecallerSdkCallback.error!.code}"));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
           /*Navigator.push(
               context,
               MaterialPageRoute(
@@ -558,7 +558,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   _hideKeyboard() {
-    FocusManager.instance.primaryFocus.unfocus();
+    FocusManager.instance.primaryFocus!.unfocus();
   }
 
   @override
@@ -566,9 +566,7 @@ class _HomePageState extends State<HomePage> {
     privacyPolicyController.dispose();
     termsOfServiceController.dispose();
     localeController.dispose();
-    if (streamSubscription != null) {
-      streamSubscription.cancel();
-    }
+    streamSubscription!.cancel();
     super.dispose();
   }
 }
