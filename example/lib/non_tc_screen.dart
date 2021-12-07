@@ -374,8 +374,8 @@ class _HomePageState extends State<HomePage> {
     fNameController.dispose();
     lNameController.dispose();
     otpController.dispose();
-    streamSubscription!.cancel();
-    _timer!.cancel();
+    streamSubscription?.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 }

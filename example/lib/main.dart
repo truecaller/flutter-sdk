@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
-                      if (isUsable!) {
+                      if (isUsable) {
                         TruecallerSdk.getProfile;
                       } else {
                         final snackBar = SnackBar(content: Text("Not Usable"));

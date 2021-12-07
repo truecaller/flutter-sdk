@@ -100,7 +100,7 @@ class TruecallerSdk {
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP], you can check if the Truecaller app is
   /// present on the user's device or whether the user has a valid account state or not by using
   /// the following method
-  static Future<bool?> get isUsable async => _methodChannel.invokeMethod('isUsable');
+  static Future<dynamic> get isUsable async => _methodChannel.invokeMethod('isUsable');
 
   /// After checking [isUsable], you can show the Truecaller profile verification dialog
   /// anywhere in your app flow by calling the following method

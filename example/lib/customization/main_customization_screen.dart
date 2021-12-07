@@ -506,7 +506,7 @@ class _HomePageState extends State<HomePage> {
         buttonTextColor: ctaTextColor);
 
     TruecallerSdk.isUsable.then((isUsable) {
-      if (isUsable!) {
+      if (isUsable) {
         if (darkMode) {
           TruecallerSdk.setDarkTheme;
         }
@@ -566,7 +566,7 @@ class _HomePageState extends State<HomePage> {
     privacyPolicyController.dispose();
     termsOfServiceController.dispose();
     localeController.dispose();
-    streamSubscription!.cancel();
+    streamSubscription?.cancel();
     super.dispose();
   }
 }
