@@ -34,3 +34,7 @@ need to restart the verification process.
 
 * Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.6.0
 * More optimisations, bug fixes and support for targetSdkVersion 30
+
+## 0.1.0
+
+* Migrated the plugin and example to support null safety

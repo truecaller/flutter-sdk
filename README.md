@@ -18,7 +18,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^0.0.4
+  truecaller_sdk: ^0.1.0
   ...
 ```
 ### 2. Generate App key and add it to `AndroidManifest.xml`:
@@ -94,7 +94,7 @@ import 'package:truecaller_sdk/truecaller_sdk.dart';
 //Step 1: Initialize the SDK with SDK_OPTION_WITHOUT_OTP
 TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP);
 
-//Step 2: Check if SDK is usable
+//Step 2: Check if SDK is usable on that device, otherwise fall back to any other alternative
 bool isUsable = await TruecallerSdk.isUsable;
 
 //Step 3: If isUsable is true, you can call getProfile to show consent screen to verify user's number
@@ -109,11 +109,12 @@ TruecallerSdk.isUsable.then((isUsable) {
 StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
   switch (truecallerSdkCallback.result) {
     case TruecallerSdkCallbackResult.success:
-      print("First Name: ${truecallerSdkCallback.profile.firstName}");
-      print("Last Name: ${truecallerSdkCallback.profile.lastName}");
+      String firstName = truecallerSdkCallback.profile!.firstName;
+      String? lastName = truecallerSdkCallback.profile!.lastName;
+      String phNo = truecallerSdkCallback.profile!.phoneNumber;
       break;
     case TruecallerSdkCallbackResult.failure:
-      print("Error code : ${truecallerSdkCallback.error.code}");
+      int errorCode = truecallerSdkCallback.error!.code;
       break;
     case TruecallerSdkCallbackResult.verification:
       print("Verification Required!!");
@@ -126,9 +127,7 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
 //Step 5: Dispose streamSubscription
 @override
 void dispose() {
-  if (streamSubscription != null) {
-    streamSubscription.cancel();
-  }
+  streamSubscription?.cancel();
   super.dispose();
 }
 ```
@@ -157,17 +156,18 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
   switch (truecallerSdkCallback.result) {
     case TruecallerSdkCallbackResult.success:
     //If Truecaller user and has Truecaller app on his device, you'd directly get the Profile
-      print("First Name: ${truecallerSdkCallback.profile.firstName}");
-      print("Last Name: ${truecallerSdkCallback.profile.lastName}");
+      String firstName = truecallerSdkCallback.profile!.firstName;
+      String? lastName = truecallerSdkCallback.profile!.lastName;
+      String phNo = truecallerSdkCallback.profile!.phoneNumber;
       break;
     case TruecallerSdkCallbackResult.failure:
-      print("Error code : ${truecallerSdkCallback.error.code}");
+      int errorCode = truecallerSdkCallback.error!.code;
       break;
     case TruecallerSdkCallbackResult.verification:
       //If the callback comes here, it indicates that user has to be manually verified, so follow step 4
       //You'd receive nullable error which can be used to determine user action that led to verification 
-      print("Manual Verification Required!! ${truecallerSdkCallback.error != null ? 
-            truecallerSdkCallback.error.code : ""}");
+      int? errorCode = truecallerSdkCallback.error?.code;
+      print("Manual Verification Required!");
       break;
     default:
       print("Invalid result");
@@ -187,7 +187,7 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
       //You'd also receive ttl (in seconds) that determines time left to complete the user verification
       //Once TTL expires, you need to start from step 4. So you can either ask the user to input another number
       //or you can also auto-retry the verification on the same number by giving a retry button
-      print("${truecallerUserCallback.ttl}");
+      String? ttl = truecallerSdkCallback.ttl;
       break;
     case TruecallerSdkCallbackResult.missedCallReceived:
       //Missed call received and now you can complete the verification as mentioned in step 6a
@@ -197,26 +197,28 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
       //You'd also receive ttl (in seconds) that determines time left to complete the user verification
       //Once TTL expires, you need to start from step 4. So you can either ask the user to input another number
       //or you can also auto-retry the verification on the same number by giving a retry button
-      print("${truecallerUserCallback.ttl}");
+      String? ttl = truecallerSdkCallback.ttl;
       break;
     case TruecallerSdkCallbackResult.otpReceived:
       //OTP received and now you can complete the verification as mentioned in step 6b
       //If SMS Retriever hashcode is configured on Truecaller's developer dashboard, get the OTP from callback
-      print("${truecallerUserCallback.otp}");
+      String? otp = truecallerSdkCallback.otp;
       break;
     case TruecallerSdkCallbackResult.verificationComplete:
       //Number verification has been completed successfully and you can get the accessToken from callback
-      print("${truecallerUserCallback.accessToken}");
+      String? token = truecallerSdkCallback.accessToken;
       break;
     case TruecallerSdkCallbackResult.verifiedBefore:
       //Number has already been verified before, hence no need to verify. Retrieve the Profile data from callback
-      print("${truecallerUserCallback.profile.firstName}");
-      print("${truecallerUserCallback.profile.lastName}");
-      print("${truecallerUserCallback.profile.accessToken}");
+      String firstName = truecallerSdkCallback.profile!.firstName;
+      String? lastName = truecallerSdkCallback.profile!.lastName;
+      String phNo = truecallerSdkCallback.profile!.phoneNumber;
+      String? token = truecallerSdkCallback.profile!.accessToken;
       break;
     case TruecallerSdkCallbackResult.exception:
       //Handle the exception
-      print("${truecallerUserCallback.exception.code}, ${truecallerUserCallback.exception.message}");
+      int exceptionCode = truecallerSdkCallback.exception!.code;
+      String exceptionMsg = truecallerSdkCallback.exception!.message;
       break;
     default:
       print("Invalid result");
@@ -225,17 +227,15 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
 
 //Step 6: Complete user verification
 //6a: If Missed call has been received on the same device, call this method with user's name
-TruecallerSdk.verifyMissedCall("FIRST_NAME", "LAST_NAME");
+TruecallerSdk.verifyMissedCall(firstName: "FIRST_NAME", lastName: "LAST_NAME");
 
 //6b: If OTP has been initiated OR received on any device, call this method with the user's name & OTP received
-TruecallerSdk.verifyOtp("FIRST_NAME", "LAST_NAME", "OTP");
+TruecallerSdk.verifyOtp(firstName: "FIRST_NAME", lastName: "LAST_NAME", otp: "OTP");
 
 //Step 7: Dispose streamSubscription
 @override
 void dispose() {
-  if (streamSubscription != null) {
-    streamSubscription.cancel();
-  }
+  streamSubscription?.cancel();
   super.dispose();
 }
 ```
@@ -299,7 +299,7 @@ You can customize the consent screen UI using the options available in class `Tr
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {@required int sdkOptions,
+          {required int sdkOptions,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
           int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
           int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
@@ -309,8 +309,8 @@ You can customize the consent screen UI using the options available in class `Tr
           String privacyPolicyUrl: "",
           String termsOfServiceUrl: "",
           int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
-          int buttonColor,
-          int buttonTextColor})
+          int? buttonColor,
+          int? buttonTextColor})
 ```
 
 By default, `initializeSDK()` has default argument values for all the arguments except the `sdkOptions` which is a required argument, so if you
