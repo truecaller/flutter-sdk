@@ -28,8 +28,6 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
-import 'package:collection/collection.dart' show IterableExtension;
-
 import 'truecaller.dart';
 
 /// callback stream that gets returned from [TruecallerSdk.streamCallbackData]
@@ -87,7 +85,7 @@ enum TruecallerSdkCallbackResult {
 /// extension method that converts String to corresponding enum value
 extension EnumParser on String? {
   TruecallerSdkCallbackResult? enumValue() {
-    return TruecallerSdkCallbackResult.values.firstWhereOrNull(
+    return TruecallerSdkCallbackResult.values.firstWhere(
         (element) => element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
   }
 }
