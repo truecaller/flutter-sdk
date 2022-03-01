@@ -25,6 +25,8 @@ public class SwiftTruecallerSdkPlugin: NSObject,
         _ = SwiftTruecallerSdkPlugin(with: registrar)
     }
     
+    private var trueProfileResponse: TCTrueProfileResponse?
+    
     init(with registrar: FlutterPluginRegistrar) {
         super.init()
         
@@ -113,19 +115,24 @@ extension SwiftTruecallerSdkPlugin: TCTrueSDKDelegate {
     public func didReceive(_ profile: TCTrueProfile) {
         var map = [String: Any]()
         map["result"] = "success"
-        map["data"] = profile.toDict.tojsonString
+        var data = profile.toDict
+        if let response = trueProfileResponse {
+            data = data.merging(response.toDict) { $1 }
+            trueProfileResponse = nil
+        }
+        map["data"] = data
         eventSink?(map)
     }
     
     public func didReceive(_ profileResponse: TCTrueProfileResponse) {
-        var map = [String: Any]()
-        map["result"] = "failure"
+        trueProfileResponse = profileResponse
     }
     
     public func didFailToReceiveTrueProfileWithError(_ error: TCError) {
         var map = [String: Any]()
         map["result"] = "failure"
         map["result"] = error.toDict.tojsonString
+        trueProfileResponse = nil
         eventSink?(error)
     }
 }
