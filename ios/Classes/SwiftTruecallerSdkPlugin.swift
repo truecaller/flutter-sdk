@@ -18,9 +18,9 @@ public class SwiftTruecallerSdkPlugin: NSObject,
     private var mainChannel: FlutterMethodChannel?
     private var eventChannel: FlutterEventChannel?
     private var eventSink: FlutterEventSink?
-        
+    
     private var trueSdk = TCTrueSDK.sharedManager()
-        
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         _ = SwiftTruecallerSdkPlugin(with: registrar)
     }
@@ -36,7 +36,7 @@ public class SwiftTruecallerSdkPlugin: NSObject,
     }
     
     private func addMainChannel(registrar: FlutterPluginRegistrar) {
-        mainChannel = FlutterMethodChannel(name: "tc_method_channel",
+        mainChannel = FlutterMethodChannel(name: Constants.ChannelNames.methodChannel,
                                            binaryMessenger: registrar.messenger())
         guard let mainChannel = mainChannel else {
             return
@@ -45,7 +45,7 @@ public class SwiftTruecallerSdkPlugin: NSObject,
     }
     
     private func addEventChannel(registrar: FlutterPluginRegistrar) {
-        eventChannel = FlutterEventChannel(name: "tc_event_channel",
+        eventChannel = FlutterEventChannel(name: Constants.ChannelNames.eventChannel,
                                            binaryMessenger: registrar.messenger())
         guard let eventChannel = eventChannel else {
             return
@@ -67,11 +67,11 @@ public class SwiftTruecallerSdkPlugin: NSObject,
                 .requestVerification,
                 .verifyOtp,
                 .verifyMissedCall:
-            result("Method not implemented")
+            result(Constants.Error.methodNotImplemented)
         case .getProfile:
             trueSdk.requestTrueProfile()
         case .none:
-            result("Method not implemented")
+            result(Constants.Error.methodNotImplemented)
         }
     }
 }
@@ -114,13 +114,13 @@ extension SwiftTruecallerSdkPlugin: FlutterStreamHandler {
 extension SwiftTruecallerSdkPlugin: TCTrueSDKDelegate {
     public func didReceive(_ profile: TCTrueProfile) {
         var map = [String: Any]()
-        map["result"] = "success"
+        map[Constants.String.result] = Constants.String.success
         var data = profile.toDict
         if let response = trueProfileResponse {
             data = data.merging(response.toDict) { $1 }
             trueProfileResponse = nil
         }
-        map["data"] = data
+        map[Constants.String.data] = data.tojsonString
         eventSink?(map)
     }
     
@@ -130,65 +130,9 @@ extension SwiftTruecallerSdkPlugin: TCTrueSDKDelegate {
     
     public func didFailToReceiveTrueProfileWithError(_ error: TCError) {
         var map = [String: Any]()
-        map["result"] = "failure"
-        map["result"] = error.toDict.tojsonString
+        map[Constants.String.result] = Constants.String.failure
+        map[Constants.String.data] = error.toDict.tojsonString
         trueProfileResponse = nil
         eventSink?(error)
-    }
-}
-
-// MARK: - Private Extensions -
-
-private extension TCTrueProfileResponse {
-    var toDict: [String: AnyHashable] {
-        var dict = [String: AnyHashable]()
-        dict["payload"] = payload
-        dict["signature"] = signature
-        dict["signatureAlgorithm"] = signatureAlgorithm
-        dict["requestNonce"] = requestNonce
-        return dict
-    }
-}
-
-private extension TCTrueProfile {
-    var toDict: [String: AnyHashable] {
-        var dict = [String: AnyHashable]()
-        dict["firstName"] = firstName
-        dict["lastName"] = lastName
-        dict["isVerified"] = isVerified
-        dict["isAmbassador"] = isAmbassador
-        dict["phoneNumber"] = phoneNumber
-        dict["countryCode"] = countryCode
-        dict["street"] = street
-        dict["city"] = city
-        dict["facebookID"] = facebookID
-        dict["twitterID"] = twitterID
-        dict["email"] = email
-        dict["url"] = url
-        dict["avatarURL"] = avatarURL
-        dict["jobTitle"] = jobTitle
-        dict["companyName"] = companyName
-        dict["requestTime"] = requestTime
-        dict["genderValue"] = gender.rawValue
-        return dict
-    }
-}
-
-private extension TCError {
-    var toDict: [String: AnyHashable] {
-        var dict = [String: AnyHashable]()
-        dict["code"] = getCode()
-        dict["message"] = description
-        return dict
-    }
-}
-
-private extension Dictionary {
-    var tojsonString: String? {
-        guard let data = try? JSONSerialization.data(withJSONObject: self) else {
-            return nil
-        }
-        
-        return String(data: data, encoding: .utf8)
     }
 }
