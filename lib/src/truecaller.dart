@@ -121,7 +121,8 @@ class TruecallerSdk {
       _callbackStream = _eventChannel.receiveBroadcastStream().map<TruecallerSdkCallback>((value) {
         TruecallerSdkCallback callback = new TruecallerSdkCallback();
         var resultHashMap = HashMap<String, String>.from(value);
-        switch (resultHashMap["result"].enumValue()) {
+        final String? result = resultHashMap["result"];
+        switch (result.enumValue()) {
           case TruecallerSdkCallbackResult.success:
             callback.result = TruecallerSdkCallbackResult.success;
             _insertProfile(callback, resultHashMap["data"]!);
