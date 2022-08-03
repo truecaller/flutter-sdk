@@ -320,16 +320,22 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  void onProceedClick() {
+  Future<void> onProceedClick() async {
     if (showInputNumberView() && validateNumber()) {
-      setProgressBarToActive();
-      TruecallerSdk.requestVerification(phoneNumber: phoneController.text);
+      try {
+        await TruecallerSdk.requestVerification(phoneNumber: phoneController.text);
+        setProgressBarToActive();
+      } on PlatformException catch (exception) {
+        showSnackBar(exception.message.toString());
+      } catch (exception) {
+        showSnackBar(exception.toString());
+      }
     } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
       setProgressBarToActive();
       TruecallerSdk.verifyMissedCall(
           firstName: fNameController.text, lastName: lNameController.text);
     } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
-            tempResult == TruecallerSdkCallbackResult.otpReceived) &&
+        tempResult == TruecallerSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();

@@ -139,8 +139,12 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     ?: return result.error("Invalid phone", "Can't be null or empty", null)
                 val countryISO = call.argument<String>(Constants.COUNTRY_ISO) ?: "IN"
                 activity?.let {
-                    TruecallerSDK.getInstance()
-                        .requestVerification(countryISO, phoneNumber, verificationCallback, it as FragmentActivity)
+                    try {
+                        TruecallerSDK.getInstance()
+                            .requestVerification(countryISO, phoneNumber, verificationCallback, it as FragmentActivity)
+                    } catch (e: RuntimeException) {
+                        result.error(TrueException.TYPE_INVALID_NUMBER, TrueException.TYPE_INVALID_NUMBER, null)
+                    }
                 }
                     ?: result.error("UNAVAILABLE", "Activity not available.", null)
             }
