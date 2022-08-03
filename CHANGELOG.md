@@ -38,3 +38,8 @@ need to restart the verification process.
 ## 0.1.0
 
 * Migrated the plugin and example to support null safety
+
+## 0.1.1
+
+* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.7.0
+* TruecallerSdk.requestVerification() would now throw a PlatformException in case an invalid number is supplied to it.
