@@ -175,6 +175,8 @@ StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen(
 });
 
 //Step 4: Initiate manual verification by asking user for his number
+//Please ensure proper validations are in place so as to send correct phone number string to the below method,
+//otherwise an exception would be thrown
 TruecallerSdk.requestVerification(phoneNumber: "PHONE_NUMBER");
 
 //Step 5: Be informed about the TruecallerSdk.requestVerification callback result via [streamCallbackData] stream
