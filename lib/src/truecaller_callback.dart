@@ -85,8 +85,8 @@ enum TruecallerSdkCallbackResult {
 /// extension method that converts String to corresponding enum value
 extension EnumParser on String? {
   TruecallerSdkCallbackResult? enumValue() {
-    return TruecallerSdkCallbackResult.values.firstWhere(
-        (element) => element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
+    return TruecallerSdkCallbackResult.values.firstWhere((element) =>
+        element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
   }
 }
 
