@@ -26,5 +26,3 @@ flutter:
       android:
         package: com.truecallersdk
         pluginClass: TruecallerSdkPlugin
-      ios:
-        pluginClass: TruecallerSdkPlugin
