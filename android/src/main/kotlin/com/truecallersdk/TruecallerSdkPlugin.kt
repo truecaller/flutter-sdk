@@ -143,7 +143,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                         TruecallerSDK.getInstance()
                             .requestVerification(countryISO, phoneNumber, verificationCallback, it as FragmentActivity)
                     } catch (e: RuntimeException) {
-                        result.error(e.message, e.message, null)
+                        result.error(e.message?: "unavailable", e.message?: "unavailable", null)
                     }
                 }
                     ?: result.error("UNAVAILABLE", "Activity not available.", null)
