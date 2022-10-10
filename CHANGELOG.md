@@ -43,3 +43,9 @@ need to restart the verification process.
 
 * Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.7.0
 * TruecallerSdk.requestVerification() would now throw a PlatformException in case an invalid number is supplied to it.
+
+## 0.1.2
+
+* Updated Flutter channel to stable version 3.3.0
+* Updated Android Gradle Plugin to 7.2.2 and Kotlin to 1.7.0
+* Fixed a bug related to type mismatch

@@ -18,7 +18,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^0.1.1
+  truecaller_sdk: ^0.1.2
   ...
 ```
 ### 2. Generate App key and add it to `AndroidManifest.xml`:
