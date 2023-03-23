@@ -18,6 +18,8 @@ dependencies:
     # the parent directory to use the current plugin's version. 
     path: ../
 
+  uuid: ^3.0.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

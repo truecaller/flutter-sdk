@@ -60,6 +60,14 @@ class TruecallerSdkCallback {
   /// It indicates time left to complete the user verification process
   String? ttl;
 
+  /// Request Nonce received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
+  /// or [TruecallerSdkCallbackResult.missedCallInitiated]
+  /// or [TruecallerSdkCallbackResult.verificationComplete]
+  /// It can be used to verify whether the custom request identifier (if set) during SDK
+  /// initialization is same as this one received in response which essentially assures a
+  /// correlation between the request and the response
+  String? requestNonce;
+
   /// received when [result] equals [TruecallerSdkCallbackResult.exception]
   /// It indicates reason why non-truecaller user verification failed
   TruecallerException? exception;
@@ -85,8 +93,8 @@ enum TruecallerSdkCallbackResult {
 /// extension method that converts String to corresponding enum value
 extension EnumParser on String? {
   TruecallerSdkCallbackResult? enumValue() {
-    return TruecallerSdkCallbackResult.values.firstWhere((element) =>
-        element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
+    return TruecallerSdkCallbackResult.values.firstWhere(
+        (element) => element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
   }
 }
 
@@ -177,5 +185,21 @@ class TruecallerException {
   @override
   String toString() {
     return "$code : $message";
+  }
+}
+
+class CallbackData {
+  late String? otp;
+  late String? ttl;
+  late String? accessToken;
+  late String? requestNonce;
+  late String? profile;
+
+  CallbackData.fromJson(Map<String, dynamic> map) {
+    otp = map['otp'];
+    ttl = map['ttl'];
+    accessToken = map['accessToken'];
+    requestNonce = map['requestNonce'];
+    profile = map['profile'];
   }
 }

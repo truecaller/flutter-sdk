@@ -46,6 +46,7 @@ class Constants {
         const val BTN_CLR = "buttonColor";
         const val BTN_TXT_CLR = "buttonTextColor";
         const val LOCALE = "locale";
+        const val REQ_NONCE = "reqNonce";
 
         //callback data
         const val RESULT = "result";
@@ -73,3 +74,11 @@ class Constants {
         const val OTP = "otp"
     }
 }
+
+data class CallbackData(
+    val otp: String? = null,
+    val ttl: String? = null,
+    val accessToken: String? = null,
+    val requestNonce: String? = null,
+    val profile: String? = null,
+)

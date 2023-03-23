@@ -37,10 +37,8 @@ import 'scope_options.dart';
 import 'truecaller_callback.dart';
 
 class TruecallerSdk {
-  static const MethodChannel _methodChannel =
-      const MethodChannel('tc_method_channel');
-  static const EventChannel _eventChannel =
-      const EventChannel('tc_event_channel');
+  static const MethodChannel _methodChannel = const MethodChannel('tc_method_channel');
+  static const EventChannel _eventChannel = const EventChannel('tc_event_channel');
   static Stream<TruecallerSdkCallback>? _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
@@ -72,13 +70,10 @@ class TruecallerSdk {
   static initializeSDK(
           {required int sdkOptions,
           int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
-          int consentTitleOptions:
-              TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
+          int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
           int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
-          int loginTextPrefix:
-              TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
-          int loginTextSuffix:
-              TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
+          int loginTextPrefix: TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
+          int loginTextSuffix: TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
           int ctaTextPrefix: TruecallerSdkScope.CTA_TEXT_PREFIX_USE,
           String privacyPolicyUrl: "",
           String termsOfServiceUrl: "",
@@ -105,14 +100,12 @@ class TruecallerSdk {
   /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP], you can check if the Truecaller app is
   /// present on the user's device or whether the user has a valid account state or not by using
   /// the following method
-  static Future<dynamic> get isUsable async =>
-      _methodChannel.invokeMethod('isUsable');
+  static Future<dynamic> get isUsable async => _methodChannel.invokeMethod('isUsable');
 
   /// After checking [isUsable], you can show the Truecaller profile verification dialog
   /// anywhere in your app flow by calling the following method
   /// The result will be returned asynchronously via [streamCallbackData] stream
-  static get getProfile async =>
-      await _methodChannel.invokeMethod('getProfile');
+  static get getProfile async => await _methodChannel.invokeMethod('getProfile');
 
   /// Once you call [getProfile], you can listen to this stream to determine the result of the
   /// action taken by the user.
@@ -125,9 +118,7 @@ class TruecallerSdk {
   /// manually, so this is not applicable for truecaller_sdk 0.0.1
   static Stream<TruecallerSdkCallback> get streamCallbackData {
     if (_callbackStream == null) {
-      _callbackStream = _eventChannel
-          .receiveBroadcastStream()
-          .map<TruecallerSdkCallback>((value) {
+      _callbackStream = _eventChannel.receiveBroadcastStream().map<TruecallerSdkCallback>((value) {
         TruecallerSdkCallback callback = new TruecallerSdkCallback();
         var resultHashMap = HashMap<String, String>.from(value);
         final String? result = resultHashMap["result"];
@@ -146,43 +137,55 @@ class TruecallerSdk {
             break;
           case TruecallerSdkCallbackResult.missedCallInitiated:
             callback.result = TruecallerSdkCallbackResult.missedCallInitiated;
-            callback.ttl = resultHashMap["data"];
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            callback.ttl = data.ttl;
+            callback.requestNonce = data.requestNonce;
             break;
           case TruecallerSdkCallbackResult.missedCallReceived:
             callback.result = TruecallerSdkCallbackResult.missedCallReceived;
             break;
           case TruecallerSdkCallbackResult.otpInitiated:
             callback.result = TruecallerSdkCallbackResult.otpInitiated;
-            callback.ttl = resultHashMap["data"];
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            callback.ttl = data.ttl;
+            callback.requestNonce = data.requestNonce;
             break;
           case TruecallerSdkCallbackResult.otpReceived:
             callback.result = TruecallerSdkCallbackResult.otpReceived;
-            callback.otp = resultHashMap["data"];
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            callback.otp = data.otp;
             break;
           case TruecallerSdkCallbackResult.verifiedBefore:
             callback.result = TruecallerSdkCallbackResult.verifiedBefore;
-            _insertProfile(callback, resultHashMap["data"]!);
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            _insertProfile(callback, data.profile!);
             break;
           case TruecallerSdkCallbackResult.verificationComplete:
             callback.result = TruecallerSdkCallbackResult.verificationComplete;
-            callback.accessToken = resultHashMap["data"];
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            callback.accessToken = data.accessToken;
+            callback.requestNonce = data.requestNonce;
             break;
           case TruecallerSdkCallbackResult.exception:
             callback.result = TruecallerSdkCallbackResult.exception;
             Map exceptionMap = jsonDecode(resultHashMap["data"]!);
-            TruecallerException exception = TruecallerException.fromJson(
-                exceptionMap as Map<String, dynamic>);
+            TruecallerException exception =
+                TruecallerException.fromJson(exceptionMap as Map<String, dynamic>);
             callback.exception = exception;
             break;
           default:
             throw PlatformException(
-                code: "1010",
-                message: "${resultHashMap["result"]} is not a valid result");
+                code: "1010", message: "${resultHashMap["result"]} is not a valid result");
         }
         return callback;
       });
     }
     return _callbackStream!;
+  }
+
+  static CallbackData _insertData(TruecallerSdkCallback callback, String data) {
+    Map dataMap = jsonDecode(data);
+    return CallbackData.fromJson(dataMap as Map<String, dynamic>);
   }
 
   static _insertProfile(TruecallerSdkCallback callback, String data) {
@@ -194,12 +197,9 @@ class TruecallerSdk {
 
   static _insertError(TruecallerSdkCallback callback, String? data) {
     // onVerificationRequired has nullable error, hence null check
-    if (data != null &&
-        data.trim().isNotEmpty &&
-        data.trim().toLowerCase() != "null") {
+    if (data != null && data.trim().isNotEmpty && data.trim().toLowerCase() != "null") {
       Map errorMap = jsonDecode(data);
-      TruecallerError truecallerError =
-          TruecallerError.fromJson(errorMap as Map<String, dynamic>);
+      TruecallerError truecallerError = TruecallerError.fromJson(errorMap as Map<String, dynamic>);
       callback.error = truecallerError;
     }
   }
@@ -207,14 +207,17 @@ class TruecallerSdk {
   /// To customise the look and feel of the verification consent screen as per your app theme, add
   /// the following lines before calling the [getProfile] method.
   /// NOTE: It's not applicable for [TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET]
-  static get setDarkTheme async =>
-      await _methodChannel.invokeMethod('setDarkTheme');
+  static get setDarkTheme async => await _methodChannel.invokeMethod('setDarkTheme');
 
   /// To customise the profile dialog in any of the supported Indian languages, add the
   /// following lines before calling the [getProfile] method with [locale] of your choice.
   /// NOTE: Default value is en
   static setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
+
+  /// To set your own custom request identifier, add the following before calling [getProfile]
+  static setRequestNonce(String requestNonce) async =>
+      await _methodChannel.invokeMethod('setRequestNonce', {"reqNonce": requestNonce});
 
   /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
   /// numbers only so that's why default countryISO is set to "IN".
@@ -223,20 +226,18 @@ class TruecallerSdk {
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
   /// or if the user is already verified on the device, will get the call back as
   /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
-  static requestVerification(
-          {required String phoneNumber, String countryISO: "IN"}) async =>
-      await _methodChannel.invokeMethod(
-          'requestVerification', {"ph": phoneNumber, "ci": countryISO});
+  static requestVerification({required String phoneNumber, String countryISO: "IN"}) async =>
+      await _methodChannel
+          .invokeMethod('requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with a missed call.
   /// i.e call this method only when you receive [TruecallerSdkCallbackResult.missedCallReceived]
   /// in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
-  static verifyMissedCall(
-          {required String firstName, required String lastName}) async =>
-      await _methodChannel.invokeMethod(
-          'verifyMissedCall', {"fname": firstName, "lname": lastName});
+  static verifyMissedCall({required String firstName, required String lastName}) async =>
+      await _methodChannel
+          .invokeMethod('verifyMissedCall', {"fname": firstName, "lname": lastName});
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with an OTP.
@@ -245,9 +246,7 @@ class TruecallerSdk {
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   /// with the [otp] code received over SMS
   static verifyOtp(
-          {required String firstName,
-          required String lastName,
-          required String otp}) async =>
-      await _methodChannel.invokeMethod(
-          'verifyOtp', {"fname": firstName, "lname": lastName, "otp": otp});
+          {required String firstName, required String lastName, required String otp}) async =>
+      await _methodChannel
+          .invokeMethod('verifyOtp', {"fname": firstName, "lname": lastName, "otp": otp});
 }

@@ -35,15 +35,15 @@ import android.content.Intent
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
-import com.truecaller.android.sdk.ITrueCallback
-import com.truecaller.android.sdk.SdkThemeOptions
-import com.truecaller.android.sdk.TrueError
-import com.truecaller.android.sdk.TrueException
-import com.truecaller.android.sdk.TrueProfile
-import com.truecaller.android.sdk.TruecallerSDK
-import com.truecaller.android.sdk.TruecallerSdkScope
-import com.truecaller.android.sdk.clients.VerificationCallback
-import com.truecaller.android.sdk.clients.VerificationDataBundle
+import com.truecaller.android.sdk.common.VerificationCallback
+import com.truecaller.android.sdk.common.VerificationDataBundle
+import com.truecaller.android.sdk.common.TrueException
+import com.truecaller.android.sdk.common.models.TrueProfile
+import com.truecaller.android.sdk.legacy.ITrueCallback
+import com.truecaller.android.sdk.legacy.SdkThemeOptions
+import com.truecaller.android.sdk.legacy.TrueError
+import com.truecaller.android.sdk.legacy.TruecallerSDK
+import com.truecaller.android.sdk.legacy.TruecallerSdkScope
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -61,6 +61,7 @@ const val INITIATE_SDK = "initiateSDK"
 const val IS_USABLE = "isUsable"
 const val SET_DARK_THEME = "setDarkTheme"
 const val SET_LOCALE = "setLocale"
+const val SET_REQUEST_NONCE = "setRequestNonce"
 const val GET_PROFILE = "getProfile"
 const val REQUEST_VERIFICATION = "requestVerification"
 const val VERIFY_OTP = "verifyOtp"
@@ -125,6 +126,11 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             SET_LOCALE -> {
                 call.argument<String>(Constants.LOCALE)?.let {
                     TruecallerSDK.getInstance().setLocale(Locale(it))
+                }
+            }
+            SET_REQUEST_NONCE -> {
+                call.argument<String>(Constants.REQ_NONCE)?.let {
+                    TruecallerSDK.getInstance().setRequestNonce(it)
                 }
             }
             GET_PROFILE -> {
@@ -232,7 +238,12 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.MISSED_CALL_INITIATED,
-                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_TTL)
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    ttl = bundle?.getString(VerificationDataBundle.KEY_TTL),
+                                    requestNonce = bundle?.getString(VerificationDataBundle.KEY_REQUEST_NONCE)
+                                )
+                            )
                         )
                     )
                 }
@@ -247,7 +258,12 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.OTP_INITIATED,
-                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_TTL)
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    ttl = bundle?.getString(VerificationDataBundle.KEY_TTL),
+                                    requestNonce = bundle?.getString(VerificationDataBundle.KEY_REQUEST_NONCE)
+                                )
+                            )
                         )
                     )
                 }
@@ -255,7 +271,11 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.OTP_RECEIVED,
-                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_OTP)
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    otp = bundle?.getString(VerificationDataBundle.KEY_OTP)
+                                )
+                            )
                         )
                     )
                 }
@@ -263,7 +283,11 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.VERIFIED_BEFORE,
-                            Constants.DATA to gson.toJson(bundle?.profile)
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    profile = gson.toJson(bundle?.profile)
+                                )
+                            )
                         )
                     )
                 }
@@ -271,7 +295,12 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.VERIFICATION_COMPLETE,
-                            Constants.DATA to bundle?.getString(VerificationDataBundle.KEY_ACCESS_TOKEN)
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    accessToken = bundle?.getString(VerificationDataBundle.KEY_ACCESS_TOKEN),
+                                    requestNonce = bundle?.getString(VerificationDataBundle.KEY_REQUEST_NONCE)
+                                )
+                            )
                         )
                     )
                 }

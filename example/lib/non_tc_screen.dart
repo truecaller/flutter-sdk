@@ -276,24 +276,28 @@ class _HomePageState extends State<HomePage> {
       switch (truecallerUserCallback.result) {
         case TruecallerSdkCallbackResult.missedCallInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
-          showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl}");
+          showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl} && "
+              "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
         case TruecallerSdkCallbackResult.missedCallReceived:
           showSnackBar("Missed call Received");
           break;
         case TruecallerSdkCallbackResult.otpInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
-          showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl}");
+          showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl} && "
+              "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
         case TruecallerSdkCallbackResult.otpReceived:
           showSnackBar("OTP Received : ${truecallerUserCallback.otp}");
           break;
         case TruecallerSdkCallbackResult.verificationComplete:
-          showSnackBar("Verification Completed : ${truecallerUserCallback.accessToken}");
+          showSnackBar("Verification Completed : ${truecallerUserCallback.accessToken} && "
+              "requestNonce = ${truecallerUserCallback.requestNonce}");
           _navigateToResult(fNameController.text);
           break;
         case TruecallerSdkCallbackResult.verifiedBefore:
-          showSnackBar("Verified Before : ${truecallerUserCallback.profile!.accessToken}");
+          showSnackBar("Verified Before : ${truecallerUserCallback.profile!.accessToken} && "
+              "requestNonce = ${truecallerUserCallback.profile!.requestNonce}");
           _navigateToResult(truecallerUserCallback.profile!.firstName);
           break;
         case TruecallerSdkCallbackResult.exception:
@@ -335,7 +339,7 @@ class _HomePageState extends State<HomePage> {
       TruecallerSdk.verifyMissedCall(
           firstName: fNameController.text, lastName: lNameController.text);
     } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
-        tempResult == TruecallerSdkCallbackResult.otpReceived) &&
+            tempResult == TruecallerSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();

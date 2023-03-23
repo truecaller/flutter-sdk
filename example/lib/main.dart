@@ -31,6 +31,7 @@
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 import 'package:truecaller_sdk_example/non_tc_screen.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(MyApp());
@@ -67,6 +68,7 @@ class _MyAppState extends State<MyApp> {
                     TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
                     TruecallerSdk.isUsable.then((isUsable) {
                       if (isUsable) {
+                        TruecallerSdk.setRequestNonce(Uuid().v1());
                         TruecallerSdk.getProfile;
                       } else {
                         final snackBar = SnackBar(content: Text("Not Usable"));
@@ -93,7 +95,7 @@ class _MyAppState extends State<MyApp> {
                           case TruecallerSdkCallbackResult.success:
                             return Text(
                                 "Hi, ${snapshot.data!.profile!.firstName} ${snapshot.data!.profile!.lastName}"
-                                "\nBusiness Profile: ${snapshot.data!.profile!.isBusiness}");
+                                "\nRequest Nonce: ${snapshot.data!.profile!.requestNonce}");
                           case TruecallerSdkCallbackResult.failure:
                             return Text("Oops!! Error type ${snapshot.data!.error!.code}");
                           case TruecallerSdkCallbackResult.verification:

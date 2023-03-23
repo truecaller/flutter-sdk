@@ -33,6 +33,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 import 'package:truecaller_sdk_example/non_tc_screen.dart';
+import 'package:uuid/uuid.dart';
 
 import 'config_options.dart';
 import 'result_screen.dart';
@@ -507,6 +508,7 @@ class _HomePageState extends State<HomePage> {
 
     TruecallerSdk.isUsable.then((isUsable) {
       if (isUsable) {
+        TruecallerSdk.setRequestNonce(Uuid().v1());
         if (darkMode) {
           TruecallerSdk.setDarkTheme;
         }
@@ -529,7 +531,7 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                 builder: (context) => ResultScreen(
                     "${truecallerSdkCallback.profile!.firstName}"
-                    "\nBusiness Profile: ${truecallerSdkCallback.profile!.isBusiness}",
+                    "\nReq Nonce: ${truecallerSdkCallback.profile!.requestNonce}",
                     1),
               ));
           break;
