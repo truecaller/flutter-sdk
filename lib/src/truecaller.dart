@@ -69,15 +69,15 @@ class TruecallerSdk {
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
           {required int sdkOptions,
-          int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
-          int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
-          int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
-          int loginTextPrefix: TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
-          int loginTextSuffix: TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
-          int ctaTextPrefix: TruecallerSdkScope.CTA_TEXT_PREFIX_USE,
-          String privacyPolicyUrl: "",
-          String termsOfServiceUrl: "",
-          int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
+          int consentMode = TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
+          int consentTitleOptions = TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
+          int footerType = TruecallerSdkScope.FOOTER_TYPE_SKIP,
+          int loginTextPrefix = TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
+          int loginTextSuffix = TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
+          int ctaTextPrefix = TruecallerSdkScope.CTA_TEXT_PREFIX_USE,
+          String privacyPolicyUrl = "",
+          String termsOfServiceUrl = "",
+          int buttonShapeOptions = TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
           int? buttonColor,
           int? buttonTextColor}) async =>
       await _methodChannel.invokeMethod('initiateSDK', {
@@ -226,7 +226,7 @@ class TruecallerSdk {
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
   /// or if the user is already verified on the device, will get the call back as
   /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
-  static requestVerification({required String phoneNumber, String countryISO: "IN"}) async =>
+  static requestVerification({required String phoneNumber, String countryISO = "IN"}) async =>
       await _methodChannel
           .invokeMethod('requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
