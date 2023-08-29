@@ -92,63 +92,15 @@ extension EnumParser on String? {
 
 /// user profile that corresponds to [TruecallerSdkCallback.profile]
 class TruecallerUserProfile {
-  String firstName;
-  String? lastName;
-  String phoneNumber;
-  String? gender;
-  String? street;
-  String? city;
-  String? zipcode;
-  String? countryCode;
-  String? facebookId;
-  String? twitterId;
-  String? email;
-  String? url;
-  String? avatarUrl;
-  bool? isTrueName;
-  bool? isAmbassador;
-  String? companyName;
-  String? jobTitle;
-  String? payload;
-  String? signature;
-  String? signatureAlgorithm;
-  String? requestNonce;
-  bool? isSimChanged;
-  String? verificationMode;
-  int? verificationTimestamp;
-  String? userLocale;
-  String? accessToken;
-  bool? isBusiness;
+  String authorizationCode;
+  String? state;
+  String codeVerifier;
 
   /// get the [TruecallerUserProfile] values from Json
   TruecallerUserProfile.fromJson(Map<String, dynamic> map)
-      : firstName = map['firstName'],
-        lastName = map['lastName'],
-        phoneNumber = map['phoneNumber'],
-        gender = map['gender'],
-        street = map['street'],
-        city = map['city'],
-        zipcode = map['zipcode'],
-        countryCode = map['countryCode'],
-        facebookId = map['facebookId'],
-        twitterId = map['twitterId'],
-        email = map['email'],
-        url = map['url'],
-        avatarUrl = map['avatarUrl'],
-        isTrueName = map['isTrueName'],
-        isAmbassador = map['isAmbassador'],
-        companyName = map['companyName'],
-        jobTitle = map['jobTitle'],
-        payload = map['payload'],
-        signature = map['signature'],
-        signatureAlgorithm = map['signatureAlgorithm'],
-        requestNonce = map['requestNonce'],
-        isSimChanged = map['isSimChanged'],
-        verificationMode = map['verificationMode'],
-        verificationTimestamp = map['verificationTimestamp'],
-        userLocale = map['userLocale'],
-        accessToken = map['accessToken'],
-        isBusiness = map['isBusiness'];
+      : authorizationCode = map['authorizationCode'],
+        codeVerifier = map['codeVerifier'],
+        state = map['state'];
 }
 
 /// error that corresponds to [TruecallerSdkCallback.error]
@@ -158,8 +110,8 @@ class TruecallerError {
 
   /// get the [TruecallerError] values from Json
   TruecallerError.fromJson(Map<String, dynamic> map) {
-    code = map['mErrorType'];
-    message = map['message'];
+    code = map['errorCode'];
+    message = map['errorMessage'];
   }
 }
 

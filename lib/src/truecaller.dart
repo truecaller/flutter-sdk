@@ -38,9 +38,9 @@ import 'truecaller_callback.dart';
 
 class TruecallerSdk {
   static const MethodChannel _methodChannel =
-      const MethodChannel('tc_method_channel');
+  const MethodChannel('tc_method_channel');
   static const EventChannel _eventChannel =
-      const EventChannel('tc_event_channel');
+  const EventChannel('tc_event_channel');
   static Stream<TruecallerSdkCallback>? _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
@@ -70,29 +70,19 @@ class TruecallerSdk {
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {required int sdkOptions,
-          int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
-          int consentTitleOptions:
-              TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
-          int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
-          int loginTextPrefix:
-              TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
-          int loginTextSuffix:
-              TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
-          int ctaTextPrefix: TruecallerSdkScope.CTA_TEXT_PREFIX_USE,
-          String privacyPolicyUrl: "",
-          String termsOfServiceUrl: "",
-          int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
-          int? buttonColor,
-          int? buttonTextColor}) async =>
+      {required int sdkOptions,
+
+        int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
+        int loginTextPrefix: TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
+        String privacyPolicyUrl: "",
+        String termsOfServiceUrl: "",
+        int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
+        int? buttonColor,
+        int? buttonTextColor}) async =>
       await _methodChannel.invokeMethod('initiateSDK', {
         "sdkOptions": sdkOptions,
-        "consentMode": consentMode,
-        "consentTitleOptions": consentTitleOptions,
         "footerType": footerType,
         "loginTextPrefix": loginTextPrefix,
-        "loginTextSuffix": loginTextSuffix,
-        "ctaTextPrefix": ctaTextPrefix,
         "privacyPolicyUrl": privacyPolicyUrl,
         "termsOfServiceUrl": termsOfServiceUrl,
         "buttonShapeOptions": buttonShapeOptions,
@@ -187,8 +177,7 @@ class TruecallerSdk {
 
   static _insertProfile(TruecallerSdkCallback callback, String data) {
     Map profileMap = jsonDecode(data);
-    TruecallerUserProfile profile =
-        TruecallerUserProfile.fromJson(profileMap as Map<String, dynamic>);
+    TruecallerUserProfile profile = TruecallerUserProfile.fromJson(profileMap as Map<String, dynamic>);
     callback.profile = profile;
   }
 
@@ -199,7 +188,7 @@ class TruecallerSdk {
         data.trim().toLowerCase() != "null") {
       Map errorMap = jsonDecode(data);
       TruecallerError truecallerError =
-          TruecallerError.fromJson(errorMap as Map<String, dynamic>);
+      TruecallerError.fromJson(errorMap as Map<String, dynamic>);
       callback.error = truecallerError;
     }
   }
@@ -224,7 +213,7 @@ class TruecallerSdk {
   /// or if the user is already verified on the device, will get the call back as
   /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
   static requestVerification(
-          {required String phoneNumber, String countryISO: "IN"}) async =>
+      {required String phoneNumber, String countryISO: "IN"}) async =>
       await _methodChannel.invokeMethod(
           'requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
@@ -234,7 +223,7 @@ class TruecallerSdk {
   /// in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   static verifyMissedCall(
-          {required String firstName, required String lastName}) async =>
+      {required String firstName, required String lastName}) async =>
       await _methodChannel.invokeMethod(
           'verifyMissedCall', {"fname": firstName, "lname": lastName});
 
@@ -245,9 +234,9 @@ class TruecallerSdk {
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   /// with the [otp] code received over SMS
   static verifyOtp(
-          {required String firstName,
-          required String lastName,
-          required String otp}) async =>
+      {required String firstName,
+        required String lastName,
+        required String otp}) async =>
       await _methodChannel.invokeMethod(
           'verifyOtp', {"fname": firstName, "lname": lastName, "otp": otp});
 }
