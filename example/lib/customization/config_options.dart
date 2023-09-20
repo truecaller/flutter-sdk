@@ -31,19 +31,34 @@
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
-class TitleOption {
-  String name;
-
-  TitleOption(this.name);
-
-  static List<TitleOption> getTitleOptions() {
-    return <TitleOption>[
-      TitleOption("Login"),
-      TitleOption("Signup"),
-      TitleOption("Signin"),
-      TitleOption("Verify"),
-      TitleOption("Register"),
-      TitleOption("Get Started")
+class HeadingOption {
+  static List<String> getHeadingOptions() {
+    return [
+      "Login",
+      "Signup",
+      "Signin",
+      "Verify",
+      "Register",
+      "Get Started",
+      "Proceed with",
+      "Verify with",
+      "Verify profile with",
+      "Verify your profile with",
+      "Verify phone number with",
+      "Verify your number with",
+      "Continue with",
+      "Complete order with",
+      "Place order with",
+      "Complete booking with",
+      "Checkout with",
+      "Manage details with",
+      "Manage your details with",
+      "Login to %s with one tap",
+      "Subscribe to",
+      "Get updates from",
+      "Continue reading on",
+      "Get new updates from",
+      "Login/Signup with"
     ];
   }
 }
@@ -55,12 +70,11 @@ class FooterOption {
 
   static Map<int, String> getFooterOptionsMap() {
     return {
-      TruecallerSdkScope.FOOTER_TYPE_SKIP: "Skip",
-      TruecallerSdkScope.FOOTER_TYPE_CONTINUE: "Use Another Number",
-      TruecallerSdkScope.FOOTER_TYPE_ANOTHER_METHOD: "Use Another Method",
-      TruecallerSdkScope.FOOTER_TYPE_MANUALLY: "Enter Details Manually",
-      TruecallerSdkScope.FOOTER_TYPE_LATER: "I'll do later",
-      TruecallerSdkScope.FOOTER_TYPE_NONE: "None"
+      TcSdkOptions.FOOTER_TYPE_SKIP: "Skip",
+      TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO: "Use Another Number",
+      TcSdkOptions.FOOTER_TYPE_ANOTHER_METHOD: "Use Another Method",
+      TcSdkOptions.FOOTER_TYPE_MANUALLY: "Enter Details Manually",
+      TcSdkOptions.FOOTER_TYPE_LATER: "I'll do later",
     };
   }
 }
@@ -87,7 +101,15 @@ class ConfigOptions {
   }
 
   static List<String> getCtaPrefixOptions() {
-    return ["Use %s", "Continue with %s", "Proceed with %s"];
+    return [
+      "Proceed",
+      "Continue",
+      "Accept",
+      "Confirm",
+      "Use %s",
+      "Continue with %s",
+      "Proceed with %s"
+    ];
   }
 
   static List<String> getLoginPrefixOptions() {
@@ -108,17 +130,6 @@ class ConfigOptions {
       "To get updates",
       "To subscribe",
       "To subscribe & get updates",
-    ];
-  }
-
-  static List<String> getLoginSuffixOptions() {
-    return [
-      "please verify mobile number",
-      "please login",
-      "please signup",
-      "please login/signup",
-      "please register",
-      "please sign in",
     ];
   }
 }

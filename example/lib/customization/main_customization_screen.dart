@@ -62,21 +62,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<bool> selectedConsentType;
-  late List<TitleOption> titleOptions;
-  late TitleOption selectedTitle;
   late int selectedFooter;
-  late bool darkMode, rectangularBtn, withOtp;
+  late bool rectangularBtn, verifyAllUsers;
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
   List<DropdownMenuItem<int>> loginPrefixMenuItemList = [];
-  List<DropdownMenuItem<int>> loginSuffixMenuItemList = [];
+  List<DropdownMenuItem<int>> headingMenuItemList = [];
   late int ctaColor, ctaTextColor;
-  late int ctaPrefixOption, loginPrefixOption, loginSuffixOption;
-  final TextEditingController privacyPolicyController =
-      TextEditingController(text: "https://www.example.com");
-  final TextEditingController termsOfServiceController =
-      TextEditingController(text: "https://www.truecaller.com/");
+  late int ctaPrefixOption, loginPrefixOption, headingOption;
   final TextEditingController localeController = TextEditingController();
   late StreamSubscription? streamSubscription;
 
@@ -84,18 +77,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     createStreamBuilder();
-    selectedConsentType = [true, false, false];
-    titleOptions = TitleOption.getTitleOptions();
-    selectedTitle = titleOptions[0];
     selectedFooter = FooterOption.getFooterOptionsMap().keys.first;
-    darkMode = false;
     rectangularBtn = false;
-    withOtp = false;
+    verifyAllUsers = false;
     ctaColor = Colors.blue.value;
     ctaTextColor = Colors.white.value;
     ctaPrefixOption = 0;
     loginPrefixOption = 0;
-    loginSuffixOption = 0;
+    headingOption = 0;
 
     for (String key in ConfigOptions.getColorList().keys) {
       colorMenuItemList.add(DropdownMenuItem<int>(
@@ -118,37 +107,12 @@ class _HomePageState extends State<HomePage> {
       ));
     }
 
-    for (int i = 0; i < ConfigOptions.getLoginSuffixOptions().length; i++) {
-      loginSuffixMenuItemList.add(DropdownMenuItem<int>(
+    for (int i = 0; i < HeadingOption.getHeadingOptions().length; i++) {
+      headingMenuItemList.add(DropdownMenuItem<int>(
         value: i,
-        child: Text("${ConfigOptions.getLoginSuffixOptions()[i]}"),
+        child: Text("${HeadingOption.getHeadingOptions()[i]}"),
       ));
     }
-  }
-
-  List<Widget> createRadioListTitleOptions() {
-    List<Widget> widgets = [];
-    for (TitleOption titleOption in titleOptions) {
-      widgets.add(
-        RadioListTile(
-          value: titleOption,
-          groupValue: selectedTitle,
-          title: Text(titleOption.name),
-          onChanged: (dynamic currentOption) {
-            setSelectedTitle(currentOption);
-          },
-          selected: selectedTitle == titleOption,
-          activeColor: Colors.green,
-        ),
-      );
-    }
-    return widgets;
-  }
-
-  setSelectedTitle(TitleOption option) {
-    setState(() {
-      selectedTitle = option;
-    });
   }
 
   List<Widget> createRadioListFooterOptions() {
@@ -176,10 +140,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  bool isBottomSheetSelected() {
-    return selectedConsentType[0] == true;
-  }
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -194,49 +154,11 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: <Widget>[
                 Text(
-                  "UI Options",
+                  "Customization Options",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
                 ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                ToggleButtons(
-                  constraints: BoxConstraints(minHeight: 50, minWidth: (width - 48) / 3),
-                  children: <Widget>[
-                    Text("Bottomsheet"),
-                    Text("Popup"),
-                    Text("Fullscreen"),
-                  ],
-                  selectedColor: Colors.green,
-                  selectedBorderColor: Colors.green,
-                  onPressed: (int index) {
-                    setState(() {
-                      for (int buttonIndex = 0;
-                          buttonIndex < selectedConsentType.length;
-                          buttonIndex++) {
-                        selectedConsentType[buttonIndex] = buttonIndex == index ? true : false;
-                      }
-                    });
-                  },
-                  isSelected: selectedConsentType,
-                ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                Text(
-                  isBottomSheetSelected() ? "Bottomsheet customization Options" : "Title Options",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-                ),
-                Visibility(
-                  visible: isBottomSheetSelected(),
-                  child: Column(
-                    children: createBottomsheetConfigOptions(),
-                  ),
-                  replacement: Column(
-                    children: createRadioListTitleOptions(),
-                  ),
+                Column(
+                  children: createConfigOptions(),
                 ),
                 Divider(
                   color: Colors.transparent,
@@ -248,20 +170,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Column(
                   children: createRadioListFooterOptions(),
-                ),
-                Visibility(
-                  visible: !isBottomSheetSelected(),
-                  child: SwitchListTile(
-                    title: Text("Dark Mode"),
-                    value: darkMode,
-                    onChanged: (value) {
-                      setState(() {
-                        darkMode = value;
-                      });
-                    },
-                    selected: darkMode,
-                    activeColor: Colors.green,
-                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10.0, bottom: 10.0),
@@ -280,14 +188,14 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SwitchListTile(
-                  title: Text("With OTP"),
-                  value: withOtp,
+                  title: Text("Verify all users"),
+                  value: verifyAllUsers,
                   onChanged: (value) {
                     setState(() {
-                      withOtp = value;
+                      verifyAllUsers = value;
                     });
                   },
-                  selected: withOtp,
+                  selected: verifyAllUsers,
                   activeColor: Colors.green,
                 ),
                 Divider(
@@ -295,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                   height: 20.0,
                 ),
                 MaterialButton(
-                  minWidth: width - 50.0,
+                  minWidth: width - 20.0,
                   height: 45.0,
                   child: Text(
                     "LET'S GO",
@@ -316,7 +224,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  createBottomsheetConfigOptions() {
+  createConfigOptions() {
     return [
       Divider(
         color: Colors.transparent,
@@ -425,16 +333,16 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         child: DropdownButtonFormField<int>(
             decoration: InputDecoration(
-              labelText: "Login Suffix",
+              labelText: "Heading options",
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
             style: TextStyle(color: Colors.green),
-            value: loginSuffixOption,
+            value: headingOption,
             isExpanded: true,
-            items: loginSuffixMenuItemList,
+            items: headingMenuItemList,
             onChanged: (value) {
               setState(() {
-                loginSuffixOption = value!;
+                headingOption = value!;
               });
             }),
       ),
@@ -442,80 +350,44 @@ class _HomePageState extends State<HomePage> {
         color: Colors.transparent,
         height: 10.0,
       ),
-      Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-        child: TextField(
-          controller: termsOfServiceController,
-          style: TextStyle(
-            color: Colors.green,
-          ),
-          decoration: InputDecoration(
-            labelText: "Terms & Conditions URL",
-            labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
-          ),
-        ),
-      ),
-      Divider(
-        color: Colors.transparent,
-        height: 10.0,
-      ),
-      Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-        child: TextField(
-          controller: privacyPolicyController,
-          style: TextStyle(
-            color: Colors.green,
-          ),
-          decoration: InputDecoration(
-            labelText: "Privacy Policy URL",
-            labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
-          ),
-        ),
-      ),
-      Divider(
-        color: Colors.transparent,
-        height: 20.0,
-      )
     ];
   }
 
   void initializeSdk() {
     _hideKeyboard();
-    int selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET;
-    if (selectedConsentType[1] == true) {
-      selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_POPUP;
-    } else if (selectedConsentType[2] == true) {
-      selectedConsentMode = TruecallerSdkScope.CONSENT_MODE_FULLSCREEN;
-    }
-    TruecallerSdk.initializeSDK(
-        sdkOptions: withOtp
-            ? TruecallerSdkScope.SDK_OPTION_WITH_OTP
-            : TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP,
-        consentMode: selectedConsentMode,
-        consentTitleOptions:
-            TitleOption.getTitleOptions().indexWhere((title) => title.name == selectedTitle.name),
-        footerType: selectedFooter,
+    TcSdk.initializeSDK(
+        sdkOption: verifyAllUsers
+            ? TcSdkOptions.OPTION_VERIFY_ALL_USERS
+            : TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS,
+        consentHeadingOption: headingOption,
         loginTextPrefix: loginPrefixOption,
-        loginTextSuffix: loginSuffixOption,
-        ctaTextPrefix: ctaPrefixOption,
-        privacyPolicyUrl: privacyPolicyController.text,
-        termsOfServiceUrl: termsOfServiceController.text,
-        buttonShapeOptions: rectangularBtn
-            ? TruecallerSdkScope.BUTTON_SHAPE_RECTANGLE
-            : TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
+        footerType: selectedFooter,
+        ctaText: ctaPrefixOption,
+        buttonShapeOption: rectangularBtn
+            ? TcSdkOptions.BUTTON_SHAPE_RECTANGLE
+            : TcSdkOptions.BUTTON_SHAPE_ROUNDED,
         buttonColor: ctaColor,
         buttonTextColor: ctaTextColor);
 
-    TruecallerSdk.isUsable.then((isUsable) {
-      if (isUsable) {
-        TruecallerSdk.setRequestNonce(Uuid().v1());
-        if (darkMode) {
-          TruecallerSdk.setDarkTheme;
-        }
+    TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
+      if (isOAuthFlowUsable) {
+        TcSdk.setOAuthState(Uuid().v1());
+        TcSdk.setOAuthScopes(['profile', 'phone', 'openid', 'offline_access']);
         if (localeController.text.isNotEmpty) {
-          TruecallerSdk.setLocale(localeController.text);
+          TcSdk.setLocale(localeController.text);
         }
-        TruecallerSdk.getProfile;
+        TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
+          TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {
+            if (codeChallenge != null) {
+              TcSdk.setCodeChallenge(codeChallenge);
+              TcSdk.getAuthorizationCode;
+            } else {
+              final snackBar = SnackBar(content: Text("Device not supported"));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              print("***Code challenge NULL***");
+            }
+          });
+        });
       } else {
         print("****Not usable****");
       }
@@ -523,28 +395,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
+    streamSubscription = TcSdk.streamCallbackData.listen((truecallerSdkCallback) {
       switch (truecallerSdkCallback.result) {
         case TruecallerSdkCallbackResult.success:
           Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ResultScreen(
-                    "${truecallerSdkCallback.profile!.firstName}"
-                    "\nReq Nonce: ${truecallerSdkCallback.profile!.requestNonce}",
-                    1),
+                    "Auth Code: ${truecallerSdkCallback.tcOAuthData!.authorizationCode}"
+                    "\n\nState: ${truecallerSdkCallback.tcOAuthData!.state}"),
               ));
           break;
         case TruecallerSdkCallbackResult.failure:
-          final snackBar =
-              SnackBar(content: Text("Error code : ${truecallerSdkCallback.error!.code}"));
+          final snackBar = SnackBar(
+              content: Text("${truecallerSdkCallback.error!.code} : "
+                  "${truecallerSdkCallback.error!.message}"));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          /*Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    ResultScreen("Error code : ${truecallerSdkCallback.error.code}", -1),
-              ));*/
           break;
         case TruecallerSdkCallbackResult.verification:
           Navigator.push(
@@ -565,8 +431,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    privacyPolicyController.dispose();
-    termsOfServiceController.dispose();
     localeController.dispose();
     streamSubscription?.cancel();
     super.dispose();

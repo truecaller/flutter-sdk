@@ -28,25 +28,24 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
-import 'truecaller.dart';
-
 /// callback stream that gets returned from [TruecallerSdk.streamCallbackData]
 class TruecallerSdkCallback {
   late TruecallerSdkCallbackResult result;
 
   //for tc-flow
 
+  /// received when [result] equals [TruecallerSdkCallbackResult.success]
+  TcOAuthData? tcOAuthData;
+
   /// received when [result] equals [TruecallerSdkCallbackResult.failure] or
   /// [result] equals [TruecallerSdkCallbackResult.verification]
-  /// It indicates reason why truecaller user verification failed
-  TruecallerError? error;
+  /// It indicates reason why Truecaller user verification failed
+  TcOAuthError? error;
 
-  //for tc-flow and non-tc flow
-  /// received when [result] equals [TruecallerSdkCallbackResult.success] or
-  /// [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
+  //for non-tc flow
+
+  /// received when [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
   TruecallerUserProfile? profile;
-
-  //** for non-tc flow **//
 
   /// received when [result] equals [TruecallerSdkCallbackResult.otpReceived]
   String? otp;
@@ -98,6 +97,20 @@ extension EnumParser on String? {
   }
 }
 
+/// OAuth data that corresponds to [TruecallerSdkCallback.tcOAuthData]
+class TcOAuthData {
+  late String authorizationCode;
+  late String state;
+  late List<dynamic> scopesGranted;
+
+  /// get the [TcOAuthData] values from Json
+  TcOAuthData.fromJson(Map<String, dynamic> map) {
+    authorizationCode = map['authorizationCode'];
+    state = map['state'];
+    scopesGranted = map['scopesGranted'];
+  }
+}
+
 /// user profile that corresponds to [TruecallerSdkCallback.profile]
 class TruecallerUserProfile {
   String firstName;
@@ -126,7 +139,6 @@ class TruecallerUserProfile {
   int? verificationTimestamp;
   String? userLocale;
   String? accessToken;
-  bool? isBusiness;
 
   /// get the [TruecallerUserProfile] values from Json
   TruecallerUserProfile.fromJson(Map<String, dynamic> map)
@@ -155,19 +167,18 @@ class TruecallerUserProfile {
         verificationMode = map['verificationMode'],
         verificationTimestamp = map['verificationTimestamp'],
         userLocale = map['userLocale'],
-        accessToken = map['accessToken'],
-        isBusiness = map['isBusiness'];
+        accessToken = map['accessToken'];
 }
 
 /// error that corresponds to [TruecallerSdkCallback.error]
-class TruecallerError {
+class TcOAuthError {
   late int code;
   late String? message;
 
   /// get the [TruecallerError] values from Json
-  TruecallerError.fromJson(Map<String, dynamic> map) {
-    code = map['mErrorType'];
-    message = map['message'];
+  TcOAuthError.fromJson(Map<String, dynamic> map) {
+    code = map['errorCode'];
+    message = map['errorMessage'];
   }
 }
 

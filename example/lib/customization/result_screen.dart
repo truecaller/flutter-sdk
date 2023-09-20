@@ -32,9 +32,8 @@ import 'package:flutter/material.dart';
 
 class ResultScreen extends StatelessWidget {
   final String result;
-  final int resultCode;
 
-  ResultScreen(this.result, this.resultCode);
+  ResultScreen(this.result);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +43,7 @@ class ResultScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          (resultCode == 1) ? "Hi, $result!" : "$result",
+          "$result!",
           style: TextStyle(fontSize: 20.0, letterSpacing: 5.0),
         ),
       ),

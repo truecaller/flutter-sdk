@@ -29,37 +29,50 @@
  */
 
 /// scope options that are used to customize the consent screen UI
-class TruecallerSdkScope {
-  /// footer options
+class TcSdkOptions {
+  /// secondary cta text options
   static const int FOOTER_TYPE_SKIP = 1;
-  static const int FOOTER_TYPE_CONTINUE = 2;
-  static const int FOOTER_TYPE_NONE = 64;
-  static const int FOOTER_TYPE_ANOTHER_METHOD = 256;
-  static const int FOOTER_TYPE_MANUALLY = 512;
-  static const int FOOTER_TYPE_LATER = 4096;
-
-  /// consent mode options
-  static const int CONSENT_MODE_POPUP = 4;
-  static const int CONSENT_MODE_FULLSCREEN = 8;
-  static const int CONSENT_MODE_BOTTOMSHEET = 128;
+  static const int FOOTER_TYPE_ANOTHER_MOBILE_NO = 2;
+  static const int FOOTER_TYPE_ANOTHER_METHOD = 4;
+  static const int FOOTER_TYPE_MANUALLY = 8;
+  static const int FOOTER_TYPE_LATER = 16;
 
   /// sdk options
-  static const int SDK_OPTION_WITHOUT_OTP = 16;
-  static const int SDK_OPTION_WITH_OTP = 32;
+  static const int OPTION_VERIFY_ONLY_TC_USERS = 32;
+  static const int OPTION_VERIFY_ALL_USERS = 64;
 
-  /// title options (applicable for [CONSENT_MODE_POPUP] and [CONSENT_MODE_FULLSCREEN])
-  static const int SDK_CONSENT_TITLE_LOG_IN = 0;
-  static const int SDK_CONSENT_TITLE_SIGN_UP = 1;
-  static const int SDK_CONSENT_TITLE_SIGN_IN = 2;
-  static const int SDK_CONSENT_TITLE_VERIFY = 3;
-  static const int SDK_CONSENT_TITLE_REGISTER = 4;
-  static const int SDK_CONSENT_TITLE_GET_STARTED = 5;
+  /// button shape options
+  static const int BUTTON_SHAPE_ROUNDED = 128;
+  static const int BUTTON_SHAPE_RECTANGLE = 256;
 
-  /// button shape options (applicable for [CONSENT_MODE_BOTTOMSHEET])
-  static const int BUTTON_SHAPE_ROUNDED = 1024;
-  static const int BUTTON_SHAPE_RECTANGLE = 2048;
+  /// heading options
+  static const int SDK_CONSENT_HEADING_LOG_IN_TO = 0;
+  static const int SDK_CONSENT_HEADING_SIGN_UP_WITH = 1;
+  static const int SDK_CONSENT_HEADING_SIGN_IN_TO = 2;
+  static const int SDK_CONSENT_HEADING_VERIFY_NUMBER_WITH = 3;
+  static const int SDK_CONSENT_HEADING_REGISTER_WITH = 4;
+  static const int SDK_CONSENT_HEADING_GET_STARTED_WITH = 5;
+  static const int SDK_CONSENT_HEADING_PROCEED_WITH = 6;
+  static const int SDK_CONSENT_HEADING_VERIFY_WITH = 7;
+  static const int SDK_CONSENT_HEADING_VERIFY_PROFILE_WITH = 8;
+  static const int SDK_CONSENT_HEADING_VERIFY_YOUR_PROFILE_WITH = 9;
+  static const int SDK_CONSENT_HEADING_VERIFY_PHONE_NO_WITH = 10;
+  static const int SDK_CONSENT_HEADING_VERIFY_YOUR_NO_WITH = 11;
+  static const int SDK_CONSENT_HEADING_CONTINUE_WITH = 12;
+  static const int SDK_CONSENT_HEADING_COMPLETE_ORDER_WITH = 13;
+  static const int SDK_CONSENT_HEADING_PLACE_ORDER_WITH = 14;
+  static const int SDK_CONSENT_HEADING_COMPLETE_BOOKING_WITH = 15;
+  static const int SDK_CONSENT_HEADING_CHECKOUT_WITH = 16;
+  static const int SDK_CONSENT_HEADING_MANAGE_DETAILS_WITH = 17;
+  static const int SDK_CONSENT_HEADING_MANAGE_YOUR_DETAILS_WITH = 18;
+  static const int SDK_CONSENT_HEADING_LOGIN_TO_WITH_ONE_TAP = 19;
+  static const int SDK_CONSENT_HEADING_SUBSCRIBE_TO = 20;
+  static const int SDK_CONSENT_HEADING_GET_UPDATES_FROM = 21;
+  static const int SDK_CONSENT_HEADING_CONTINUE_READING_ON = 22;
+  static const int SDK_CONSENT_HEADING_GET_NEW_UPDATES_FROM = 23;
+  static const int SDK_CONSENT_HEADING_LOGIN_SIGNUP_WITH = 24;
 
-  /// login text prefix options (applicable for [CONSENT_MODE_BOTTOMSHEET])
+  /// login text prefix options
   static const int LOGIN_TEXT_PREFIX_TO_GET_STARTED = 0;
   static const int LOGIN_TEXT_PREFIX_TO_CONTINUE = 1;
   static const int LOGIN_TEXT_PREFIX_TO_PLACE_ORDER = 2;
@@ -77,16 +90,12 @@ class TruecallerSdkScope {
   static const int LOGIN_TEXT_PREFIX_TO_SUBSCRIBE = 14;
   static const int LOGIN_TEXT_PREFIX_TO_SUBSCRIBE_AND_GET_UPDATES = 15;
 
-  /// login text suffix options (applicable for [CONSENT_MODE_BOTTOMSHEET])
-  static const int LOGIN_TEXT_SUFFIX_PLEASE_VERIFY_MOBILE_NO = 0;
-  static const int LOGIN_TEXT_SUFFIX_PLEASE_LOGIN = 1;
-  static const int LOGIN_TEXT_SUFFIX_PLEASE_SIGNUP = 2;
-  static const int LOGIN_TEXT_SUFFIX_PLEASE_LOGIN_SIGNUP = 3;
-  static const int LOGIN_TEXT_SUFFIX_PLEASE_REGISTER = 4;
-  static const int LOGIN_TEXT_SUFFIX_PLEASE_SIGN_IN = 5;
-
-  /// button text prefix options (applicable for [CONSENT_MODE_BOTTOMSHEET])
-  static const int CTA_TEXT_PREFIX_USE = 0;
-  static const int CTA_TEXT_PREFIX_CONTINUE_WITH = 1;
-  static const int CTA_TEXT_PREFIX_PROCEED_WITH = 2;
+  /// primary cta text prefix options
+  static const int CTA_TEXT_PROCEED = 0;
+  static const int CTA_TEXT_CONTINUE = 1;
+  static const int CTA_TEXT_ACCEPT = 2;
+  static const int CTA_TEXT_CONFIRM = 3;
+  static const int CTA_TEXT_USE = 4;
+  static const int CTA_TEXT_CONTINUE_WITH = 5;
+  static const int CTA_TEXT_PROCEED_WITH = 6;
 }

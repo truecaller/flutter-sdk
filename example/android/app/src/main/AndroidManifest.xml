@@ -63,7 +63,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <meta-data
-            android:name="com.truecaller.android.sdk.PartnerKey"
-            android:value="WNYkXa7bb7c9f63c14ba291b66869c778cddc" />
+            android:name="com.truecaller.android.sdk.ClientId"
+            android:value="1si1lk7rbbo_mtg29mw5yczekv2ripbbnwnaozhpz6o" />
     </application>
 </manifest>

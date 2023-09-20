@@ -257,7 +257,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerUserCallback) {
+    streamSubscription = TcSdk.streamCallbackData.listen((truecallerUserCallback) {
       // make sure you're changing state only after number has been entered. there could be case
       // where user initiated missed call, pressed back, and came to this screen again after
       // which the call was received and hence it would directly open input name screen.
@@ -320,14 +320,14 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultScreen(firstName, 1),
+          builder: (context) => ResultScreen(firstName),
         ));
   }
 
   Future<void> onProceedClick() async {
     if (showInputNumberView() && validateNumber()) {
       try {
-        await TruecallerSdk.requestVerification(phoneNumber: phoneController.text);
+        await TcSdk.requestVerification(phoneNumber: phoneController.text);
         setProgressBarToActive();
       } on PlatformException catch (exception) {
         showSnackBar(exception.message.toString());
@@ -336,14 +336,13 @@ class _HomePageState extends State<HomePage> {
       }
     } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
       setProgressBarToActive();
-      TruecallerSdk.verifyMissedCall(
-          firstName: fNameController.text, lastName: lNameController.text);
+      TcSdk.verifyMissedCall(firstName: fNameController.text, lastName: lNameController.text);
     } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
             tempResult == TruecallerSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();
-      TruecallerSdk.verifyOtp(
+      TcSdk.verifyOtp(
           firstName: fNameController.text, lastName: lNameController.text, otp: otpController.text);
     }
   }

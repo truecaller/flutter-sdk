@@ -36,7 +36,7 @@ import 'package:flutter/services.dart';
 import 'scope_options.dart';
 import 'truecaller_callback.dart';
 
-class TruecallerSdk {
+class TcSdk {
   static const MethodChannel _methodChannel = const MethodChannel('tc_method_channel');
   static const EventChannel _eventChannel = const EventChannel('tc_event_channel');
   static Stream<TruecallerSdkCallback>? _callbackStream;
@@ -44,78 +44,59 @@ class TruecallerSdk {
   /// This method has to be called before anything else. It initializes the SDK with the
   /// customizable options which are all optional and have default values as set below in the method
   ///
-  /// [sdkOptions] determines whether you want to use the SDK for verifying -
-  /// 1. [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] i.e only Truecaller users
-  /// 2. [TruecallerSdkScope.SDK_OPTION_WITH_OTP] i.e both Truecaller and Non-truecaller users
+  /// [sdkOption] determines whether you want to use the SDK for verifying -
+  /// 1. [TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS] i.e only Truecaller users
+  /// 2. [TcSdkOptions.OPTION_VERIFY_ALL_USERS] i.e both Truecaller and Non-Truecaller users
   ///
-  /// NOTE: In truecaller_sdk 0.0.1, only
-  /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] is supported
-  /// In truecaller_sdk 0.0.2 and onwards, both [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] and
-  /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] are supported
-  /// [consentMode] determines which kind of consent screen you want to show to the user.
-  /// [consentTitleOptions] is applicable only for [TruecallerSdkScope.CONSENT_MODE_POPUP]
-  /// and [TruecallerSdkScope.CONSENT_MODE_FULLSCREEN] and it sets the title prefix
-  /// [footerType] determines the footer button text. You can set it to
-  /// [TruecallerSdkScope.FOOTER_TYPE_NONE] if you don't want to show any footer button
-  /// There are some customization options applicable only for [TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET]
-  /// which are following -
+  /// [consentHeadingOption] determines the heading of the consent screen.
   /// [loginTextPrefix] determines prefix text in login sentence
-  /// [loginTextSuffix] determines suffix text in login sentence
-  /// [ctaTextPrefix] determines prefix text in login button
-  /// [privacyPolicyUrl] to set your own privacy policy url
-  /// [termsOfServiceUrl] to set your own terms of service url
-  /// [buttonShapeOptions] to set login button shape
+  /// [ctaText] determines prefix text in login/primary button
+  /// [footerType] determines the footer button/secondary button text.
+  /// [buttonShapeOption] to set login button shape
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {required int sdkOptions,
-          int consentMode = TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
-          int consentTitleOptions = TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
-          int footerType = TruecallerSdkScope.FOOTER_TYPE_SKIP,
-          int loginTextPrefix = TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
-          int loginTextSuffix = TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
-          int ctaTextPrefix = TruecallerSdkScope.CTA_TEXT_PREFIX_USE,
-          String privacyPolicyUrl = "",
-          String termsOfServiceUrl = "",
-          int buttonShapeOptions = TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
+          {required int sdkOption,
+          int consentHeadingOption = TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO,
+          int loginTextPrefix = TcSdkOptions.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
+          int footerType = TcSdkOptions.FOOTER_TYPE_SKIP,
+          int ctaText = TcSdkOptions.CTA_TEXT_PROCEED,
+          int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
           int? buttonColor,
           int? buttonTextColor}) async =>
-      await _methodChannel.invokeMethod('initiateSDK', {
-        "sdkOptions": sdkOptions,
-        "consentMode": consentMode,
-        "consentTitleOptions": consentTitleOptions,
-        "footerType": footerType,
+      await _methodChannel.invokeMethod('initializeSDK', {
+        "sdkOption": sdkOption,
+        "consentHeadingOption": consentHeadingOption,
         "loginTextPrefix": loginTextPrefix,
-        "loginTextSuffix": loginTextSuffix,
-        "ctaTextPrefix": ctaTextPrefix,
-        "privacyPolicyUrl": privacyPolicyUrl,
-        "termsOfServiceUrl": termsOfServiceUrl,
-        "buttonShapeOptions": buttonShapeOptions,
+        "footerType": footerType,
+        "ctaText": ctaText,
+        "buttonShapeOption": buttonShapeOption,
         "buttonColor": buttonColor,
         "buttonTextColor": buttonTextColor,
       });
 
   /// Once you initialise the Truecaller SDK using the [initializeSDK] method, and if you are using
   /// the SDK for verification of only Truecaller users ( by setting the sdkOptions scope as
-  /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP], you can check if the Truecaller app is
-  /// present on the user's device or whether the user has a valid account state or not by using
-  /// the following method
-  static Future<dynamic> get isUsable async => _methodChannel.invokeMethod('isUsable');
+  /// [TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS], you can check if the Truecaller app is
+  /// present on the user's device and whether the user has a valid account state or not and
+  /// whether the OAuth flow is supported or not using the following method
+  static Future<dynamic> get isOAuthFlowUsable async =>
+      _methodChannel.invokeMethod('isOAuthFlowUsable');
 
-  /// After checking [isUsable], you can show the Truecaller profile verification dialog
-  /// anywhere in your app flow by calling the following method
+  /// After checking [isUsable], you can invoke Truecaller's OAuth consent screen dialog
+  /// in your app flow by calling the following method
   /// The result will be returned asynchronously via [streamCallbackData] stream
-  static get getProfile async => await _methodChannel.invokeMethod('getProfile');
+  static get getAuthorizationCode async =>
+      await _methodChannel.invokeMethod('getAuthorizationCode');
 
-  /// Once you call [getProfile], you can listen to this stream to determine the result of the
+  /// Once you call [getAuthorizationCode], you can listen to this stream to determine the result of the
   /// action taken by the user.
   /// [TruecallerSdkCallbackResult.success] means the result is successful and you can now fetch
-  /// the user's profile from [TruecallerSdkCallback.profile]
+  /// the user's access token using the authorization code from [TruecallerSdkCallback.tcOAuthData]
   /// [TruecallerSdkCallbackResult.failure] means the result is failure and you can now fetch
   /// the result of failure from [TruecallerSdkCallback.error]
   /// [TruecallerSdkCallbackResult.verification] will be returned only when using
-  /// [TruecallerSdkScope.SDK_OPTION_WITH_OTP] which indicates to verify the user
-  /// manually, so this is not applicable for truecaller_sdk 0.0.1
+  /// [TcSdkOptions.OPTION_VERIFY_ALL_USERS] which indicates to verify the user manually
   static Stream<TruecallerSdkCallback> get streamCallbackData {
     if (_callbackStream == null) {
       _callbackStream = _eventChannel.receiveBroadcastStream().map<TruecallerSdkCallback>((value) {
@@ -125,7 +106,7 @@ class TruecallerSdk {
         switch (result.enumValue()) {
           case TruecallerSdkCallbackResult.success:
             callback.result = TruecallerSdkCallbackResult.success;
-            _insertProfile(callback, resultHashMap["data"]!);
+            _insertOAuthData(callback, resultHashMap["data"]!);
             break;
           case TruecallerSdkCallbackResult.failure:
             callback.result = TruecallerSdkCallbackResult.failure;
@@ -188,6 +169,12 @@ class TruecallerSdk {
     return CallbackData.fromJson(dataMap as Map<String, dynamic>);
   }
 
+  static _insertOAuthData(TruecallerSdkCallback callback, String data) {
+    Map oAuthDataMap = jsonDecode(data);
+    TcOAuthData tcOAuthData = TcOAuthData.fromJson(oAuthDataMap as Map<String, dynamic>);
+    callback.tcOAuthData = tcOAuthData;
+  }
+
   static _insertProfile(TruecallerSdkCallback callback, String data) {
     Map profileMap = jsonDecode(data);
     TruecallerUserProfile profile =
@@ -199,25 +186,52 @@ class TruecallerSdk {
     // onVerificationRequired has nullable error, hence null check
     if (data != null && data.trim().isNotEmpty && data.trim().toLowerCase() != "null") {
       Map errorMap = jsonDecode(data);
-      TruecallerError truecallerError = TruecallerError.fromJson(errorMap as Map<String, dynamic>);
-      callback.error = truecallerError;
+      TcOAuthError tcOAuthError = TcOAuthError.fromJson(errorMap as Map<String, dynamic>);
+      callback.error = tcOAuthError;
     }
   }
 
-  /// To customise the look and feel of the verification consent screen as per your app theme, add
-  /// the following lines before calling the [getProfile] method.
-  /// NOTE: It's not applicable for [TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET]
-  static get setDarkTheme async => await _methodChannel.invokeMethod('setDarkTheme');
+  /// This utility method generates a random code verifier string using SecureRandom as the
+  /// source of entropy with 64 as the default entropy quantity.
+  /// You can either generate your own code verifier or use this utility method to generate one
+  /// for you.
+  /// NOTE: Store the code verifier in the current session since it would be required later
+  /// to generate the access token.
+  static Future<dynamic> get generateRandomCodeVerifier async =>
+      _methodChannel.invokeMethod('generateRandomCodeVerifier');
 
-  /// To customise the profile dialog in any of the supported Indian languages, add the
-  /// following lines before calling the [getProfile] method with [locale] of your choice.
+  /// This utility method produces a code challenge from the supplied code verifier[codeVerifier]
+  /// using SHA-256 as the challenge method and Base64 as encoding if the system supports it.
+  /// NOTE: All Android devices should ideally support SHA-256 and Base64, but in rare case if
+  /// the doesn't, then this method would return null meaning that you can’t proceed further.
+  /// Please ensure to have a null safe check for such cases.
+  static Future<dynamic> generateCodeChallenge(String codeVerifier) async =>
+      _methodChannel.invokeMethod('generateCodeChallenge', {"codeVerifier": codeVerifier});
+
+  /// Set your own code challenge or use the utility method [generateRandomCodeVerifier] to generate
+  /// one for you and set it via [codeChallenge] to this method
+  /// Set it before calling [getAuthorizationCode]
+  static setCodeChallenge(String codeChallenge) async =>
+      await _methodChannel.invokeMethod('setCodeChallenge', {"codeChallenge": codeChallenge});
+
+  /// Set the list of scopes to be requested using [scopes].
+  /// Set it before calling [getAuthorizationCode]
+  static setOAuthScopes(List<String> scopes) async =>
+      await _methodChannel.invokeMethod('setOAuthScopes', {"scopes": scopes});
+
+  /// Set a unique state parameter [oAuthState] & store it in the current session to use it later in the
+  /// onSuccess() callback method of the [TcOAuthCallback] to match if the state received from the
+  /// authorization server is the same as set here to prevent request forgery attacks.
+  /// Set it before calling [getAuthorizationCode]
+  static setOAuthState(String oAuthState) async =>
+      await _methodChannel.invokeMethod('setOAuthState', {"oAuthState": oAuthState});
+
+  /// Customise the consent screen dialog in any of the supported Indian languages by supplying
+  /// [locale] to the method.
   /// NOTE: Default value is en
+  /// Set it before calling [getAuthorizationCode]
   static setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
-
-  /// To set your own custom request identifier, add the following before calling [getProfile]
-  static setRequestNonce(String requestNonce) async =>
-      await _methodChannel.invokeMethod('setRequestNonce', {"reqNonce": requestNonce});
 
   /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
   /// numbers only so that's why default countryISO is set to "IN".

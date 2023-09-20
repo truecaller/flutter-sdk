@@ -37,13 +37,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestWidgetsFlutterBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+        (MethodCall methodCall) async {
       return '42';
     });
   });
 
   tearDown(() {
-    channel.setMockMethodCallHandler(null);
+    TestWidgetsFlutterBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
   });
 
   /*test('getPlatformVersion', () async {

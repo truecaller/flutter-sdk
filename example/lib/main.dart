@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _stream = TruecallerSdk.streamCallbackData;
+    _stream = TcSdk.streamCallbackData;
   }
 
   @override
@@ -65,11 +65,23 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
-                    TruecallerSdk.isUsable.then((isUsable) {
-                      if (isUsable) {
-                        TruecallerSdk.setRequestNonce(Uuid().v1());
-                        TruecallerSdk.getProfile;
+                    TcSdk.initializeSDK(sdkOption: TcSdkOptions.OPTION_VERIFY_ALL_USERS);
+                    TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
+                      if (isOAuthFlowUsable) {
+                        TcSdk.setOAuthState(Uuid().v1());
+                        TcSdk.setOAuthScopes(['profile', 'phone', 'openid', 'offline_access']);
+                        TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
+                          TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {
+                            if (codeChallenge != null) {
+                              TcSdk.setCodeChallenge(codeChallenge);
+                              TcSdk.getAuthorizationCode;
+                            } else {
+                              final snackBar = SnackBar(content: Text("Device not supported"));
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              print("***Code challenge NULL***");
+                            }
+                          });
+                        });
                       } else {
                         final snackBar = SnackBar(content: Text("Not Usable"));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -78,7 +90,7 @@ class _MyAppState extends State<MyApp> {
                     });
                   },
                   child: Text(
-                    "Initialize SDK & Get Profile",
+                    "Initialize SDK & Get Authorization Code",
                     style: TextStyle(color: Colors.white),
                   ),
                   color: Colors.blue,
@@ -94,10 +106,11 @@ class _MyAppState extends State<MyApp> {
                         switch (snapshot.data!.result) {
                           case TruecallerSdkCallbackResult.success:
                             return Text(
-                                "Hi, ${snapshot.data!.profile!.firstName} ${snapshot.data!.profile!.lastName}"
-                                "\nRequest Nonce: ${snapshot.data!.profile!.requestNonce}");
+                                "Auth Code: ${snapshot.data!.tcOAuthData!.authorizationCode}"
+                                "\n\nState: ${snapshot.data!.tcOAuthData!.state}");
                           case TruecallerSdkCallbackResult.failure:
-                            return Text("Oops!! Error type ${snapshot.data!.error!.code}");
+                            return Text(
+                                "${snapshot.data!.error!.code} : ${snapshot.data!.error!.message}");
                           case TruecallerSdkCallbackResult.verification:
                             return Column(
                               children: [
