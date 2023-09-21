@@ -49,7 +49,6 @@ class TcSdk {
   /// 2. [TcSdkOptions.OPTION_VERIFY_ALL_USERS] i.e both Truecaller and Non-Truecaller users
   ///
   /// [consentHeadingOption] determines the heading of the consent screen.
-  /// [loginTextPrefix] determines prefix text in login sentence
   /// [ctaText] determines prefix text in login/primary button
   /// [footerType] determines the footer button/secondary button text.
   /// [buttonShapeOption] to set login button shape
@@ -58,8 +57,7 @@ class TcSdk {
   static initializeSDK(
           {required int sdkOption,
           int consentHeadingOption = TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO,
-          int loginTextPrefix = TcSdkOptions.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
-          int footerType = TcSdkOptions.FOOTER_TYPE_SKIP,
+          int footerType = TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO,
           int ctaText = TcSdkOptions.CTA_TEXT_PROCEED,
           int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
           int? buttonColor,
@@ -67,7 +65,6 @@ class TcSdk {
       await _methodChannel.invokeMethod('initializeSDK', {
         "sdkOption": sdkOption,
         "consentHeadingOption": consentHeadingOption,
-        "loginTextPrefix": loginTextPrefix,
         "footerType": footerType,
         "ctaText": ctaText,
         "buttonShapeOption": buttonShapeOption,

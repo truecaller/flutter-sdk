@@ -70,11 +70,11 @@ class FooterOption {
 
   static Map<int, String> getFooterOptionsMap() {
     return {
-      TcSdkOptions.FOOTER_TYPE_SKIP: "Skip",
       TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO: "Use Another Number",
       TcSdkOptions.FOOTER_TYPE_ANOTHER_METHOD: "Use Another Method",
       TcSdkOptions.FOOTER_TYPE_MANUALLY: "Enter Details Manually",
       TcSdkOptions.FOOTER_TYPE_LATER: "I'll do later",
+      TcSdkOptions.FOOTER_TYPE_SKIP: "Skip",
     };
   }
 }
@@ -132,4 +132,11 @@ class ConfigOptions {
       "To subscribe & get updates",
     ];
   }
+}
+
+class AccessTokenHelper {
+  final TcOAuthData tcOAuthData;
+  final String codeVerifier;
+
+  AccessTokenHelper(this.tcOAuthData, this.codeVerifier);
 }

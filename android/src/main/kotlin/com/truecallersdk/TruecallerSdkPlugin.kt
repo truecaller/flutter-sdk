@@ -220,7 +220,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 .sdkOptions(call.argument<Int>(Constants.SDK_OPTION) ?: TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS)
                 .consentHeadingOption(call.argument<Int>(Constants.CONSENT_HEADING_OPTION) ?: TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO)
                 .loginTextPrefix(call.argument<Int>(Constants.LOGIN_TEXT_PRE) ?: TcSdkOptions.LOGIN_TEXT_PREFIX_TO_GET_STARTED)
-                .footerType(call.argument<Int>(Constants.FOOTER_TYPE) ?: TcSdkOptions.FOOTER_TYPE_SKIP)
+                .footerType(call.argument<Int>(Constants.FOOTER_TYPE) ?: TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO)
                 .ctaText(call.argument<Int>(Constants.CTA_TEXT_PRE) ?: TcSdkOptions.CTA_TEXT_PROCEED)
                 .buttonShapeOptions(call.argument<Int>(Constants.BTN_SHAPE) ?: TcSdkOptions.BUTTON_SHAPE_ROUNDED)
                 .buttonColor(call.argument<Long>(Constants.BTN_CLR)?.toInt() ?: 0)

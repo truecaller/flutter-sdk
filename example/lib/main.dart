@@ -33,6 +33,9 @@ import 'package:truecaller_sdk/truecaller_sdk.dart';
 import 'package:truecaller_sdk_example/non_tc_screen.dart';
 import 'package:uuid/uuid.dart';
 
+import 'customization/config_options.dart';
+import 'customization/oauth_result_screen.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -44,6 +47,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Stream<TruecallerSdkCallback>? _stream;
+  late String? codeVerifier;
 
   @override
   void initState() {
@@ -73,6 +77,7 @@ class _MyAppState extends State<MyApp> {
                         TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
                           TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {
                             if (codeChallenge != null) {
+                              this.codeVerifier = codeVerifier;
                               TcSdk.setCodeChallenge(codeChallenge);
                               TcSdk.getAuthorizationCode;
                             } else {
@@ -105,9 +110,23 @@ class _MyAppState extends State<MyApp> {
                       if (snapshot.hasData) {
                         switch (snapshot.data!.result) {
                           case TruecallerSdkCallbackResult.success:
-                            return Text(
-                                "Auth Code: ${snapshot.data!.tcOAuthData!.authorizationCode}"
-                                "\n\nState: ${snapshot.data!.tcOAuthData!.state}");
+                            return MaterialButton(
+                                color: Colors.green,
+                                child: Text(
+                                  "Go to OAuth Result",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OAuthResultScreen(),
+                                        settings: RouteSettings(
+                                          arguments: AccessTokenHelper(
+                                              snapshot.data!.tcOAuthData!, codeVerifier!),
+                                        ),
+                                      ));
+                                });
                           case TruecallerSdkCallbackResult.failure:
                             return Text(
                                 "${snapshot.data!.error!.code} : ${snapshot.data!.error!.message}");

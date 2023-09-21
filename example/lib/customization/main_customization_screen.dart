@@ -32,11 +32,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
+import 'package:truecaller_sdk_example/customization/oauth_result_screen.dart';
 import 'package:truecaller_sdk_example/non_tc_screen.dart';
 import 'package:uuid/uuid.dart';
 
 import 'config_options.dart';
-import 'result_screen.dart';
 
 // This screen shows different customization options available in Truecaller SDK
 
@@ -64,6 +64,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late int selectedFooter;
   late bool rectangularBtn, verifyAllUsers;
+  late String? codeVerifier;
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
   List<DropdownMenuItem<int>> loginPrefixMenuItemList = [];
@@ -142,7 +143,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text("Configure SDK options"),
@@ -203,7 +203,6 @@ class _HomePageState extends State<HomePage> {
                   height: 20.0,
                 ),
                 MaterialButton(
-                  minWidth: width - 20.0,
                   height: 45.0,
                   child: Text(
                     "LET'S GO",
@@ -379,6 +378,7 @@ class _HomePageState extends State<HomePage> {
         TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
           TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {
             if (codeChallenge != null) {
+              this.codeVerifier = codeVerifier;
               TcSdk.setCodeChallenge(codeChallenge);
               TcSdk.getAuthorizationCode;
             } else {
@@ -401,9 +401,10 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ResultScreen(
-                    "Auth Code: ${truecallerSdkCallback.tcOAuthData!.authorizationCode}"
-                    "\n\nState: ${truecallerSdkCallback.tcOAuthData!.state}"),
+                builder: (context) => OAuthResultScreen(),
+                settings: RouteSettings(
+                  arguments: AccessTokenHelper(truecallerSdkCallback.tcOAuthData!, codeVerifier!),
+                ),
               ));
           break;
         case TruecallerSdkCallbackResult.failure:
