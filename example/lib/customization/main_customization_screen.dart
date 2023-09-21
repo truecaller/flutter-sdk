@@ -67,10 +67,9 @@ class _HomePageState extends State<HomePage> {
   late String? codeVerifier;
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
-  List<DropdownMenuItem<int>> loginPrefixMenuItemList = [];
   List<DropdownMenuItem<int>> headingMenuItemList = [];
   late int ctaColor, ctaTextColor;
-  late int ctaPrefixOption, loginPrefixOption, headingOption;
+  late int ctaPrefixOption, headingOption;
   final TextEditingController localeController = TextEditingController();
   late StreamSubscription? streamSubscription;
 
@@ -84,7 +83,6 @@ class _HomePageState extends State<HomePage> {
     ctaColor = Colors.blue.value;
     ctaTextColor = Colors.white.value;
     ctaPrefixOption = 0;
-    loginPrefixOption = 0;
     headingOption = 0;
 
     for (String key in ConfigOptions.getColorList().keys) {
@@ -98,13 +96,6 @@ class _HomePageState extends State<HomePage> {
       ctaPrefixMenuItemList.add(DropdownMenuItem<int>(
         value: i,
         child: Text("${ConfigOptions.getCtaPrefixOptions()[i]}"),
-      ));
-    }
-
-    for (int i = 0; i < ConfigOptions.getLoginPrefixOptions().length; i++) {
-      loginPrefixMenuItemList.add(DropdownMenuItem<int>(
-        value: i,
-        child: Text("${ConfigOptions.getLoginPrefixOptions()[i]}"),
       ));
     }
 
@@ -167,6 +158,10 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   "Footer Options",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                ),
+                Divider(
+                  color: Colors.transparent,
+                  height: 20.0,
                 ),
                 Column(
                   children: createRadioListFooterOptions(),
@@ -311,27 +306,6 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         child: DropdownButtonFormField<int>(
             decoration: InputDecoration(
-              labelText: "Login Prefix",
-              labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
-            ),
-            style: TextStyle(color: Colors.green),
-            value: loginPrefixOption,
-            isExpanded: true,
-            items: loginPrefixMenuItemList,
-            onChanged: (value) {
-              setState(() {
-                loginPrefixOption = value!;
-              });
-            }),
-      ),
-      Divider(
-        color: Colors.transparent,
-        height: 10.0,
-      ),
-      Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-        child: DropdownButtonFormField<int>(
-            decoration: InputDecoration(
               labelText: "Heading options",
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
@@ -359,7 +333,6 @@ class _HomePageState extends State<HomePage> {
             ? TcSdkOptions.OPTION_VERIFY_ALL_USERS
             : TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS,
         consentHeadingOption: headingOption,
-        loginTextPrefix: loginPrefixOption,
         footerType: selectedFooter,
         ctaText: ctaPrefixOption,
         buttonShapeOption: rectangularBtn

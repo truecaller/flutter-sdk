@@ -111,27 +111,6 @@ class ConfigOptions {
       "Proceed with %s"
     ];
   }
-
-  static List<String> getLoginPrefixOptions() {
-    return [
-      "To get started",
-      "To continue",
-      "To place order",
-      "To complete your purchase",
-      "To checkout",
-      "To complete your booking",
-      "To proceed with your booking",
-      "To continue with your booking",
-      "To get details",
-      "To view more",
-      "To continue reading",
-      "To proceed",
-      "For new updates",
-      "To get updates",
-      "To subscribe",
-      "To subscribe & get updates",
-    ];
-  }
 }
 
 class AccessTokenHelper {
