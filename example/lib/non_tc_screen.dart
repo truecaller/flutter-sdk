@@ -32,6 +32,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
 import 'customization/result_screen.dart';
@@ -327,8 +328,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> onProceedClick() async {
     if (showInputNumberView() && validateNumber()) {
       try {
-        await TcSdk.requestVerification(phoneNumber: phoneController.text);
-        setProgressBarToActive();
+        if (await Permission.phone.request().isGranted) {
+          await TcSdk.requestVerification(phoneNumber: phoneController.text);
+          setProgressBarToActive();
+        } else if (await Permission.phone.isPermanentlyDenied) {
+          openAppSettings();
+        } else {
+          showSnackBar("Please grant all the permissions to proceed");
+        }
       } on PlatformException catch (exception) {
         showSnackBar(exception.message.toString());
       } catch (exception) {
