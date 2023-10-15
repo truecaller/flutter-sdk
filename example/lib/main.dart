@@ -46,7 +46,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Stream<TruecallerSdkCallback>? _stream;
+  late Stream<TcSdkCallback>? _stream;
   late String? codeVerifier;
 
   @override
@@ -104,12 +104,12 @@ class _MyAppState extends State<MyApp> {
                   color: Colors.transparent,
                   height: 20.0,
                 ),
-                StreamBuilder<TruecallerSdkCallback>(
+                StreamBuilder<TcSdkCallback>(
                     stream: _stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         switch (snapshot.data!.result) {
-                          case TruecallerSdkCallbackResult.success:
+                          case TcSdkCallbackResult.success:
                             return MaterialButton(
                                 color: Colors.green,
                                 child: Text(
@@ -127,10 +127,10 @@ class _MyAppState extends State<MyApp> {
                                         ),
                                       ));
                                 });
-                          case TruecallerSdkCallbackResult.failure:
+                          case TcSdkCallbackResult.failure:
                             return Text(
                                 "${snapshot.data!.error!.code} : ${snapshot.data!.error!.message}");
-                          case TruecallerSdkCallbackResult.verification:
+                          case TcSdkCallbackResult.verification:
                             return Column(
                               children: [
                                 Text("Verification Required : "

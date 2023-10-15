@@ -370,7 +370,7 @@ class _HomePageState extends State<HomePage> {
   void createStreamBuilder() {
     streamSubscription = TcSdk.streamCallbackData.listen((truecallerSdkCallback) {
       switch (truecallerSdkCallback.result) {
-        case TruecallerSdkCallbackResult.success:
+        case TcSdkCallbackResult.success:
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -380,13 +380,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ));
           break;
-        case TruecallerSdkCallbackResult.failure:
+        case TcSdkCallbackResult.failure:
           final snackBar = SnackBar(
               content: Text("${truecallerSdkCallback.error!.code} : "
                   "${truecallerSdkCallback.error!.message}"));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
           break;
-        case TruecallerSdkCallbackResult.verification:
+        case TcSdkCallbackResult.verification:
           Navigator.push(
               context,
               MaterialPageRoute(

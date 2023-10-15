@@ -180,6 +180,7 @@ class _MyAppState extends State<OAuthResultScreen> {
 
   void fetchUserInfo() async {
     try {
+      userInfoResponse = "";
       Response response;
       response = await dio.get('https://oauth-account-noneu.truecaller.com/v1/userinfo',
           options: Options(headers: {"Authorization": "Bearer $accessToken"}));

@@ -39,7 +39,7 @@ import 'truecaller_callback.dart';
 class TcSdk {
   static const MethodChannel _methodChannel = const MethodChannel('tc_method_channel');
   static const EventChannel _eventChannel = const EventChannel('tc_event_channel');
-  static Stream<TruecallerSdkCallback>? _callbackStream;
+  static Stream<TcSdkCallback>? _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
   /// customizable options which are all optional and have default values as set below in the method
@@ -88,64 +88,64 @@ class TcSdk {
 
   /// Once you call [getAuthorizationCode], you can listen to this stream to determine the result of the
   /// action taken by the user.
-  /// [TruecallerSdkCallbackResult.success] means the result is successful and you can now fetch
-  /// the user's access token using the authorization code from [TruecallerSdkCallback.tcOAuthData]
-  /// [TruecallerSdkCallbackResult.failure] means the result is failure and you can now fetch
-  /// the result of failure from [TruecallerSdkCallback.error]
-  /// [TruecallerSdkCallbackResult.verification] will be returned only when using
+  /// [TcSdkCallbackResult.success] means the result is successful and you can now fetch
+  /// the user's access token using the authorization code from [TcSdkCallback.tcOAuthData]
+  /// [TcSdkCallbackResult.failure] means the result is failure and you can now fetch
+  /// the result of failure from [TcSdkCallback.error]
+  /// [TcSdkCallbackResult.verification] will be returned only when using
   /// [TcSdkOptions.OPTION_VERIFY_ALL_USERS] which indicates to verify the user manually
-  static Stream<TruecallerSdkCallback> get streamCallbackData {
+  static Stream<TcSdkCallback> get streamCallbackData {
     if (_callbackStream == null) {
-      _callbackStream = _eventChannel.receiveBroadcastStream().map<TruecallerSdkCallback>((value) {
-        TruecallerSdkCallback callback = new TruecallerSdkCallback();
+      _callbackStream = _eventChannel.receiveBroadcastStream().map<TcSdkCallback>((value) {
+        TcSdkCallback callback = new TcSdkCallback();
         var resultHashMap = HashMap<String, String>.from(value);
         final String? result = resultHashMap["result"];
         switch (result.enumValue()) {
-          case TruecallerSdkCallbackResult.success:
-            callback.result = TruecallerSdkCallbackResult.success;
+          case TcSdkCallbackResult.success:
+            callback.result = TcSdkCallbackResult.success;
             _insertOAuthData(callback, resultHashMap["data"]!);
             break;
-          case TruecallerSdkCallbackResult.failure:
-            callback.result = TruecallerSdkCallbackResult.failure;
+          case TcSdkCallbackResult.failure:
+            callback.result = TcSdkCallbackResult.failure;
             _insertError(callback, resultHashMap["data"]);
             break;
-          case TruecallerSdkCallbackResult.verification:
-            callback.result = TruecallerSdkCallbackResult.verification;
+          case TcSdkCallbackResult.verification:
+            callback.result = TcSdkCallbackResult.verification;
             _insertError(callback, resultHashMap["data"]);
             break;
-          case TruecallerSdkCallbackResult.missedCallInitiated:
-            callback.result = TruecallerSdkCallbackResult.missedCallInitiated;
+          case TcSdkCallbackResult.missedCallInitiated:
+            callback.result = TcSdkCallbackResult.missedCallInitiated;
             CallbackData data = _insertData(callback, resultHashMap["data"]!);
             callback.ttl = data.ttl;
             callback.requestNonce = data.requestNonce;
             break;
-          case TruecallerSdkCallbackResult.missedCallReceived:
-            callback.result = TruecallerSdkCallbackResult.missedCallReceived;
+          case TcSdkCallbackResult.missedCallReceived:
+            callback.result = TcSdkCallbackResult.missedCallReceived;
             break;
-          case TruecallerSdkCallbackResult.otpInitiated:
-            callback.result = TruecallerSdkCallbackResult.otpInitiated;
+          case TcSdkCallbackResult.otpInitiated:
+            callback.result = TcSdkCallbackResult.otpInitiated;
             CallbackData data = _insertData(callback, resultHashMap["data"]!);
             callback.ttl = data.ttl;
             callback.requestNonce = data.requestNonce;
             break;
-          case TruecallerSdkCallbackResult.otpReceived:
-            callback.result = TruecallerSdkCallbackResult.otpReceived;
+          case TcSdkCallbackResult.otpReceived:
+            callback.result = TcSdkCallbackResult.otpReceived;
             CallbackData data = _insertData(callback, resultHashMap["data"]!);
             callback.otp = data.otp;
             break;
-          case TruecallerSdkCallbackResult.verifiedBefore:
-            callback.result = TruecallerSdkCallbackResult.verifiedBefore;
+          case TcSdkCallbackResult.verifiedBefore:
+            callback.result = TcSdkCallbackResult.verifiedBefore;
             CallbackData data = _insertData(callback, resultHashMap["data"]!);
             _insertProfile(callback, data.profile!);
             break;
-          case TruecallerSdkCallbackResult.verificationComplete:
-            callback.result = TruecallerSdkCallbackResult.verificationComplete;
+          case TcSdkCallbackResult.verificationComplete:
+            callback.result = TcSdkCallbackResult.verificationComplete;
             CallbackData data = _insertData(callback, resultHashMap["data"]!);
             callback.accessToken = data.accessToken;
             callback.requestNonce = data.requestNonce;
             break;
-          case TruecallerSdkCallbackResult.exception:
-            callback.result = TruecallerSdkCallbackResult.exception;
+          case TcSdkCallbackResult.exception:
+            callback.result = TcSdkCallbackResult.exception;
             Map exceptionMap = jsonDecode(resultHashMap["data"]!);
             TruecallerException exception =
                 TruecallerException.fromJson(exceptionMap as Map<String, dynamic>);
@@ -161,25 +161,25 @@ class TcSdk {
     return _callbackStream!;
   }
 
-  static CallbackData _insertData(TruecallerSdkCallback callback, String data) {
+  static CallbackData _insertData(TcSdkCallback callback, String data) {
     Map dataMap = jsonDecode(data);
     return CallbackData.fromJson(dataMap as Map<String, dynamic>);
   }
 
-  static _insertOAuthData(TruecallerSdkCallback callback, String data) {
+  static _insertOAuthData(TcSdkCallback callback, String data) {
     Map oAuthDataMap = jsonDecode(data);
     TcOAuthData tcOAuthData = TcOAuthData.fromJson(oAuthDataMap as Map<String, dynamic>);
     callback.tcOAuthData = tcOAuthData;
   }
 
-  static _insertProfile(TruecallerSdkCallback callback, String data) {
+  static _insertProfile(TcSdkCallback callback, String data) {
     Map profileMap = jsonDecode(data);
     TruecallerUserProfile profile =
         TruecallerUserProfile.fromJson(profileMap as Map<String, dynamic>);
     callback.profile = profile;
   }
 
-  static _insertError(TruecallerSdkCallback callback, String? data) {
+  static _insertError(TcSdkCallback callback, String? data) {
     // onVerificationRequired has nullable error, hence null check
     if (data != null && data.trim().isNotEmpty && data.trim().toLowerCase() != "null") {
       Map errorMap = jsonDecode(data);
@@ -233,17 +233,17 @@ class TcSdk {
   /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
   /// numbers only so that's why default countryISO is set to "IN".
   /// The result will be returned asynchronously via [streamCallbackData] stream
-  /// Check [TruecallerSdkCallbackResult] to understand the different verifications states.
+  /// Check [TcSdkCallbackResult] to understand the different verifications states.
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
   /// or if the user is already verified on the device, will get the call back as
-  /// [TruecallerSdkCallbackResult.verifiedBefore] in [streamCallbackData]
+  /// [TcSdkCallbackResult.verifiedBefore] in [streamCallbackData]
   static requestVerification({required String phoneNumber, String countryISO = "IN"}) async =>
       await _methodChannel
           .invokeMethod('requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with a missed call.
-  /// i.e call this method only when you receive [TruecallerSdkCallbackResult.missedCallReceived]
+  /// i.e call this method only when you receive [TcSdkCallbackResult.missedCallReceived]
   /// in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   static verifyMissedCall({required String firstName, required String lastName}) async =>
@@ -252,8 +252,8 @@ class TcSdk {
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with an OTP.
-  /// i.e call this method when you receive either [TruecallerSdkCallbackResult.otpInitiated] or
-  /// [TruecallerSdkCallbackResult.otpReceived] in [streamCallbackData].
+  /// i.e call this method when you receive either [TcSdkCallbackResult.otpInitiated] or
+  /// [TcSdkCallbackResult.otpReceived] in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   /// with the [otp] code received over SMS
   static verifyOtp(

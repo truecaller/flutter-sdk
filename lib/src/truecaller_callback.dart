@@ -28,52 +28,52 @@
  * PRODUCT YOU ARE ASSUMING THE ENTIRE RISK AS TO ITS QUALITY AND PERFORMANCE.
  */
 
-/// callback stream that gets returned from [TruecallerSdk.streamCallbackData]
-class TruecallerSdkCallback {
-  late TruecallerSdkCallbackResult result;
+/// callback stream that gets returned from [TcSdk.streamCallbackData]
+class TcSdkCallback {
+  late TcSdkCallbackResult result;
 
   //for tc-flow
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.success]
+  /// received when [result] equals [TcSdkCallbackResult.success]
   TcOAuthData? tcOAuthData;
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.failure] or
-  /// [result] equals [TruecallerSdkCallbackResult.verification]
+  /// received when [result] equals [TcSdkCallbackResult.failure] or
+  /// [result] equals [TcSdkCallbackResult.verification]
   /// It indicates reason why Truecaller user verification failed
   TcOAuthError? error;
 
   //for non-tc flow
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.verifiedBefore]
+  /// received when [result] equals [TcSdkCallbackResult.verifiedBefore]
   TruecallerUserProfile? profile;
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.otpReceived]
+  /// received when [result] equals [TcSdkCallbackResult.otpReceived]
   String? otp;
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.verificationComplete]
+  /// received when [result] equals [TcSdkCallbackResult.verificationComplete]
   /// It can be used for server-side response validation
   String? accessToken;
 
-  /// TTL(in sec) received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
-  /// or [result] equals [TruecallerSdkCallbackResult.missedCallInitiated]
+  /// TTL(in sec) received when [result] equals either [TcSdkCallbackResult.otpInitiated]
+  /// or [result] equals [TcSdkCallbackResult.missedCallInitiated]
   /// It indicates time left to complete the user verification process
   String? ttl;
 
-  /// Request Nonce received when [result] equals either [TruecallerSdkCallbackResult.otpInitiated]
-  /// or [TruecallerSdkCallbackResult.missedCallInitiated]
-  /// or [TruecallerSdkCallbackResult.verificationComplete]
+  /// Request Nonce received when [result] equals either [TcSdkCallbackResult.otpInitiated]
+  /// or [TcSdkCallbackResult.missedCallInitiated]
+  /// or [TcSdkCallbackResult.verificationComplete]
   /// It can be used to verify whether the custom request identifier (if set) during SDK
   /// initialization is same as this one received in response which essentially assures a
   /// correlation between the request and the response
   String? requestNonce;
 
-  /// received when [result] equals [TruecallerSdkCallbackResult.exception]
+  /// received when [result] equals [TcSdkCallbackResult.exception]
   /// It indicates reason why non-truecaller user verification failed
   TruecallerException? exception;
 }
 
-/// enum with callback results that corresponds to the [TruecallerSdkCallback.result]
-enum TruecallerSdkCallbackResult {
+/// enum with callback results that corresponds to the [TcSdkCallback.result]
+enum TcSdkCallbackResult {
   //tc user callback results
   success,
   failure,
@@ -91,13 +91,13 @@ enum TruecallerSdkCallbackResult {
 
 /// extension method that converts String to corresponding enum value
 extension EnumParser on String? {
-  TruecallerSdkCallbackResult? enumValue() {
-    return TruecallerSdkCallbackResult.values.firstWhere(
+  TcSdkCallbackResult? enumValue() {
+    return TcSdkCallbackResult.values.firstWhere(
         (element) => element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
   }
 }
 
-/// OAuth data that corresponds to [TruecallerSdkCallback.tcOAuthData]
+/// OAuth data that corresponds to [TcSdkCallback.tcOAuthData]
 class TcOAuthData {
   late String authorizationCode;
   late String state;
@@ -111,7 +111,7 @@ class TcOAuthData {
   }
 }
 
-/// user profile that corresponds to [TruecallerSdkCallback.profile]
+/// user profile that corresponds to [TcSdkCallback.profile]
 class TruecallerUserProfile {
   String firstName;
   String? lastName;
@@ -170,7 +170,7 @@ class TruecallerUserProfile {
         accessToken = map['accessToken'];
 }
 
-/// error that corresponds to [TruecallerSdkCallback.error]
+/// error that corresponds to [TcSdkCallback.error]
 class TcOAuthError {
   late int code;
   late String? message;
@@ -182,7 +182,7 @@ class TcOAuthError {
   }
 }
 
-/// exception that corresponds to [TruecallerSdkCallback.exception]
+/// exception that corresponds to [TcSdkCallback.exception]
 class TruecallerException {
   late int code;
   late String message;

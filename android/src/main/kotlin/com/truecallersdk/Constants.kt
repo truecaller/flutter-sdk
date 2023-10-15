@@ -30,13 +30,15 @@
 
 package com.truecallersdk
 
+import androidx.annotation.Keep
+
 class Constants {
     companion object {
         //scope options
         const val SDK_OPTION = "sdkOption";
         const val CONSENT_HEADING_OPTION = "consentHeadingOption";
         const val LOGIN_TEXT_PRE = "loginTextPrefix";
-        const val CTA_TEXT_PRE = "ctaTextPrefix";
+        const val CTA_TEXT_PRE = "ctaText";
         const val FOOTER_TYPE = "footerType";
         const val BTN_SHAPE = "buttonShapeOption";
         const val BTN_CLR = "buttonColor";
@@ -76,6 +78,7 @@ class Constants {
     }
 }
 
+@Keep
 data class CallbackData(
     val otp: String? = null,
     val ttl: String? = null,

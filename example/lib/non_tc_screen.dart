@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController lNameController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   late StreamSubscription? streamSubscription;
-  TruecallerSdkCallbackResult? tempResult;
+  TcSdkCallbackResult? tempResult;
   Timer? _timer;
   int? _ttl;
 
@@ -84,13 +84,13 @@ class _HomePageState extends State<HomePage> {
 
   bool showInputNameView() {
     return tempResult != null &&
-        (tempResult == TruecallerSdkCallbackResult.missedCallReceived || showInputOtpView());
+        (tempResult == TcSdkCallbackResult.missedCallReceived || showInputOtpView());
   }
 
   bool showInputOtpView() {
     return tempResult != null &&
-        ((tempResult == TruecallerSdkCallbackResult.otpInitiated) ||
-            (tempResult == TruecallerSdkCallbackResult.otpReceived));
+        ((tempResult == TcSdkCallbackResult.otpInitiated) ||
+            (tempResult == TcSdkCallbackResult.otpReceived));
   }
 
   bool showRetryTextView() {
@@ -264,44 +264,44 @@ class _HomePageState extends State<HomePage> {
       // which the call was received and hence it would directly open input name screen.
       if (phoneController.text.length == 10) {
         setState(() {
-          if (truecallerUserCallback.result != TruecallerSdkCallbackResult.exception) {
+          if (truecallerUserCallback.result != TcSdkCallbackResult.exception) {
             tempResult = truecallerUserCallback.result;
           }
-          showProgressBar = tempResult == TruecallerSdkCallbackResult.missedCallInitiated;
-          if (tempResult == TruecallerSdkCallbackResult.otpReceived) {
+          showProgressBar = tempResult == TcSdkCallbackResult.missedCallInitiated;
+          if (tempResult == TcSdkCallbackResult.otpReceived) {
             otpController.text = truecallerUserCallback.otp!;
           }
         });
       }
 
       switch (truecallerUserCallback.result) {
-        case TruecallerSdkCallbackResult.missedCallInitiated:
+        case TcSdkCallbackResult.missedCallInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
           showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl} && "
               "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
-        case TruecallerSdkCallbackResult.missedCallReceived:
+        case TcSdkCallbackResult.missedCallReceived:
           showSnackBar("Missed call Received");
           break;
-        case TruecallerSdkCallbackResult.otpInitiated:
+        case TcSdkCallbackResult.otpInitiated:
           startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
           showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl} && "
               "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
-        case TruecallerSdkCallbackResult.otpReceived:
+        case TcSdkCallbackResult.otpReceived:
           showSnackBar("OTP Received : ${truecallerUserCallback.otp}");
           break;
-        case TruecallerSdkCallbackResult.verificationComplete:
+        case TcSdkCallbackResult.verificationComplete:
           showSnackBar("Verification Completed : ${truecallerUserCallback.accessToken} && "
               "requestNonce = ${truecallerUserCallback.requestNonce}");
           _navigateToResult(fNameController.text);
           break;
-        case TruecallerSdkCallbackResult.verifiedBefore:
+        case TcSdkCallbackResult.verifiedBefore:
           showSnackBar("Verified Before : ${truecallerUserCallback.profile!.accessToken} && "
               "requestNonce = ${truecallerUserCallback.profile!.requestNonce}");
           _navigateToResult(truecallerUserCallback.profile!.firstName);
           break;
-        case TruecallerSdkCallbackResult.exception:
+        case TcSdkCallbackResult.exception:
           showSnackBar("Exception : ${truecallerUserCallback.exception!.code}, "
               "${truecallerUserCallback.exception!.message}");
           break;
@@ -341,11 +341,11 @@ class _HomePageState extends State<HomePage> {
       } catch (exception) {
         showSnackBar(exception.toString());
       }
-    } else if (tempResult == TruecallerSdkCallbackResult.missedCallReceived && validateName()) {
+    } else if (tempResult == TcSdkCallbackResult.missedCallReceived && validateName()) {
       setProgressBarToActive();
       TcSdk.verifyMissedCall(firstName: fNameController.text, lastName: lNameController.text);
-    } else if ((tempResult == TruecallerSdkCallbackResult.otpInitiated ||
-            tempResult == TruecallerSdkCallbackResult.otpReceived) &&
+    } else if ((tempResult == TcSdkCallbackResult.otpInitiated ||
+            tempResult == TcSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();
