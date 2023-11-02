@@ -1,18 +1,29 @@
-## 0.0.1
+## 1.0.0
 
-* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.3.0
-* Only supports Android at the moment
-* Only supports verification of Truecaller users at the moment
+#### Breaking change
 
-## 0.0.2
+* Flutter plugin supporting OAuth flow and manual verification flow.
+* Based on Truecaller's OAuth SDK for Android version [3.0.0](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0)
 
-* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.4.0
-* Only supports Android at the moment
-* Supports verification of both Truecaller and Non-Truecaller users
-* TTL is now exposed to partners when OTP or Missed Call is initiated so that partners are aware of time left to complete the user verification and can take
- an appropriate action once TTL expires.
-* Optional nullable Error is passed in case of **`TruecallerSdkCallbackResult.verification`** which can be used to determine user action which led to initiating
- manual verification like whether the user pressed on the `footer CTA` on the verification screen OR the `system back button`.
+## 0.1.2
+
+* Updated Flutter channel to stable version 3.3.0
+* Updated Android Gradle Plugin to 7.2.2 and Kotlin to 1.7.0
+* Fixed a bug related to type mismatch
+
+## 0.1.1
+
+* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.7.0
+* TruecallerSdk.requestVerification() would now throw a PlatformException in case an invalid number is supplied to it.
+
+## 0.1.0
+
+* Migrated the plugin and example to support null safety
+
+## 0.0.4
+
+* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.6.0
+* More optimisations, bug fixes and support for targetSdkVersion 30
 
 ## 0.0.3
 
@@ -30,22 +41,18 @@ handle the time out logic at your own end which can be retrieved from `Truecalle
 verification flow by OTP or Missed call, you will receive a TTL value which you can use appropriately to show a countdown timer and once it expires you
 need to restart the verification process.
 
-## 0.0.4
+## 0.0.2
 
-* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.6.0
-* More optimisations, bug fixes and support for targetSdkVersion 30
+* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.4.0
+* Only supports Android at the moment
+* Supports verification of both Truecaller and Non-Truecaller users
+* TTL is now exposed to partners when OTP or Missed Call is initiated so that partners are aware of time left to complete the user verification and can take
+ an appropriate action once TTL expires.
+* Optional nullable Error is passed in case of **`TruecallerSdkCallbackResult.verification`** which can be used to determine user action which led to initiating
+ manual verification like whether the user pressed on the `footer CTA` on the verification screen OR the `system back button`.
 
-## 0.1.0
+ ## 0.0.1
 
-* Migrated the plugin and example to support null safety
-
-## 0.1.1
-
-* Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.7.0
-* TruecallerSdk.requestVerification() would now throw a PlatformException in case an invalid number is supplied to it.
-
-## 0.1.2
-
-* Updated Flutter channel to stable version 3.3.0
-* Updated Android Gradle Plugin to 7.2.2 and Kotlin to 1.7.0
-* Fixed a bug related to type mismatch
+ * Flutter plugin for Truecaller SDK based on Truecaller's Android SDK 2.3.0
+ * Only supports Android at the moment
+ * Only supports verification of Truecaller users at the moment

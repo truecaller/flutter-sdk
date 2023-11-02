@@ -4,12 +4,9 @@
 <img src="https://raw.githubusercontent.com/truecaller/flutter-sdk/tc/images/truecaller_logo.png" height="200">
 </p>
 
-Flutter plugin that uses [Truecaller's Android SDK](https://docs.truecaller.com/truecaller-sdk/) to provide mobile number verification service to verify Truecaller users.
+Flutter plugin that uses [Truecaller's OAuth SDK for Android](https://docs.truecaller.com/truecaller-sdk/) based on OAuth 2.0 which is the industry-standard protocol for authorization.
 
-This plugin currently supports **only Android** at the moment. **v0.0.2 & above** will allow you to verify both Truecaller as well as non-Truecaller users on your application. (**v0.0.1** only allows you to verify users who have Truecaller Android app on their device and are logged-in).
-Verification via Truecaller SDK enables you to quickly verify/signup/login your users using their mobile number.
-
-For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/implementing-user-flow-for-your-app)
+For more details, please refer [here](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/implementing-user-flow-for-your-app)
 
 ## Steps to integrate
 
@@ -18,20 +15,22 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^0.1.2
+  truecaller_sdk: ^1.0.0
   ...
 ```
-### 2. Generate App key and add it to `AndroidManifest.xml`:
-* [Register](https://developer.truecaller.com/sign-up) for Truecaller's developer account, or [login](https://developer.truecaller.com/login) to your existing developer account.
-* Refer to the [official documentation](https://docs.truecaller.com/truecaller-sdk/android/generating-app-key) for generating app key.
-* Open your [AndroidManifest.xml](/example/android/app/src/main/AndroidManifest.xml) under /android module and add a `meta-data` element to the `application` element with your app key:
+### 2. Generate Client Id and add it to `AndroidManifest.xml`:
+* [Register](https://sdk-console-noneu.truecaller.com/) to create your business account and manage OAuth projects .
+* Refer to the [official documentation](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/generating-client-id) for
+generating client id.
+* Open your [AndroidManifest.xml](/example/android/app/src/main/AndroidManifest.xml) under /android module and add a `meta-data` element to the `application`
+ element with your client id:
 ```xml
 <application>  
 ...  
 <activity>  
 .. </activity>
 
-<meta-data android:name="com.truecaller.android.sdk.PartnerKey" android:value="PASTE_YOUR_PARTNER_KEY_HERE"/>  
+<meta-data android:name="com.truecaller.android.sdk.ClientId" android:value="PASTE_YOUR_CLIENT_ID_HERE"/>
 ...  
 </application>  
 ```
@@ -63,7 +62,7 @@ class MainActivity: FlutterFragmentActivity() {
 ```
 
 ### 4. Add required Permissions to `AndroidManifest.xml`:
-Permissions are mandatory only if you are initializing the SDK with `TruecallerSdkScope.SDK_OPTION_WITH_OTP` in order to verify the non-Truecaller users.
+Permissions are mandatory only if you are initializing the SDK with `TcSdkOptions.OPTION_VERIFY_ALL_USERS` in order to verify the users manually.
 
 For Android 8 and above :
 ```xml
@@ -81,42 +80,67 @@ For Android 7 and below :
 
 These permissions are required for the SDK to be able to automatically detect the drop call and complete the verification flow.
 
-To read more about different scenarios for user verifications, [click here](https://docs.truecaller.com/truecaller-sdk/android/user-flows-for-verification-truecaller-+-non-truecaller-users).
+To read more about different scenarios for user verifications, [click here](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/scenarios-for-all-user-verifications-truecaller-and-non-truecaller-users).
 
 ## Example 1 (to verify only Truecaller users having Truecaller app on their device)
 
 ```dart
-// This Example is valid for truecaller_sdk 0.0.1 onwards 
 
 //Import package
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
-//Step 1: Initialize the SDK with SDK_OPTION_WITHOUT_OTP
-TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP);
+//Step 1: Initialize the SDK with OPTION_VERIFY_ONLY_TC_USERS
+TcSdk.initializeSDK(sdkOption: TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS);
 
-//Step 2: Check if SDK is usable on that device, otherwise fall back to any other alternative
-bool isUsable = await TruecallerSdk.isUsable;
+//Step 2: Check if SDK is usable on that device, otherwise fall back to any other login alternative
+bool isUsable = await TcSdk.isOAuthFlowUsable;
 
-//Step 3: If isUsable is true, you can call getProfile to show consent screen to verify user's number
-isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
-
-//OR you can also replace Step 2 and Step 3 directly with this  
-TruecallerSdk.isUsable.then((isUsable) {
- isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
-});
+//Step 3: If isUsable is true, then do the following before you can invoke the OAuth consent screen -
+//3.1: Set a unique OAuth state and store that state in your session so that you can match it with the state received from the authorization server to prevent
+//any request forgery attacks.
+//3.2: Set the OAuth scopes that you'd want to request from the user. You can either ask all of them together or a subset of it.
+//3.3: Generate a random code verifier either yourself or using the SDK method as shown below. Store the code verifier in the current session since it would
+//be required later to generate the access token.
+//3.4: Generate code challenge using the code verifier from the previous step
+//3.5 Set the code challenge
+//3.6 Finally, after setting all of the above, invoke the consent screen by calling getAuthorizationCode
+TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
+    if (isOAuthFlowUsable) {
+        oAuthState = "some_unique_uuid" //store the state to use later
+        TcSdk.setOAuthState(oAuthState); //3.1
+        TcSdk.setOAuthScopes(['profile', 'phone', 'openid']); //3.2
+        TcSdk.generateRandomCodeVerifier.then((codeVerifier) { //3.3
+            TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) { //3.4
+                if (codeChallenge != null) {
+                    this.codeVerifier = codeVerifier; //store the code verifier to use later
+                    TcSdk.setCodeChallenge(codeChallenge); //3.5
+                    TcSdk.getAuthorizationCode; //3.6
+                } else {
+                    print("***Code challenge NULL. Device not supported***");
+                }
+            });
+        });
+    } else {
+        print("***Not usable***");
+    }
+}
                    
-//Step 4: Be informed about the TruecallerSdk.getProfile callback result(success, failure, verification)
-StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
-  switch (truecallerSdkCallback.result) {
-    case TruecallerSdkCallbackResult.success:
-      String firstName = truecallerSdkCallback.profile!.firstName;
-      String? lastName = truecallerSdkCallback.profile!.lastName;
-      String phNo = truecallerSdkCallback.profile!.phoneNumber;
+//Step 4: Be informed about the TcSdk.getAuthorizationCode callback result(success, failure, verification)
+StreamSubscription streamSubscription = TcSdk.streamCallbackData.listen((tcSdkCallback) {
+  switch (tcSdkCallback.result) {
+    case TcSdkCallbackResult.success:
+      TcOAuthData tcOAuthData = tcSdkCallback.tcOAuthData!;
+      String authorizationCode = tcOAuthData.authorizationCode; //use this along with codeVerifier generated in step 3.3 to generate an access token
+      String stateReceivedFromServer = tcOAuthData.state; //match it with what you set in step 3.1
+      List<dynamic> scopesGranted = tcOAuthData.scopesGranted; //list of scopes granted by the user
       break;
-    case TruecallerSdkCallbackResult.failure:
-      int errorCode = truecallerSdkCallback.error!.code;
+    case TcSdkCallbackResult.failure:
+      //Handle the failure
+      int errorCode = tcSdkCallback.error!.code;
+      String message = tcSdkCallback.error!.message;
       break;
-    case TruecallerSdkCallbackResult.verification:
+    case TcSdkCallbackResult.verification:
+    // won't receive this callback if initializing SDK with sdkOption as TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS
       print("Verification Required!!");
       break;
     default:
@@ -132,107 +156,125 @@ void dispose() {
 }
 ```
 
+//Step 4a
+Using the “code verifier” from step 3.3, and the “authorization code” received in success callback of step 4, you need to make a network call to
+Truecaller’s backend so as to [fetch the access token](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/integrating-with-your-backend/fetching-user-token)
+
+//Step 4b
+Make a network call to [fetch the userInfo](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/integrating-with-your-backend/fetching-user-profile) using access token from step 4a. The response would be corresponding to the scopes granted by the user.
+
 ## Example 2 (to verify both Truecaller users (Example 1) and non-Truecaller users via manual verification)
 
 ```dart
-// This Example is valid for truecaller_sdk 0.0.2 onwards 
 
 //Import package
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 
 //Step 1: Initialize the SDK with SDK_OPTION_WITH_OTP
-TruecallerSdk.initializeSDK(sdkOptions: TruecallerSdkScope.SDK_OPTION_WITH_OTP);
+TcSdk.initializeSDK(sdkOption: TcSdkOptions.OPTION_VERIFY_ALL_USERS);
 
-//Step 2: Call getProfile to show consent screen to verify user's number
-//NOTE: isUsable will always return TRUE when using SDK_OPTION_WITH_OTP, so you can also call
-//getProfile directly
-TruecallerSdk.isUsable.then((isUsable) {
- isUsable ? TruecallerSdk.getProfile : print("***Not usable***");
-});
-                   
-//Step 3: Be informed about the TruecallerSdk.getProfile callback result via [streamCallbackData] stream 
-//result could be either of (success, failure, verification)
-StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
-  switch (truecallerSdkCallback.result) {
-    case TruecallerSdkCallbackResult.success:
-    //If Truecaller user and has Truecaller app on his device, you'd directly get the Profile
-      String firstName = truecallerSdkCallback.profile!.firstName;
-      String? lastName = truecallerSdkCallback.profile!.lastName;
-      String phNo = truecallerSdkCallback.profile!.phoneNumber;
+//Follow steps 2 and 3 from Example 1
+
+//Step 4: Be informed about the TcSdk.getAuthorizationCode callback result(success, failure, verification)
+StreamSubscription streamSubscription = TcSdk.streamCallbackData.listen((tcSdkCallback) {
+  switch (tcSdkCallback.result) {
+    case TcSdkCallbackResult.success:
+      TcOAuthData tcOAuthData = tcSdkCallback.tcOAuthData!;
+      String authorizationCode = tcOAuthData.authorizationCode; // use this along with codeVerifier generated in step 3.3 to generate an access token
+      String stateReceivedFromServer = tcOAuthData.state; // match it with what you set in step 3.1
+      List<dynamic> scopesGranted = tcOAuthData.scopesGranted;
       break;
-    case TruecallerSdkCallbackResult.failure:
-      int errorCode = truecallerSdkCallback.error!.code;
+    case TcSdkCallbackResult.failure:
+      //Handle the failure
+      int errorCode = tcSdkCallback.error!.code;
+      String message = tcSdkCallback.error!.message;
       break;
-    case TruecallerSdkCallbackResult.verification:
-      //If the callback comes here, it indicates that user has to be manually verified, so follow step 4
-      //You'd receive nullable error which can be used to determine user action that led to verification 
-      int? errorCode = truecallerSdkCallback.error?.code;
-      print("Manual Verification Required!");
+    case TcSdkCallbackResult.verification:
+      //If the callback comes here, it indicates that user has to be manually verified, so follow step 5
+      //You'd receive nullable error which can be used to determine user action that led to manual verification
+      int errorCode = tcSdkCallback.error!.code;
+      String message = tcSdkCallback.error!.message;
+      print("Verification Required!!");
       break;
     default:
       print("Invalid result");
   }
 });
 
-//Step 4: Initiate manual verification by asking user for his number
-//Please ensure proper validations are in place so as to send correct phone number string to the below method,
-//otherwise an exception would be thrown
-TruecallerSdk.requestVerification(phoneNumber: "PHONE_NUMBER");
+//Step 5: Initiate manual verification by asking user for his number only if you receive callback result as
+//TcSdkCallbackResult.verification in the previous step.
+//Please ensure proper validations are in place so as to send a valid phone number string to the below method,
+//otherwise an exception would be thrown.
+//Also, request the required permissions from the user and ensure they are granted before calling this method.
+TcSdk.requestVerification(phoneNumber: "PHONE_NUMBER");
 
-//Step 5: Be informed about the TruecallerSdk.requestVerification callback result via [streamCallbackData] stream
+//Step 6: Be informed about the TcSdk.requestVerification callback result via [streamCallbackData] stream
 //result could be either of (missedCallInitiated, missedCallReceived, otpInitiated, otpReceived, 
 //verifiedBefore, verificationComplete, exception)
-StreamSubscription streamSubscription = TruecallerSdk.streamCallbackData.listen((truecallerSdkCallback) {
-  switch (truecallerSdkCallback.result) {
-    case TruecallerSdkCallbackResult.missedCallInitiated:
+StreamSubscription streamSubscription = TcSdk.streamCallbackData.listen((tcSdkCallback) {
+  switch (tcSdkCallback.result) {
+    case TcSdkCallbackResult.missedCallInitiated:
       //Number Verification would happen via Missed call, so you can show a loader till you receive the call
       //You'd also receive ttl (in seconds) that determines time left to complete the user verification
-      //Once TTL expires, you need to start from step 4. So you can either ask the user to input another number
+      //Once TTL expires, you need to start from step 5. So you can either ask the user to input another number
       //or you can also auto-retry the verification on the same number by giving a retry button
-      String? ttl = truecallerSdkCallback.ttl;
+      String? ttl = tcSdkCallback.ttl;
+      //You'd also receive a request nonce whose value would be same as the State that you set in step 3.1
+      String requestNonce = tcSdkCallback.requestNonce;
       break;
-    case TruecallerSdkCallbackResult.missedCallReceived:
-      //Missed call received and now you can complete the verification as mentioned in step 6a
+    case TcSdkCallbackResult.missedCallReceived:
+      //Missed call received and now you can complete the verification as mentioned in step 7a
       break;
-    case TruecallerSdkCallbackResult.otpInitiated:
+    case TcSdkCallbackResult.otpInitiated:
       //Number Verification would happen via OTP
       //You'd also receive ttl (in seconds) that determines time left to complete the user verification
-      //Once TTL expires, you need to start from step 4. So you can either ask the user to input another number
+      //Once TTL expires, you need to start from step 5. So you can either ask the user to input another number
       //or you can also auto-retry the verification on the same number by giving a retry button
-      String? ttl = truecallerSdkCallback.ttl;
+      String? ttl = tcSdkCallback.ttl;
+      //You'd also receive a request nonce whose value would be same as the State that you set in step 3.1
+      String requestNonce = tcSdkCallback.requestNonce;
       break;
-    case TruecallerSdkCallbackResult.otpReceived:
-      //OTP received and now you can complete the verification as mentioned in step 6b
+    case TcSdkCallbackResult.otpReceived:
+      //OTP received and now you can complete the verification as mentioned in step 7b
       //If SMS Retriever hashcode is configured on Truecaller's developer dashboard, get the OTP from callback
-      String? otp = truecallerSdkCallback.otp;
+      String? otp = tcSdkCallback.otp;
       break;
-    case TruecallerSdkCallbackResult.verificationComplete:
+    case TcSdkCallbackResult.verificationComplete:
       //Number verification has been completed successfully and you can get the accessToken from callback
-      String? token = truecallerSdkCallback.accessToken;
+      String? token = tcSdkCallback.accessToken;
+      //You'd also receive a request nonce whose value would be same as the State that you set in step 3.1
+      String requestNonce = tcSdkCallback.requestNonce;
       break;
-    case TruecallerSdkCallbackResult.verifiedBefore:
+    case TcSdkCallbackResult.verifiedBefore:
       //Number has already been verified before, hence no need to verify. Retrieve the Profile data from callback
-      String firstName = truecallerSdkCallback.profile!.firstName;
-      String? lastName = truecallerSdkCallback.profile!.lastName;
-      String phNo = truecallerSdkCallback.profile!.phoneNumber;
-      String? token = truecallerSdkCallback.profile!.accessToken;
+      String firstName = tcSdkCallback.profile!.firstName;
+      String? lastName = tcSdkCallback.profile!.lastName;
+      String phNo = tcSdkCallback.profile!.phoneNumber;
+      String? token = tcSdkCallback.profile!.accessToken;
+      //You'd also receive a request nonce whose value would be same as the State that you set in step 3.1
+      String requestNonce = tcSdkCallback.profile!.requestNonce;
       break;
-    case TruecallerSdkCallbackResult.exception:
+    case TcSdkCallbackResult.exception:
       //Handle the exception
-      int exceptionCode = truecallerSdkCallback.exception!.code;
-      String exceptionMsg = truecallerSdkCallback.exception!.message;
+      int exceptionCode = tcSdkCallback.exception!.code;
+      String exceptionMsg = tcSdkCallback.exception!.message;
       break;
     default:
       print("Invalid result");
   }
 });
 
-//Step 6: Complete user verification
-//6a: If Missed call has been received on the same device, call this method with user's name
-TruecallerSdk.verifyMissedCall(firstName: "FIRST_NAME", lastName: "LAST_NAME");
+//Step 7: Complete user verification
+//7a: If Missed call has been received successfully, i.e. if you received callback result as
+// TcSdkCallbackResult.missedCallReceived in the previous step call this method with user's name
+TcSdk.verifyMissedCall(firstName: "FIRST_NAME", lastName: "LAST_NAME");
 
-//6b: If OTP has been initiated OR received on any device, call this method with the user's name & OTP received
-TruecallerSdk.verifyOtp(firstName: "FIRST_NAME", lastName: "LAST_NAME", otp: "OTP");
+//7b: If OTP has been initiated, show user an input OTP screen where they can enter the OTP.
+//If the OTP is received on the same device, and you've configured the SMS Retriever, you can prefill the OTP which
+//you'd receive if the callback result is TcSdkCallbackResult.otpReceived, and call this method with user's name
+//Otherwise, if OTP is not auto-read or if the OTP is received on any other device, call this method with the user's name
+//and OTP entered by the user.
+TcSdk.verifyOtp(firstName: "FIRST_NAME", lastName: "LAST_NAME", otp: "OTP");
 
 //Step 7: Dispose streamSubscription
 @override
@@ -242,84 +284,55 @@ void dispose() {
 }
 ```
 
-As mentioned in Step 5 above, when `TruecallerSdkCallbackResult` equals `TruecallerSdkCallbackResult.missedCallInitiated` or `TruecallerSdkCallbackResult
-.otpInitiated`, you will receive an additional parameter for the time to live i.e TTL (in seconds) which is passed as String extra and can be retrieved from
- the callback using `truecallerUserCallback.ttl`. This value determines amount of time left to complete the user verification. You can use this value to show a waiting message to your user before they can try for another attempt i.e fresh verification for same number cannot be re-initiated till the TTL expires. Once the TTL expires, you need to start the verification process again from step 4.
+As mentioned in Step 6 above, when `TcSdkCallbackResult` equals `TcSdkCallbackResult.missedCallInitiated` or `TcSdkCallbackResult.otpInitiated`, you will receive an additional parameter for the time to live i.e TTL (in seconds) which is passed as String extra and can be retrieved from
+the callback using `tcSdkCallback.ttl`. This value determines amount of time left to complete the user verification. You can use this value to show
+a waiting message to your user before they can retry for another attempt i.e fresh verification for same number cannot be re-initiated till the TTL expires.
+Once the TTL expires, you need to start the verification process again from step 5.
 
 ##### NOTE #####
-* For details on different kinds of errorCodes, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/handling-error-scenarios).
-* For details on different kinds of exceptions, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/verifying-non-truecaller-users/verificationcallback).
-* For details on Server Side Response Validation, refer [here](https://docs.truecaller.com/truecaller-sdk/android/server-side-response-validation).
+* For details on different kinds of errorCodes, refer [here](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/handling-error-scenarios).
+* For details on different kinds of exceptions, refer [here](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/non-truecaller-user-verification/trueexception).
+* For details on Server Side Response Validation, refer [here](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/non-truecaller-user-verification/server-side-validation).
 * For sample implementations, head over to [example](example) module.
 
 ## Customization Options
 
 ### Language
-To customise the profile consent screen in any of the supported Indian languages, add the following line before calling `TruecallerSdk.getProfile`:
+To customise the consent screen in any of the supported Indian languages, add the following line before calling `TcSdk.getAuthorizationCode`:
 ```dart
 /// initialize the SDK and check isUsable first before calling this method
 /// Default value is "en" i.e English
-TruecallerSdk.setLocale("hi") // this sets the language to Hindi
+TcSdk.setLocale("hi") // this sets the language to Hindi
 ```
-
-### Dark Theme
-You can also set the Dark Theme for consent screen by adding the following line before calling `TruecallerSdk.getProfile`:
-```dart
-/// initialize the SDK and check isUsable first before calling this method
-TruecallerSdk.setDarkTheme 
-```
-
-##### Note
-Dark Theme is not applicable for `TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET`
 
 ### Consent screen UI
-You can customize the consent screen UI using the options available in class `TruecallerSdkScope` under `scope_options.dart` and pass them while initializing the SDK.
+You can customize the consent screen UI using the options available in class `TcSdkOptions` under `scope_options.dart` and pass them while initializing the SDK.
 
 ```dart
-  /// [sdkOptions] determines whether you want to use the SDK for verifying - 
-  /// 1. [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] i.e only Truecaller users
-  /// 2. [TruecallerSdkScope.SDK_OPTION_WITH_OTP] i.e both Truecaller and Non-Truecaller users
-  ///
-  /// NOTE: In truecaller_sdk 0.0.1, only
-  /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] is supported
-  /// In truecaller_sdk 0.0.2 and onwards, both
-  /// [TruecallerSdkScope.SDK_OPTION_WITHOUT_OTP] and [TruecallerSdkScope.SDK_OPTION_WITH_OTP] are supported
-  ///
-  /// [consentMode] determines which kind of consent screen you want to show to the user.
-  /// [consentTitleOptions] is applicable only for [TruecallerSdkScope.CONSENT_MODE_POPUP]
-  /// and [TruecallerSdkScope.CONSENT_MODE_FULLSCREEN] and it sets the title prefix
-  /// [footerType] determines the footer button text. You can set it to
-  /// [TruecallerSdkScope.FOOTER_TYPE_NONE] if you don't want to show any footer button
-  /// There are some customization options applicable only for [TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET]
-  /// which are following -
-  /// [loginTextPrefix] determines prefix text in login sentence
-  /// [loginTextSuffix] determines suffix text in login sentence
-  /// [ctaTextPrefix] determines prefix text in login button
-  /// [privacyPolicyUrl] to set your own privacy policy url
-  /// [termsOfServiceUrl] to set your own terms of service url
-  /// [buttonShapeOptions] to set login button shape
+  /// [sdkOption] determines whether you want to use the SDK for verifying -
+  /// 1. [TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS] i.e only Truecaller users
+  /// 2. [TcSdkOptions.OPTION_VERIFY_ALL_USERS] i.e both Truecaller and Non-Truecaller users
+  /// [consentHeadingOption] determines the heading of the consent screen.
+  /// [ctaText] determines prefix text in login/primary button
+  /// [footerType] determines the footer button/secondary button text.
+  /// [buttonShapeOption] to set login button shape
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
   static initializeSDK(
-          {required int sdkOptions,
-          int consentMode: TruecallerSdkScope.CONSENT_MODE_BOTTOMSHEET,
-          int consentTitleOptions: TruecallerSdkScope.SDK_CONSENT_TITLE_GET_STARTED,
-          int footerType: TruecallerSdkScope.FOOTER_TYPE_SKIP,
-          int loginTextPrefix: TruecallerSdkScope.LOGIN_TEXT_PREFIX_TO_GET_STARTED,
-          int loginTextSuffix: TruecallerSdkScope.LOGIN_TEXT_SUFFIX_PLEASE_LOGIN,
-          int ctaTextPrefix: TruecallerSdkScope.CTA_TEXT_PREFIX_USE,
-          String privacyPolicyUrl: "",
-          String termsOfServiceUrl: "",
-          int buttonShapeOptions: TruecallerSdkScope.BUTTON_SHAPE_ROUNDED,
-          int? buttonColor,
-          int? buttonTextColor})
+            {required int sdkOption,
+            int consentHeadingOption = TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO,
+            int footerType = TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO,
+            int ctaText = TcSdkOptions.CTA_TEXT_PROCEED,
+            int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
+            int? buttonColor,
+            int? buttonTextColor})
 ```
 
-By default, `initializeSDK()` has default argument values for all the arguments except the `sdkOptions` which is a required argument, so if you
+By default, `initializeSDK()` has default argument values for all the arguments except the `sdkOption` which is a required argument, so if you
  don't pass any explicit values to the other arguments, this method will initialize the SDK with default values as above.
 
 ##### Note
-For list of supported locales and details on different kinds of customizations, refer [here](https://docs.truecaller.com/truecaller-sdk/android/integrating-with-your-app/customisation-1)
+For list of supported locales and details on different kinds of customizations, refer [here](https://docs.truecaller.com/truecaller-sdk/android/oauth-sdk-3.0/integration-steps/customisation)
 
 ##### Support
 For any technical/flow related questions, please feel free to reach out via our [support channel](https://developer.truecaller.com/support) for a fast and dedicated response.
