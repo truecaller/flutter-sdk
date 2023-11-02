@@ -37,8 +37,10 @@ import 'scope_options.dart';
 import 'truecaller_callback.dart';
 
 class TcSdk {
-  static const MethodChannel _methodChannel = const MethodChannel('tc_method_channel');
-  static const EventChannel _eventChannel = const EventChannel('tc_event_channel');
+  static const MethodChannel _methodChannel =
+      const MethodChannel('tc_method_channel');
+  static const EventChannel _eventChannel =
+      const EventChannel('tc_event_channel');
   static Stream<TcSdkCallback>? _callbackStream;
 
   /// This method has to be called before anything else. It initializes the SDK with the
@@ -96,7 +98,8 @@ class TcSdk {
   /// [TcSdkOptions.OPTION_VERIFY_ALL_USERS] which indicates to verify the user manually
   static Stream<TcSdkCallback> get streamCallbackData {
     if (_callbackStream == null) {
-      _callbackStream = _eventChannel.receiveBroadcastStream().map<TcSdkCallback>((value) {
+      _callbackStream =
+          _eventChannel.receiveBroadcastStream().map<TcSdkCallback>((value) {
         TcSdkCallback callback = new TcSdkCallback();
         var resultHashMap = HashMap<String, String>.from(value);
         final String? result = resultHashMap["result"];
@@ -147,13 +150,14 @@ class TcSdk {
           case TcSdkCallbackResult.exception:
             callback.result = TcSdkCallbackResult.exception;
             Map exceptionMap = jsonDecode(resultHashMap["data"]!);
-            TruecallerException exception =
-                TruecallerException.fromJson(exceptionMap as Map<String, dynamic>);
+            TruecallerException exception = TruecallerException.fromJson(
+                exceptionMap as Map<String, dynamic>);
             callback.exception = exception;
             break;
           default:
             throw PlatformException(
-                code: "1010", message: "${resultHashMap["result"]} is not a valid result");
+                code: "1010",
+                message: "${resultHashMap["result"]} is not a valid result");
         }
         return callback;
       });
@@ -168,7 +172,8 @@ class TcSdk {
 
   static _insertOAuthData(TcSdkCallback callback, String data) {
     Map oAuthDataMap = jsonDecode(data);
-    TcOAuthData tcOAuthData = TcOAuthData.fromJson(oAuthDataMap as Map<String, dynamic>);
+    TcOAuthData tcOAuthData =
+        TcOAuthData.fromJson(oAuthDataMap as Map<String, dynamic>);
     callback.tcOAuthData = tcOAuthData;
   }
 
@@ -181,9 +186,12 @@ class TcSdk {
 
   static _insertError(TcSdkCallback callback, String? data) {
     // onVerificationRequired has nullable error, hence null check
-    if (data != null && data.trim().isNotEmpty && data.trim().toLowerCase() != "null") {
+    if (data != null &&
+        data.trim().isNotEmpty &&
+        data.trim().toLowerCase() != "null") {
       Map errorMap = jsonDecode(data);
-      TcOAuthError tcOAuthError = TcOAuthError.fromJson(errorMap as Map<String, dynamic>);
+      TcOAuthError tcOAuthError =
+          TcOAuthError.fromJson(errorMap as Map<String, dynamic>);
       callback.error = tcOAuthError;
     }
   }
@@ -203,13 +211,14 @@ class TcSdk {
   /// the doesn't, then this method would return null meaning that you can’t proceed further.
   /// Please ensure to have a null safe check for such cases.
   static Future<dynamic> generateCodeChallenge(String codeVerifier) async =>
-      _methodChannel.invokeMethod('generateCodeChallenge', {"codeVerifier": codeVerifier});
+      _methodChannel.invokeMethod(
+          'generateCodeChallenge', {"codeVerifier": codeVerifier});
 
   /// Set your own code challenge or use the utility method [generateRandomCodeVerifier] to generate
   /// one for you and set it via [codeChallenge] to this method
   /// Set it before calling [getAuthorizationCode]
-  static setCodeChallenge(String codeChallenge) async =>
-      await _methodChannel.invokeMethod('setCodeChallenge', {"codeChallenge": codeChallenge});
+  static setCodeChallenge(String codeChallenge) async => await _methodChannel
+      .invokeMethod('setCodeChallenge', {"codeChallenge": codeChallenge});
 
   /// Set the list of scopes to be requested using [scopes].
   /// Set it before calling [getAuthorizationCode]
@@ -220,8 +229,8 @@ class TcSdk {
   /// onSuccess() callback method of the [TcOAuthCallback] to match if the state received from the
   /// authorization server is the same as set here to prevent request forgery attacks.
   /// Set it before calling [getAuthorizationCode]
-  static setOAuthState(String oAuthState) async =>
-      await _methodChannel.invokeMethod('setOAuthState', {"oAuthState": oAuthState});
+  static setOAuthState(String oAuthState) async => await _methodChannel
+      .invokeMethod('setOAuthState', {"oAuthState": oAuthState});
 
   /// Customise the consent screen dialog in any of the supported Indian languages by supplying
   /// [locale] to the method.
@@ -237,18 +246,20 @@ class TcSdk {
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
   /// or if the user is already verified on the device, will get the call back as
   /// [TcSdkCallbackResult.verifiedBefore] in [streamCallbackData]
-  static requestVerification({required String phoneNumber, String countryISO = "IN"}) async =>
-      await _methodChannel
-          .invokeMethod('requestVerification', {"ph": phoneNumber, "ci": countryISO});
+  static requestVerification(
+          {required String phoneNumber, String countryISO = "IN"}) async =>
+      await _methodChannel.invokeMethod(
+          'requestVerification', {"ph": phoneNumber, "ci": countryISO});
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with a missed call.
   /// i.e call this method only when you receive [TcSdkCallbackResult.missedCallReceived]
   /// in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
-  static verifyMissedCall({required String firstName, required String lastName}) async =>
-      await _methodChannel
-          .invokeMethod('verifyMissedCall', {"fname": firstName, "lname": lastName});
+  static verifyMissedCall(
+          {required String firstName, required String lastName}) async =>
+      await _methodChannel.invokeMethod(
+          'verifyMissedCall', {"fname": firstName, "lname": lastName});
 
   /// Call this method after [requestVerification] to complete the verification if the number has
   /// to be verified with an OTP.
@@ -257,7 +268,9 @@ class TcSdk {
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   /// with the [otp] code received over SMS
   static verifyOtp(
-          {required String firstName, required String lastName, required String otp}) async =>
-      await _methodChannel
-          .invokeMethod('verifyOtp', {"fname": firstName, "lname": lastName, "otp": otp});
+          {required String firstName,
+          required String lastName,
+          required String otp}) async =>
+      await _methodChannel.invokeMethod(
+          'verifyOtp', {"fname": firstName, "lname": lastName, "otp": otp});
 }

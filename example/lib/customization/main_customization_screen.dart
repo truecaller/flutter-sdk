@@ -52,7 +52,10 @@ class OptionsConfiguration extends StatefulWidget {
 class _OptionsConfigurationState extends State<OptionsConfiguration> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: "TC SDK Demo", debugShowCheckedModeBanner: false, home: HomePage());
+    return MaterialApp(
+        title: "TC SDK Demo",
+        debugShowCheckedModeBanner: false,
+        home: HomePage());
   }
 }
 
@@ -167,7 +170,8 @@ class _HomePageState extends State<HomePage> {
                   children: createRadioListFooterOptions(),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10.0, bottom: 10.0),
+                  padding: const EdgeInsets.only(
+                      left: 16.0, right: 16.0, top: 10.0, bottom: 10.0),
                   child: TextField(
                     controller: localeController,
                     maxLength: 2,
@@ -176,10 +180,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                     decoration: InputDecoration(
                         labelText: "Enter Locale",
-                        labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
-                        hintText: "Example: en(default), hi, kn, ta, te, mr, etc.",
+                        labelStyle:
+                            TextStyle(color: Colors.black, fontSize: 16.0),
+                        hintText:
+                            "Example: en(default), hi, kn, ta, te, mr, etc.",
                         hintStyle: TextStyle(
-                            fontStyle: FontStyle.italic, color: Colors.green, fontSize: 14.0)),
+                            fontStyle: FontStyle.italic,
+                            color: Colors.green,
+                            fontSize: 14.0)),
                   ),
                 ),
                 SwitchListTile(
@@ -368,7 +376,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TcSdk.streamCallbackData.listen((truecallerSdkCallback) {
+    streamSubscription =
+        TcSdk.streamCallbackData.listen((truecallerSdkCallback) {
       switch (truecallerSdkCallback.result) {
         case TcSdkCallbackResult.success:
           Navigator.push(
@@ -376,7 +385,8 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                 builder: (context) => OAuthResultScreen(),
                 settings: RouteSettings(
-                  arguments: AccessTokenHelper(truecallerSdkCallback.tcOAuthData!, codeVerifier!),
+                  arguments: AccessTokenHelper(
+                      truecallerSdkCallback.tcOAuthData!, codeVerifier!),
                 ),
               ));
           break;

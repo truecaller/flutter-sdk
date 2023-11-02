@@ -48,7 +48,8 @@ class _MyAppState extends State<OAuthResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final accessTokenHelper = ModalRoute.of(context)!.settings.arguments as AccessTokenHelper;
+    final accessTokenHelper =
+        ModalRoute.of(context)!.settings.arguments as AccessTokenHelper;
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(
@@ -105,7 +106,9 @@ class _MyAppState extends State<OAuthResultScreen> {
                   height: 20.0,
                 ),
                 SelectableText(
-                  accessTokenResponse.isEmpty ? "" : "Access Token Response: $accessTokenResponse",
+                  accessTokenResponse.isEmpty
+                      ? ""
+                      : "Access Token Response: $accessTokenResponse",
                   style: TextStyle(fontSize: 12.0),
                   textAlign: TextAlign.left,
                 ),
@@ -134,7 +137,9 @@ class _MyAppState extends State<OAuthResultScreen> {
                   height: 20.0,
                 ),
                 SelectableText(
-                  userInfoResponse.isEmpty ? "" : "User Info Response: $userInfoResponse",
+                  userInfoResponse.isEmpty
+                      ? ""
+                      : "User Info Response: $userInfoResponse",
                   style: TextStyle(fontSize: 14.0),
                   textAlign: TextAlign.left,
                 ),
@@ -153,20 +158,22 @@ class _MyAppState extends State<OAuthResultScreen> {
   void fetchAccessToken(AccessTokenHelper accessTokenHelper) async {
     try {
       Response response;
-      response = await dio.post('https://oauth-account-noneu.truecaller.com/v1/token',
-          data: {
-            'grant_type': 'authorization_code',
-            'client_id': '1si1lk7rbbo_mtg29mw5yczekv2ripbbnwnaozhpz6o',
-            'code': '${accessTokenHelper.tcOAuthData.authorizationCode}',
-            'code_verifier': '${accessTokenHelper.codeVerifier}'
-          },
-          options: Options(contentType: Headers.formUrlEncodedContentType));
+      response =
+          await dio.post('https://oauth-account-noneu.truecaller.com/v1/token',
+              data: {
+                'grant_type': 'authorization_code',
+                'client_id': '1si1lk7rbbo_mtg29mw5yczekv2ripbbnwnaozhpz6o',
+                'code': '${accessTokenHelper.tcOAuthData.authorizationCode}',
+                'code_verifier': '${accessTokenHelper.codeVerifier}'
+              },
+              options: Options(contentType: Headers.formUrlEncodedContentType));
       if (response.statusCode == 200 && response.data != null) {
         Map result = response.data;
         accessToken = result['access_token'];
         setState(() {
           for (final e in result.entries) {
-            accessTokenResponse = accessTokenResponse + "\n\n" + ('${e.key} = ${e.value}');
+            accessTokenResponse =
+                accessTokenResponse + "\n\n" + ('${e.key} = ${e.value}');
           }
         });
       }
@@ -182,13 +189,15 @@ class _MyAppState extends State<OAuthResultScreen> {
     try {
       userInfoResponse = "";
       Response response;
-      response = await dio.get('https://oauth-account-noneu.truecaller.com/v1/userinfo',
+      response = await dio.get(
+          'https://oauth-account-noneu.truecaller.com/v1/userinfo',
           options: Options(headers: {"Authorization": "Bearer $accessToken"}));
       if (response.statusCode == 200 && response.data != null) {
         Map result = response.data;
         setState(() {
           for (final e in result.entries) {
-            userInfoResponse = userInfoResponse + "\n\n" + ('${e.key} = ${e.value}');
+            userInfoResponse =
+                userInfoResponse + "\n\n" + ('${e.key} = ${e.value}');
           }
         });
       }

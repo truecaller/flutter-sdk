@@ -92,8 +92,8 @@ enum TcSdkCallbackResult {
 /// extension method that converts String to corresponding enum value
 extension EnumParser on String? {
   TcSdkCallbackResult? enumValue() {
-    return TcSdkCallbackResult.values.firstWhere(
-        (element) => element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
+    return TcSdkCallbackResult.values.firstWhere((element) =>
+        element.toString().split(".")[1].toLowerCase() == this!.toLowerCase());
   }
 }
 

@@ -84,7 +84,8 @@ class _HomePageState extends State<HomePage> {
 
   bool showInputNameView() {
     return tempResult != null &&
-        (tempResult == TcSdkCallbackResult.missedCallReceived || showInputOtpView());
+        (tempResult == TcSdkCallbackResult.missedCallReceived ||
+            showInputOtpView());
   }
 
   bool showInputOtpView() {
@@ -128,13 +129,19 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   prefixText: "+91",
-                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  prefixStyle:
+                      TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter Phone number",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "99999-99999",
-                  errorText: invalidNumber ? "Mobile Number must be of 10 digits" : null,
+                  errorText: invalidNumber
+                      ? "Mobile Number must be of 10 digits"
+                      : null,
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -149,13 +156,19 @@ class _HomePageState extends State<HomePage> {
                 keyboardType: TextInputType.text,
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
-                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  prefixStyle:
+                      TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter First Name",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "John",
-                  errorText: invalidFName ? "Invalid first name. Enter min 2 characters" : null,
+                  errorText: invalidFName
+                      ? "Invalid first name. Enter min 2 characters"
+                      : null,
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -170,12 +183,16 @@ class _HomePageState extends State<HomePage> {
                 keyboardType: TextInputType.text,
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
-                  prefixStyle: TextStyle(color: Colors.lightGreen, fontSize: fontSize),
+                  prefixStyle:
+                      TextStyle(color: Colors.lightGreen, fontSize: fontSize),
                   labelText: "Enter Last Name",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "Doe",
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -193,11 +210,14 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(color: Colors.green, fontSize: fontSize),
                 decoration: InputDecoration(
                   labelText: "Enter OTP",
-                  labelStyle: TextStyle(color: Colors.black, fontSize: fontSize),
+                  labelStyle:
+                      TextStyle(color: Colors.black, fontSize: fontSize),
                   hintText: "123-456",
                   errorText: invalidOtp ? "OTP must be 6 digits" : null,
                   hintStyle: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.grey, fontSize: fontSize),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                      fontSize: fontSize),
                 ),
               ),
             ),
@@ -206,7 +226,9 @@ class _HomePageState extends State<HomePage> {
               height: 20.0,
             ),
             Visibility(
-              visible: showInputNumberView() || showInputNameView() || showInputOtpView(),
+              visible: showInputNumberView() ||
+                  showInputNameView() ||
+                  showInputOtpView(),
               child: MaterialButton(
                 minWidth: width - 50.0,
                 height: 45.0,
@@ -228,7 +250,9 @@ class _HomePageState extends State<HomePage> {
                   ? TextButton(
                       child: Text(
                         "verification timed out, retry again",
-                        style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                        style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            color: Colors.blue),
                       ),
                       onPressed: () => setState(() => tempResult = null))
                   : Text("Retry again in $_ttl seconds"),
@@ -258,7 +282,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void createStreamBuilder() {
-    streamSubscription = TcSdk.streamCallbackData.listen((truecallerUserCallback) {
+    streamSubscription =
+        TcSdk.streamCallbackData.listen((truecallerUserCallback) {
       // make sure you're changing state only after number has been entered. there could be case
       // where user initiated missed call, pressed back, and came to this screen again after
       // which the call was received and hence it would directly open input name screen.
@@ -267,7 +292,8 @@ class _HomePageState extends State<HomePage> {
           if (truecallerUserCallback.result != TcSdkCallbackResult.exception) {
             tempResult = truecallerUserCallback.result;
           }
-          showProgressBar = tempResult == TcSdkCallbackResult.missedCallInitiated;
+          showProgressBar =
+              tempResult == TcSdkCallbackResult.missedCallInitiated;
           if (tempResult == TcSdkCallbackResult.otpReceived) {
             otpController.text = truecallerUserCallback.otp!;
           }
@@ -276,28 +302,34 @@ class _HomePageState extends State<HomePage> {
 
       switch (truecallerUserCallback.result) {
         case TcSdkCallbackResult.missedCallInitiated:
-          startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
-          showSnackBar("Missed call Initiated with TTL : ${truecallerUserCallback.ttl} && "
+          startCountdownTimer(
+              double.parse(truecallerUserCallback.ttl!).floor());
+          showSnackBar(
+              "Missed call Initiated with TTL : ${truecallerUserCallback.ttl} && "
               "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
         case TcSdkCallbackResult.missedCallReceived:
           showSnackBar("Missed call Received");
           break;
         case TcSdkCallbackResult.otpInitiated:
-          startCountdownTimer(double.parse(truecallerUserCallback.ttl!).floor());
-          showSnackBar("OTP Initiated with TTL : ${truecallerUserCallback.ttl} && "
+          startCountdownTimer(
+              double.parse(truecallerUserCallback.ttl!).floor());
+          showSnackBar(
+              "OTP Initiated with TTL : ${truecallerUserCallback.ttl} && "
               "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
         case TcSdkCallbackResult.otpReceived:
           showSnackBar("OTP Received : ${truecallerUserCallback.otp}");
           break;
         case TcSdkCallbackResult.verificationComplete:
-          showSnackBar("Verification Completed : ${truecallerUserCallback.accessToken} && "
+          showSnackBar(
+              "Verification Completed : ${truecallerUserCallback.accessToken} && "
               "requestNonce = ${truecallerUserCallback.requestNonce}");
           _navigateToResult(fNameController.text);
           break;
         case TcSdkCallbackResult.verifiedBefore:
-          showSnackBar("Verified Before : ${truecallerUserCallback.profile!.accessToken} && "
+          showSnackBar(
+              "Verified Before : ${truecallerUserCallback.profile!.accessToken} && "
               "requestNonce = ${truecallerUserCallback.profile!.requestNonce}");
           _navigateToResult(truecallerUserCallback.profile!.firstName);
           break;
@@ -341,16 +373,20 @@ class _HomePageState extends State<HomePage> {
       } catch (exception) {
         showSnackBar(exception.toString());
       }
-    } else if (tempResult == TcSdkCallbackResult.missedCallReceived && validateName()) {
+    } else if (tempResult == TcSdkCallbackResult.missedCallReceived &&
+        validateName()) {
       setProgressBarToActive();
-      TcSdk.verifyMissedCall(firstName: fNameController.text, lastName: lNameController.text);
+      TcSdk.verifyMissedCall(
+          firstName: fNameController.text, lastName: lNameController.text);
     } else if ((tempResult == TcSdkCallbackResult.otpInitiated ||
             tempResult == TcSdkCallbackResult.otpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();
       TcSdk.verifyOtp(
-          firstName: fNameController.text, lastName: lNameController.text, otp: otpController.text);
+          firstName: fNameController.text,
+          lastName: lNameController.text,
+          otp: otpController.text);
     }
   }
 

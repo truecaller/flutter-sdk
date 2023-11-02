@@ -69,20 +69,25 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 MaterialButton(
                   onPressed: () {
-                    TcSdk.initializeSDK(sdkOption: TcSdkOptions.OPTION_VERIFY_ALL_USERS);
+                    TcSdk.initializeSDK(
+                        sdkOption: TcSdkOptions.OPTION_VERIFY_ALL_USERS);
                     TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
                       if (isOAuthFlowUsable) {
                         TcSdk.setOAuthState(Uuid().v1());
-                        TcSdk.setOAuthScopes(['profile', 'phone', 'openid', 'offline_access']);
+                        TcSdk.setOAuthScopes(
+                            ['profile', 'phone', 'openid', 'offline_access']);
                         TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
-                          TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {
+                          TcSdk.generateCodeChallenge(codeVerifier)
+                              .then((codeChallenge) {
                             if (codeChallenge != null) {
                               this.codeVerifier = codeVerifier;
                               TcSdk.setCodeChallenge(codeChallenge);
                               TcSdk.getAuthorizationCode;
                             } else {
-                              final snackBar = SnackBar(content: Text("Device not supported"));
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              final snackBar = SnackBar(
+                                  content: Text("Device not supported"));
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
                               print("***Code challenge NULL***");
                             }
                           });
@@ -120,10 +125,12 @@ class _MyAppState extends State<MyApp> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => OAuthResultScreen(),
+                                        builder: (context) =>
+                                            OAuthResultScreen(),
                                         settings: RouteSettings(
                                           arguments: AccessTokenHelper(
-                                              snapshot.data!.tcOAuthData!, codeVerifier!),
+                                              snapshot.data!.tcOAuthData!,
+                                              codeVerifier!),
                                         ),
                                       ));
                                 });
@@ -141,7 +148,8 @@ class _MyAppState extends State<MyApp> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => NonTcVerification()));
+                                            builder: (context) =>
+                                                NonTcVerification()));
                                   },
                                   child: Text(
                                     "Do manual verification",
