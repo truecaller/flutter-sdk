@@ -32,7 +32,7 @@ group 'com.truecallersdk'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.8.22'
+    ext.kotlin_version = '1.9.0'
     repositories {
         google()
         mavenCentral()
@@ -58,13 +58,20 @@ def sdkVariant = "flutter"
 def sdkVariantVersion = "1.0.0"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
-        minSdkVersion 22
+        minSdkVersion 24
+        targetSdk 33
+        multiDexEnabled true
         resValue("string", "sdk_variant", "${sdkVariant}")
         resValue("string", "sdk_variant_version", "${sdkVariantVersion}")
     }
