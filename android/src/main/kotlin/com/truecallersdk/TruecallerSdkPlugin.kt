@@ -35,9 +35,9 @@ import android.content.Intent
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
+import com.truecaller.android.sdk.common.TrueException
 import com.truecaller.android.sdk.common.VerificationCallback
 import com.truecaller.android.sdk.common.VerificationDataBundle
-import com.truecaller.android.sdk.common.TrueException
 import com.truecaller.android.sdk.common.models.TrueProfile
 import com.truecaller.android.sdk.oAuth.CodeVerifierUtil
 import com.truecaller.android.sdk.oAuth.TcOAuthCallback
@@ -55,7 +55,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
-import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.Locale
 
 const val INITIALIZE_SDK = "initializeSDK"
@@ -91,24 +90,6 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
         onAttachedToEngine(flutterPluginBinding.binaryMessenger)
     }
 
-    /**This static function is optional and equivalent to onAttachedToEngine. It supports the old
-     * pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
-     * plugin registration via this function while apps migrate to use the new Android APIs
-     * post-flutter-1.12 via https:flutter.dev/go/android-project-migration.
-     * It is encouraged to share logic between onAttachedToEngine and registerWith to keep
-     * them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
-     * depending on the user's project. onAttachedToEngine or registerWith must both be defined
-     * in the same class.
-     **/
-    companion object {
-        @JvmStatic
-        fun registerWith(registrar: Registrar) {
-            val truecallerSdkPlugin = TruecallerSdkPlugin()
-            truecallerSdkPlugin.activity = registrar.activity()
-            truecallerSdkPlugin.onAttachedToEngine(registrar.messenger())
-        }
-    }
-
     private fun onAttachedToEngine(messenger: BinaryMessenger) {
         methodChannel = MethodChannel(messenger, TC_METHOD_CHANNEL)
         methodChannel?.setMethodCallHandler(this)
@@ -119,7 +100,11 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             INITIALIZE_SDK -> {
-                getTcSdkOptions(call)?.let { TcSdk.init(it) } ?: result.error("UNAVAILABLE", "Activity not available.", null)
+                getTcSdkOptions(call)?.let { TcSdk.init(it) } ?: result.error(
+                    "UNAVAILABLE",
+                    "Activity not available.",
+                    null
+                )
             }
 
             IS_OAUTH_FLOW_USABLE -> {
@@ -161,21 +146,28 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             }
 
             GET_AUTHORIZATION_CODE -> {
-                activity?.let { TcSdk.getInstance().getAuthorizationCode(it as FragmentActivity) } ?: result.error(
-                    "UNAVAILABLE",
-                    "Activity not available.",
-                    null
-                )
+                activity?.let { TcSdk.getInstance().getAuthorizationCode(it as FragmentActivity) }
+                    ?: result.error(
+                        "UNAVAILABLE",
+                        "Activity not available.",
+                        null
+                    )
             }
 
             REQUEST_VERIFICATION -> {
-                val phoneNumber = call.argument<String>(Constants.PH_NO)?.takeUnless(String::isBlank)
-                    ?: return result.error("Invalid phone", "Can't be null or empty", null)
+                val phoneNumber =
+                    call.argument<String>(Constants.PH_NO)?.takeUnless(String::isBlank)
+                        ?: return result.error("Invalid phone", "Can't be null or empty", null)
                 val countryISO = call.argument<String>(Constants.COUNTRY_ISO) ?: "IN"
                 activity?.let {
                     try {
                         TcSdk.getInstance()
-                            .requestVerification(countryISO, phoneNumber, verificationCallback, it as FragmentActivity)
+                            .requestVerification(
+                                countryISO,
+                                phoneNumber,
+                                verificationCallback,
+                                it as FragmentActivity
+                            )
                     } catch (e: RuntimeException) {
                         result.error(e.message ?: "UNAVAILABLE", e.message ?: "UNAVAILABLE", null)
                     }
@@ -184,8 +176,9 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             }
 
             VERIFY_OTP -> {
-                val firstName = call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
-                    ?: return result.error("Invalid name", "Can't be null or empty", null)
+                val firstName =
+                    call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
+                        ?: return result.error("Invalid name", "Can't be null or empty", null)
                 val lastName = call.argument<String>(Constants.LAST_NAME) ?: ""
                 val trueProfile = TrueProfile.Builder(firstName, lastName).build()
                 val otp = call.argument<String>(Constants.OTP)?.takeUnless(String::isBlank)
@@ -198,8 +191,9 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             }
 
             VERIFY_MISSED_CALL -> {
-                val firstName = call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
-                    ?: return result.error("Invalid name", "Can't be null or empty", null)
+                val firstName =
+                    call.argument<String>(Constants.FIRST_NAME)?.takeUnless(String::isBlank)
+                        ?: return result.error("Invalid name", "Can't be null or empty", null)
                 val lastName = call.argument<String>(Constants.LAST_NAME) ?: ""
                 val trueProfile = TrueProfile.Builder(firstName, lastName).build()
                 TcSdk.getInstance().verifyMissedCall(
@@ -217,12 +211,28 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     private fun getTcSdkOptions(call: MethodCall): TcSdkOptions? {
         return activity?.let {
             TcSdkOptions.Builder(it, oAuthCallback)
-                .sdkOptions(call.argument<Int>(Constants.SDK_OPTION) ?: TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS)
-                .consentHeadingOption(call.argument<Int>(Constants.CONSENT_HEADING_OPTION) ?: TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO)
-                .loginTextPrefix(call.argument<Int>(Constants.LOGIN_TEXT_PRE) ?: TcSdkOptions.LOGIN_TEXT_PREFIX_TO_GET_STARTED)
-                .footerType(call.argument<Int>(Constants.FOOTER_TYPE) ?: TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO)
-                .ctaText(call.argument<Int>(Constants.CTA_TEXT_PRE) ?: TcSdkOptions.CTA_TEXT_PROCEED)
-                .buttonShapeOptions(call.argument<Int>(Constants.BTN_SHAPE) ?: TcSdkOptions.BUTTON_SHAPE_ROUNDED)
+                .sdkOptions(
+                    call.argument<Int>(Constants.SDK_OPTION)
+                        ?: TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS
+                )
+                .consentHeadingOption(
+                    call.argument<Int>(Constants.CONSENT_HEADING_OPTION)
+                        ?: TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO
+                )
+                .loginTextPrefix(
+                    call.argument<Int>(Constants.LOGIN_TEXT_PRE)
+                        ?: TcSdkOptions.LOGIN_TEXT_PREFIX_TO_GET_STARTED
+                )
+                .footerType(
+                    call.argument<Int>(Constants.FOOTER_TYPE)
+                        ?: TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO
+                )
+                .ctaText(
+                    call.argument<Int>(Constants.CTA_TEXT_PRE) ?: TcSdkOptions.CTA_TEXT_PROCEED
+                )
+                .buttonShapeOptions(
+                    call.argument<Int>(Constants.BTN_SHAPE) ?: TcSdkOptions.BUTTON_SHAPE_ROUNDED
+                )
                 .buttonColor(call.argument<Long>(Constants.BTN_CLR)?.toInt() ?: 0)
                 .buttonTextColor(call.argument<Long>(Constants.BTN_TXT_CLR)?.toInt() ?: 0)
                 .build()
@@ -373,7 +383,12 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         return if (requestCode == TcSdk.SHARE_PROFILE_REQUEST_CODE) {
-            TcSdk.getInstance().onActivityResultObtained(activity as FragmentActivity, requestCode, resultCode, data)
+            TcSdk.getInstance().onActivityResultObtained(
+                activity as FragmentActivity,
+                requestCode,
+                resultCode,
+                data
+            )
         } else false
     }
 

@@ -140,6 +140,8 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Configure SDK options"),
+        backgroundColor: Colors.blue,
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 18.0),
       ),
       body: SingleChildScrollView(
         child: Padding(
