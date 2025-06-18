@@ -61,7 +61,12 @@ class _MyAppState extends State<OAuthResultScreen> {
           body: SingleChildScrollView(
             child: Container(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  top: 16.0,
+                  bottom: MediaQuery.of(context).viewPadding.bottom + 16.0,
+                ),
                 child: Column(
                   children: <Widget>[
                     SelectableText(

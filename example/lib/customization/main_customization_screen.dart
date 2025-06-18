@@ -83,8 +83,8 @@ class _HomePageState extends State<HomePage> {
     selectedFooter = FooterOption.getFooterOptionsMap().keys.first;
     rectangularBtn = false;
     verifyAllUsers = false;
-    ctaColor = Colors.blue.value;
-    ctaTextColor = Colors.white.value;
+    ctaColor = Colors.blue.toARGB32();
+    ctaTextColor = Colors.white.toARGB32();
     ctaPrefixOption = 0;
     headingOption = 0;
 
@@ -145,7 +145,12 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 16.0,
+            bottom: MediaQuery.of(context).viewPadding.bottom + 16.0,
+          ),
           child: Container(
             child: Column(
               children: <Widget>[
