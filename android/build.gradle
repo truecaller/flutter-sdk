@@ -55,7 +55,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 def sdkVariant = "flutter"
-def sdkVariantVersion = "1.0.0"
+def sdkVariantVersion = "1.0.1"
 
 android {
     compileSdk 35

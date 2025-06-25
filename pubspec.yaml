@@ -1,6 +1,6 @@
 name: truecaller_sdk
 description: Flutter plugin that uses Truecaller's OAuth SDK for Android based on OAuth 2.0 which is the industry-standard protocol for authorization.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/truecaller/flutter-sdk
 
 environment:

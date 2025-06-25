@@ -15,7 +15,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^1.0.0
+  truecaller_sdk: ^1.0.1
   ...
 ```
 ### 2. Generate Client Id and add it to `AndroidManifest.xml`:
