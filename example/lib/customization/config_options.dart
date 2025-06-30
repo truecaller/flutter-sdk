@@ -82,21 +82,21 @@ class FooterOption {
 class ConfigOptions {
   static Map<String, int> getColorList() {
     return {
-      "green": Colors.green.value,
-      "white": Colors.white.value,
-      "red": Colors.red.value,
-      "blue": Colors.blue.value,
-      "black": Colors.black.value,
-      "grey": Colors.grey.value,
-      "cyan": Colors.cyan.value,
-      "brown": Colors.brown.value,
-      "yellow": Colors.yellow.value,
-      "lime": Colors.lime.value,
-      "purple": Colors.purple.value,
-      "pink": Colors.pink.value,
-      "deepOrange": Colors.deepOrange.value,
-      "indigo": Colors.indigo.value,
-      "teal": Colors.teal.value,
+      "green": Colors.green.toARGB32(),
+      "white": Colors.white.toARGB32(),
+      "red": Colors.red.toARGB32(),
+      "blue": Colors.blue.toARGB32(),
+      "black": Colors.black.toARGB32(),
+      "grey": Colors.grey.toARGB32(),
+      "cyan": Colors.cyan.toARGB32(),
+      "brown": Colors.brown.toARGB32(),
+      "yellow": Colors.yellow.toARGB32(),
+      "lime": Colors.lime.toARGB32(),
+      "purple": Colors.purple.toARGB32(),
+      "pink": Colors.pink.toARGB32(),
+      "deepOrange": Colors.deepOrange.toARGB32(),
+      "indigo": Colors.indigo.toARGB32(),
+      "teal": Colors.teal.toARGB32(),
     };
   }
 

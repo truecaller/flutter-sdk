@@ -32,14 +32,14 @@ group 'com.truecallersdk'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.8.22'
+    ext.kotlin_version = '2.0.21'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.8.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -55,10 +55,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 def sdkVariant = "flutter"
-def sdkVariantVersion = "1.0.0"
+def sdkVariantVersion = "1.0.1"
 
 android {
-    compileSdkVersion 28
+    compileSdk 35
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -71,9 +75,9 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+    namespace = "com.truecallersdk"
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.truecaller.android.sdk:truecaller-sdk:3.0.0'
 }

@@ -1,3 +1,11 @@
+## 1.0.1
+
+* Update Android Gradle Plugin (AGP) and Kotlin Gradle Plugin (KGP) to versions 8.8.2 and 2.0.21, respectively.
+* The compileSdk and targetSdk updated to version 35.
+* Fix the namespace issue.
+* Migrate to Flutter's v2 embedding due to the removal of PluginRegistry.Registrar
+* Migrate to the Plugin DSL for Flutter's Gradle plugins
+
 ## 1.0.0
 
 #### Breaking change

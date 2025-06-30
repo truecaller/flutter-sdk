@@ -51,108 +51,116 @@ class _MyAppState extends State<OAuthResultScreen> {
     final accessTokenHelper =
         ModalRoute.of(context)!.settings.arguments as AccessTokenHelper;
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
-      appBar: AppBar(
-        title: const Text('OAuth Result'),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: <Widget>[
-                SelectableText(
-                  "Auth Code: ${accessTokenHelper.tcOAuthData.authorizationCode}",
-                  style: TextStyle(fontSize: 14.0),
-                  textAlign: TextAlign.center,
+          appBar: AppBar(
+            title: const Text('OAuth Result'),
+            backgroundColor: Colors.blue,
+            titleTextStyle: TextStyle(color: Colors.white, fontSize: 18.0),
+          ),
+          body: SingleChildScrollView(
+            child: Container(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  top: 16.0,
+                  bottom: MediaQuery.of(context).viewPadding.bottom + 16.0,
                 ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                SelectableText(
-                  "OAuth State: ${accessTokenHelper.tcOAuthData.state}",
-                  style: TextStyle(fontSize: 14.0),
-                  textAlign: TextAlign.left,
-                ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                SelectableText(
-                  "Scopes granted: ${accessTokenHelper.tcOAuthData.scopesGranted}",
-                  style: TextStyle(fontSize: 14.0),
-                  textAlign: TextAlign.left,
-                ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                MaterialButton(
-                  height: 45.0,
-                  child: Text(
-                    "Fetch Access Token",
-                    style: TextStyle(
-                      color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    SelectableText(
+                      "Auth Code: ${accessTokenHelper.tcOAuthData.authorizationCode}",
+                      style: TextStyle(fontSize: 14.0),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  color: Colors.blue,
-                  onPressed: () {
-                    fetchAccessToken(accessTokenHelper);
-                  },
-                ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                SelectableText(
-                  accessTokenResponse.isEmpty
-                      ? ""
-                      : "Access Token Response: $accessTokenResponse",
-                  style: TextStyle(fontSize: 12.0),
-                  textAlign: TextAlign.left,
-                ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                Visibility(
-                  visible: accessToken.isNotEmpty,
-                  child: MaterialButton(
-                    height: 45.0,
-                    child: Text(
-                      "Fetch User Info",
-                      style: TextStyle(
-                        color: Colors.white,
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    SelectableText(
+                      "OAuth State: ${accessTokenHelper.tcOAuthData.state}",
+                      style: TextStyle(fontSize: 14.0),
+                      textAlign: TextAlign.left,
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    SelectableText(
+                      "Scopes granted: ${accessTokenHelper.tcOAuthData.scopesGranted}",
+                      style: TextStyle(fontSize: 14.0),
+                      textAlign: TextAlign.left,
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    MaterialButton(
+                      height: 45.0,
+                      child: Text(
+                        "Fetch Access Token",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      color: Colors.blue,
+                      onPressed: () {
+                        fetchAccessToken(accessTokenHelper);
+                      },
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    SelectableText(
+                      accessTokenResponse.isEmpty
+                          ? ""
+                          : "Access Token Response: $accessTokenResponse",
+                      style: TextStyle(fontSize: 12.0),
+                      textAlign: TextAlign.left,
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    Visibility(
+                      visible: accessToken.isNotEmpty,
+                      child: MaterialButton(
+                        height: 45.0,
+                        child: Text(
+                          "Fetch User Info",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        color: Colors.blue,
+                        onPressed: () {
+                          fetchUserInfo();
+                        },
                       ),
                     ),
-                    color: Colors.blue,
-                    onPressed: () {
-                      fetchUserInfo();
-                    },
-                  ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    SelectableText(
+                      userInfoResponse.isEmpty
+                          ? ""
+                          : "User Info Response: $userInfoResponse",
+                      style: TextStyle(fontSize: 14.0),
+                      textAlign: TextAlign.left,
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                  ],
                 ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-                SelectableText(
-                  userInfoResponse.isEmpty
-                      ? ""
-                      : "User Info Response: $userInfoResponse",
-                  style: TextStyle(fontSize: 14.0),
-                  textAlign: TextAlign.left,
-                ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 20.0,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
   void fetchAccessToken(AccessTokenHelper accessTokenHelper) async {
