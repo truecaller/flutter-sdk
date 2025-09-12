@@ -79,5 +79,5 @@ android {
 }
 
 dependencies {
-    implementation 'com.truecaller.android.sdk:truecaller-sdk:3.0.0'
+    implementation 'com.truecaller.android.sdk:truecaller-sdk:3.1.0'
 }
