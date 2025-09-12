@@ -44,6 +44,7 @@ class Constants {
         const val BTN_CLR = "buttonColor";
         const val BTN_TXT_CLR = "buttonTextColor";
         const val LOCALE = "locale";
+        const val DISMISS_OPTIONS = "dismissOptions";
 
         //oauth customization
         const val SCOPES = "scopes";
