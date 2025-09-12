@@ -113,6 +113,15 @@ class ConfigOptions {
   }
 }
 
+class DismissOptions {
+  static Map<String, int> getDismissOptions() {
+    return {
+      "Secondary cta border": TcSdkOptions.DISMISS_OPTION_SECONDARY_CTA_BORDER,
+      "Cross button": TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON,
+    };
+  }
+}
+
 class AccessTokenHelper {
   final TcOAuthData tcOAuthData;
   final String codeVerifier;

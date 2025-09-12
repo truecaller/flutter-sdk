@@ -64,7 +64,7 @@ class TcSdk {
           int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
           int? buttonColor,
           int? buttonTextColor,
-          int dismissOptions = TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON}) async =>
+          int dismissOption = TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON}) async =>
       await _methodChannel.invokeMethod('initializeSDK', {
         "sdkOption": sdkOption,
         "consentHeadingOption": consentHeadingOption,
@@ -73,7 +73,7 @@ class TcSdk {
         "buttonShapeOption": buttonShapeOption,
         "buttonColor": buttonColor,
         "buttonTextColor": buttonTextColor,
-        "dismissOptions": dismissOptions,
+        "dismissOption": dismissOption,
       });
 
   /// Once you initialise the Truecaller SDK using the [initializeSDK] method, and if you are using

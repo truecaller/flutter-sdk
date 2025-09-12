@@ -236,7 +236,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 .buttonColor(call.argument<Long>(Constants.BTN_CLR)?.toInt() ?: 0)
                 .buttonTextColor(call.argument<Long>(Constants.BTN_TXT_CLR)?.toInt() ?: 0)
                 .dismissOptions(
-                    call.argument<Int>(Constants.DISMISS_OPTIONS)
+                    call.argument<Int>(Constants.DISMISS_OPTION)
                         ?: TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON
                 )
                 .build()
