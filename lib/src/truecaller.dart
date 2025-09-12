@@ -136,6 +136,17 @@ class TcSdk {
             CallbackData data = _insertData(callback, resultHashMap["data"]!);
             callback.otp = data.otp;
             break;
+          case TcSdkCallbackResult.imOtpInitiated:
+            callback.result = TcSdkCallbackResult.imOtpInitiated;
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            callback.ttl = data.ttl;
+            callback.requestNonce = data.requestNonce;
+            break;
+          case TcSdkCallbackResult.imOtpReceived:
+            callback.result = TcSdkCallbackResult.imOtpReceived;
+            CallbackData data = _insertData(callback, resultHashMap["data"]!);
+            callback.otp = data.otp;
+            break;
           case TcSdkCallbackResult.verifiedBefore:
             callback.result = TcSdkCallbackResult.verifiedBefore;
             CallbackData data = _insertData(callback, resultHashMap["data"]!);

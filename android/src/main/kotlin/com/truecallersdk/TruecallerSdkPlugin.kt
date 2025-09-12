@@ -320,6 +320,33 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     )
                 }
 
+                VerificationCallback.TYPE_IM_OTP_INITIATED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.IM_OTP_INITIATED,
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    ttl = bundle?.getString(VerificationDataBundle.KEY_TTL),
+                                    requestNonce = bundle?.getString(VerificationDataBundle.KEY_REQUEST_NONCE)
+                                )
+                            )
+                        )
+                    )
+                }
+
+                VerificationCallback.TYPE_IM_OTP_RECEIVED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.IM_OTP_RECEIVED,
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    otp = bundle?.getString(VerificationDataBundle.KEY_OTP)
+                                )
+                            )
+                        )
+                    )
+                }
+
                 VerificationCallback.TYPE_PROFILE_VERIFIED_BEFORE -> {
                     eventSink?.success(
                         mapOf(
