@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
     ctaTextColor = Colors.white.toARGB32();
     ctaPrefixOption = 0;
     headingOption = 0;
-    dismissOption = TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON;
+    dismissOption = 0;
 
     for (String key in ConfigOptions.getColorList().keys) {
       colorMenuItemList.add(DropdownMenuItem<int>(
