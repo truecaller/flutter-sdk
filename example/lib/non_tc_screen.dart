@@ -91,7 +91,9 @@ class _HomePageState extends State<HomePage> {
   bool showInputOtpView() {
     return tempResult != null &&
         ((tempResult == TcSdkCallbackResult.otpInitiated) ||
-            (tempResult == TcSdkCallbackResult.otpReceived));
+            (tempResult == TcSdkCallbackResult.otpReceived) ||
+            (tempResult == TcSdkCallbackResult.imOtpInitiated) ||
+            (tempResult == TcSdkCallbackResult.imOtpReceived));
   }
 
   bool showRetryTextView() {
@@ -330,6 +332,7 @@ class _HomePageState extends State<HomePage> {
           break;
         case TcSdkCallbackResult.imOtpReceived:
           showSnackBar("IM OTP Received : ${truecallerUserCallback.otp}");
+          otpController.text = truecallerUserCallback.otp!;
           break;
         case TcSdkCallbackResult.verificationComplete:
           showSnackBar(
