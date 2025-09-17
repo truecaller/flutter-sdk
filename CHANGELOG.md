@@ -1,3 +1,11 @@
+## 1.1.0
+
+* Bump oauth sdk version to 3.1.0
+* Add Im otp support.
+* Add dismiss options support.
+* Add dismiss options in example app.
+* bump kotlin plugin and jdk to 17
+
 ## 1.0.1
 
 * Update Android Gradle Plugin (AGP) and Kotlin Gradle Plugin (KGP) to versions 8.8.2 and 2.0.21, respectively.

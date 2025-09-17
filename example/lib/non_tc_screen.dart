@@ -296,7 +296,8 @@ class _HomePageState extends State<HomePage> {
           }
           showProgressBar =
               tempResult == TcSdkCallbackResult.missedCallInitiated;
-          if (tempResult == TcSdkCallbackResult.otpReceived || tempResult == TcSdkCallbackResult.imOtpReceived) {
+          if (tempResult == TcSdkCallbackResult.otpReceived ||
+              tempResult == TcSdkCallbackResult.imOtpReceived) {
             otpController.text = truecallerUserCallback.otp!;
           }
         });
@@ -328,7 +329,7 @@ class _HomePageState extends State<HomePage> {
               double.parse(truecallerUserCallback.ttl!).floor());
           showSnackBar(
               "IM OTP Initiated with TTL : ${truecallerUserCallback.ttl} && "
-                  "requestNonce = ${truecallerUserCallback.requestNonce}");
+              "requestNonce = ${truecallerUserCallback.requestNonce}");
           break;
         case TcSdkCallbackResult.imOtpReceived:
           showSnackBar("IM OTP Received : ${truecallerUserCallback.otp}");
