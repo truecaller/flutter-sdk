@@ -71,8 +71,9 @@ class _HomePageState extends State<HomePage> {
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
   List<DropdownMenuItem<int>> headingMenuItemList = [];
+  List<DropdownMenuItem<int>> dismissOptionItemList = [];
   late int ctaColor, ctaTextColor;
-  late int ctaPrefixOption, headingOption;
+  late int ctaPrefixOption, headingOption, dismissOption;
   final TextEditingController localeController = TextEditingController();
   late StreamSubscription? streamSubscription;
 
@@ -87,6 +88,7 @@ class _HomePageState extends State<HomePage> {
     ctaTextColor = Colors.white.toARGB32();
     ctaPrefixOption = 0;
     headingOption = 0;
+    dismissOption = 0;
 
     for (String key in ConfigOptions.getColorList().keys) {
       colorMenuItemList.add(DropdownMenuItem<int>(
@@ -108,6 +110,14 @@ class _HomePageState extends State<HomePage> {
         child: Text("${HeadingOption.getHeadingOptions()[i]}"),
       ));
     }
+
+    for (String key in DismissOptions.getDismissOptions().keys) {
+      dismissOptionItemList.add(DropdownMenuItem<int>(
+          value: DismissOptions.getDismissOptions()[key],
+          child: Text("$key"),
+      ));
+    }
+
   }
 
   List<Widget> createRadioListFooterOptions() {
@@ -338,6 +348,23 @@ class _HomePageState extends State<HomePage> {
         color: Colors.transparent,
         height: 10.0,
       ),
+      Padding(
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+        child: DropdownButtonFormField<int>(
+            decoration: InputDecoration(
+              labelText: "Dismiss options",
+              labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
+            ),
+            style: TextStyle(color: Colors.green),
+            value: dismissOption,
+            isExpanded: true,
+            items: dismissOptionItemList,
+            onChanged: (value) {
+              setState(() {
+                dismissOption = value!;
+              });
+            }),
+      ),
     ];
   }
 
@@ -354,7 +381,8 @@ class _HomePageState extends State<HomePage> {
             ? TcSdkOptions.BUTTON_SHAPE_RECTANGLE
             : TcSdkOptions.BUTTON_SHAPE_ROUNDED,
         buttonColor: ctaColor,
-        buttonTextColor: ctaTextColor);
+        buttonTextColor: ctaTextColor,
+    dismissOption: dismissOption);
 
     TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
       if (isOAuthFlowUsable) {

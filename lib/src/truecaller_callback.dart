@@ -84,6 +84,8 @@ enum TcSdkCallbackResult {
   missedCallReceived,
   otpInitiated,
   otpReceived,
+  imOtpInitiated,
+  imOtpReceived,
   verifiedBefore,
   verificationComplete,
   exception

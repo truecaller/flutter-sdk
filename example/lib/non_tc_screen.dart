@@ -91,7 +91,9 @@ class _HomePageState extends State<HomePage> {
   bool showInputOtpView() {
     return tempResult != null &&
         ((tempResult == TcSdkCallbackResult.otpInitiated) ||
-            (tempResult == TcSdkCallbackResult.otpReceived));
+            (tempResult == TcSdkCallbackResult.otpReceived) ||
+            (tempResult == TcSdkCallbackResult.imOtpInitiated) ||
+            (tempResult == TcSdkCallbackResult.imOtpReceived));
   }
 
   bool showRetryTextView() {
@@ -294,7 +296,7 @@ class _HomePageState extends State<HomePage> {
           }
           showProgressBar =
               tempResult == TcSdkCallbackResult.missedCallInitiated;
-          if (tempResult == TcSdkCallbackResult.otpReceived) {
+          if (tempResult == TcSdkCallbackResult.otpReceived || tempResult == TcSdkCallbackResult.imOtpReceived) {
             otpController.text = truecallerUserCallback.otp!;
           }
         });
@@ -320,6 +322,17 @@ class _HomePageState extends State<HomePage> {
           break;
         case TcSdkCallbackResult.otpReceived:
           showSnackBar("OTP Received : ${truecallerUserCallback.otp}");
+          break;
+        case TcSdkCallbackResult.imOtpInitiated:
+          startCountdownTimer(
+              double.parse(truecallerUserCallback.ttl!).floor());
+          showSnackBar(
+              "IM OTP Initiated with TTL : ${truecallerUserCallback.ttl} && "
+                  "requestNonce = ${truecallerUserCallback.requestNonce}");
+          break;
+        case TcSdkCallbackResult.imOtpReceived:
+          showSnackBar("IM OTP Received : ${truecallerUserCallback.otp}");
+          otpController.text = truecallerUserCallback.otp!;
           break;
         case TcSdkCallbackResult.verificationComplete:
           showSnackBar(
@@ -379,7 +392,9 @@ class _HomePageState extends State<HomePage> {
       TcSdk.verifyMissedCall(
           firstName: fNameController.text, lastName: lNameController.text);
     } else if ((tempResult == TcSdkCallbackResult.otpInitiated ||
-            tempResult == TcSdkCallbackResult.otpReceived) &&
+            tempResult == TcSdkCallbackResult.otpReceived ||
+            tempResult == TcSdkCallbackResult.imOtpInitiated ||
+            tempResult == TcSdkCallbackResult.imOtpReceived) &&
         validateName() &&
         validateOtp()) {
       setProgressBarToActive();
