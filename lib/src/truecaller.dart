@@ -64,7 +64,8 @@ class TcSdk {
           int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
           int? buttonColor,
           int? buttonTextColor,
-          int dismissOption = TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON}) async =>
+          int dismissOption =
+              TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON}) async =>
       await _methodChannel.invokeMethod('initializeSDK', {
         "sdkOption": sdkOption,
         "consentHeadingOption": consentHeadingOption,
