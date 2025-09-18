@@ -44,6 +44,7 @@ class Constants {
         const val BTN_CLR = "buttonColor";
         const val BTN_TXT_CLR = "buttonTextColor";
         const val LOCALE = "locale";
+        const val DISMISS_OPTION = "dismissOption";
 
         //oauth customization
         const val SCOPES = "scopes";
@@ -65,6 +66,8 @@ class Constants {
         const val MISSED_CALL_RECEIVED = "missedCallReceived"
         const val OTP_INITIATED = "otpInitiated"
         const val OTP_RECEIVED = "otpReceived"
+        const val IM_OTP_INITIATED = "imOtpInitiated"
+        const val IM_OTP_RECEIVED = "imOtpReceived"
         const val VERIFIED_BEFORE = "verifiedBefore"
         const val VERIFICATION_COMPLETE = "verificationComplete"
         const val EXCEPTION = "exception"

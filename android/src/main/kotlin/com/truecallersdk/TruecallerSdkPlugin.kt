@@ -235,6 +235,10 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 )
                 .buttonColor(call.argument<Long>(Constants.BTN_CLR)?.toInt() ?: 0)
                 .buttonTextColor(call.argument<Long>(Constants.BTN_TXT_CLR)?.toInt() ?: 0)
+                .dismissOptions(
+                    call.argument<Int>(Constants.DISMISS_OPTION)
+                        ?: 0
+                )
                 .build()
         }
     }
@@ -311,6 +315,33 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     eventSink?.success(
                         mapOf(
                             Constants.RESULT to Constants.OTP_RECEIVED,
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    otp = bundle?.getString(VerificationDataBundle.KEY_OTP)
+                                )
+                            )
+                        )
+                    )
+                }
+
+                VerificationCallback.TYPE_IM_OTP_INITIATED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.IM_OTP_INITIATED,
+                            Constants.DATA to gson.toJson(
+                                CallbackData(
+                                    ttl = bundle?.getString(VerificationDataBundle.KEY_TTL),
+                                    requestNonce = bundle?.getString(VerificationDataBundle.KEY_REQUEST_NONCE)
+                                )
+                            )
+                        )
+                    )
+                }
+
+                VerificationCallback.TYPE_IM_OTP_RECEIVED -> {
+                    eventSink?.success(
+                        mapOf(
+                            Constants.RESULT to Constants.IM_OTP_RECEIVED,
                             Constants.DATA to gson.toJson(
                                 CallbackData(
                                     otp = bundle?.getString(VerificationDataBundle.KEY_OTP)

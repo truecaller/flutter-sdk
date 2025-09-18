@@ -45,6 +45,10 @@ class TcSdkOptions {
   static const int BUTTON_SHAPE_ROUNDED = 128;
   static const int BUTTON_SHAPE_RECTANGLE = 256;
 
+  /// dismiss options
+  static const int DISMISS_OPTION_SECONDARY_CTA_BORDER = 512;
+  static const int DISMISS_OPTION_CROSS_BUTTON = 1024;
+
   /// heading options
   static const int SDK_CONSENT_HEADING_LOG_IN_TO = 0;
   static const int SDK_CONSENT_HEADING_SIGN_UP_WITH = 1;

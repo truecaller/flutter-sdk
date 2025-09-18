@@ -15,7 +15,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^1.0.1
+  truecaller_sdk: ^1.1.0
   ...
 ```
 ### 2. Generate Client Id and add it to `AndroidManifest.xml`:
@@ -237,6 +237,20 @@ StreamSubscription streamSubscription = TcSdk.streamCallbackData.listen((tcSdkCa
     case TcSdkCallbackResult.otpReceived:
       //OTP received and now you can complete the verification as mentioned in step 7b
       //If SMS Retriever hashcode is configured on Truecaller's developer dashboard, get the OTP from callback
+      String? otp = tcSdkCallback.otp;
+      break;
+    case TcSdkCallbackResult.imOtpInitiated:
+      //Number Verification would happen via IM OTP
+      //You'd also receive ttl (in seconds) that determines time left to complete the user verification
+      //Once TTL expires, you need to start from step 5. So you can either ask the user to input another number
+      //or you can also auto-retry the verification on the same number by giving a retry button
+      String? ttl = tcSdkCallback.ttl;
+      //You'd also receive a request nonce whose value would be same as the State that you set in step 3.1
+      String requestNonce = tcSdkCallback.requestNonce;
+      break;
+    case TcSdkCallbackResult.imOtpReceived:
+      //IM OTP received and now you can complete the verification as mentioned in step 7b
+      //If SMS Retriever hashcode is configured on Truecaller's developer dashboard, get the IM OTP from callback
       String? otp = tcSdkCallback.otp;
       break;
     case TcSdkCallbackResult.verificationComplete:
