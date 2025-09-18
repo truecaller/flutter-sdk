@@ -113,30 +113,29 @@ class _HomePageState extends State<HomePage> {
 
     for (String key in DismissOptions.getDismissOptions().keys) {
       dismissOptionItemList.add(DropdownMenuItem<int>(
-          value: DismissOptions.getDismissOptions()[key],
-          child: Text("$key"),
+        value: DismissOptions.getDismissOptions()[key],
+        child: Text("$key"),
       ));
     }
-
   }
 
-  List<Widget> createRadioListFooterOptions() {
-    List<Widget> widgets = [];
-    for (int key in FooterOption.getFooterOptionsMap().keys) {
-      widgets.add(
-        RadioListTile(
-          value: key,
-          groupValue: selectedFooter,
-          title: Text("${FooterOption.getFooterOptionsMap()[key]}"),
-          onChanged: (dynamic currentOption) {
-            setSelectedFooter(currentOption);
-          },
-          selected: selectedFooter == key,
-          activeColor: Colors.green,
-        ),
-      );
-    }
-    return widgets;
+  Widget createRadioListFooterOptions() {
+    return RadioGroup<int>(
+      groupValue: selectedFooter,
+      onChanged: (dynamic currentOption) {
+        setSelectedFooter(currentOption);
+      },
+      child: Column(
+        children: FooterOption.getFooterOptionsMap().keys.map((key) {
+          return RadioListTile<int>(
+            value: key,
+            title: Text("${FooterOption.getFooterOptionsMap()[key]}"),
+            selected: selectedFooter == key,
+            activeColor: Colors.green,
+          );
+        }).toList(),
+      ),
+    );
   }
 
   setSelectedFooter(int option) {
@@ -183,9 +182,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.transparent,
                   height: 20.0,
                 ),
-                Column(
-                  children: createRadioListFooterOptions(),
-                ),
+                createRadioListFooterOptions(),
                 Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16.0, top: 10.0, bottom: 10.0),
@@ -216,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   selected: verifyAllUsers,
-                  activeColor: Colors.green,
+                  activeThumbColor: Colors.green,
                 ),
                 Divider(
                   color: Colors.transparent,
@@ -258,7 +255,7 @@ class _HomePageState extends State<HomePage> {
           });
         },
         selected: rectangularBtn,
-        activeColor: Colors.green,
+        activeThumbColor: Colors.green,
       ),
       Divider(
         color: Colors.transparent,
@@ -272,7 +269,7 @@ class _HomePageState extends State<HomePage> {
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
             style: TextStyle(color: Colors.green),
-            value: ctaColor,
+            initialValue: ctaColor,
             isExpanded: true,
             items: colorMenuItemList,
             onChanged: (value) {
@@ -293,7 +290,7 @@ class _HomePageState extends State<HomePage> {
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
             style: TextStyle(color: Colors.green),
-            value: ctaTextColor,
+            initialValue: ctaTextColor,
             isExpanded: true,
             items: colorMenuItemList,
             onChanged: (value) {
@@ -314,7 +311,7 @@ class _HomePageState extends State<HomePage> {
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
             style: TextStyle(color: Colors.green),
-            value: ctaPrefixOption,
+            initialValue: ctaPrefixOption,
             isExpanded: true,
             items: ctaPrefixMenuItemList,
             onChanged: (value) {
@@ -335,7 +332,7 @@ class _HomePageState extends State<HomePage> {
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
             style: TextStyle(color: Colors.green),
-            value: headingOption,
+            initialValue: headingOption,
             isExpanded: true,
             items: headingMenuItemList,
             onChanged: (value) {
@@ -356,7 +353,7 @@ class _HomePageState extends State<HomePage> {
               labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
             style: TextStyle(color: Colors.green),
-            value: dismissOption,
+            initialValue: dismissOption,
             isExpanded: true,
             items: dismissOptionItemList,
             onChanged: (value) {
@@ -382,7 +379,7 @@ class _HomePageState extends State<HomePage> {
             : TcSdkOptions.BUTTON_SHAPE_ROUNDED,
         buttonColor: ctaColor,
         buttonTextColor: ctaTextColor,
-    dismissOption: dismissOption);
+        dismissOption: dismissOption);
 
     TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
       if (isOAuthFlowUsable) {
