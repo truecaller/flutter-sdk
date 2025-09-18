@@ -2,9 +2,7 @@
 
 * Bump oauth sdk version to 3.1.0
 * Add Im otp support.
-* Add dismiss options support.
-* Add dismiss options in example app.
-* bump kotlin plugin and jdk to 17
+* Bump kotlin plugin and jdk to 17
 
 ## 1.0.1
 
