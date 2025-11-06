@@ -30,8 +30,9 @@
 
 package com.truecallersdk
 
-import android.app.Activity
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
@@ -83,7 +84,9 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     private var methodChannel: MethodChannel? = null
     private var eventChannel: EventChannel? = null
     private var eventSink: EventChannel.EventSink? = null
-    private var activity: Activity? = null
+    private var activity: FragmentActivity? = null
+    private var binding: ActivityPluginBinding? = null
+    private var launcher: ActivityResultLauncher<Intent>? = null
     private val gson = Gson()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -146,12 +149,14 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             }
 
             GET_AUTHORIZATION_CODE -> {
-                activity?.let { TcSdk.getInstance().getAuthorizationCode(it as FragmentActivity) }
-                    ?: result.error(
-                        "UNAVAILABLE",
-                        "Activity not available.",
-                        null
-                    )
+                launcher?.let { launcher ->
+                    activity?.let { TcSdk.getInstance().getAuthorizationCode(it, launcher) }
+                        ?: result.error(
+                            "UNAVAILABLE",
+                            "Activity not available.",
+                            null
+                        )
+                }
             }
 
             REQUEST_VERIFICATION -> {
@@ -166,7 +171,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                                 countryISO,
                                 phoneNumber,
                                 verificationCallback,
-                                it as FragmentActivity
+                                it
                             )
                     } catch (e: RuntimeException) {
                         result.error(e.message ?: "UNAVAILABLE", e.message ?: "UNAVAILABLE", null)
@@ -403,24 +408,28 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener(this)
+        if (binding.activity is FragmentActivity) {
+            this.binding = binding
+            this.activity = binding.activity as FragmentActivity
+            binding.addActivityResultListener(this)
+
+            activity?.let {
+                launcher = it.registerForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    TcSdk.getInstance()
+                        .onActivityResultObtained(it, result.resultCode, result.data)
+                }
+            }
+        }
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener(this)
+        onAttachedToActivity(binding)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return if (requestCode == TcSdk.SHARE_PROFILE_REQUEST_CODE) {
-            TcSdk.getInstance().onActivityResultObtained(
-                activity as FragmentActivity,
-                requestCode,
-                resultCode,
-                data
-            )
-        } else false
+        return false
     }
 
     override fun onDetachedFromActivity() {
@@ -433,6 +442,9 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
     private fun cleanUp() {
         TcSdk.clear()
+        launcher = null
+        binding?.removeActivityResultListener(this)
+        binding = null
         activity = null
         methodChannel?.setMethodCallHandler(null)
         methodChannel = null
