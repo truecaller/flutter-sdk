@@ -106,4 +106,8 @@ class TcSdkOptions {
   /// theme options
   static const int THEME_LIGHT = 0;
   static const int THEME_DARK = 1;
+
+  /// consent mode Options
+  static const int CONSENT_MODE_POPUP       = 2048;
+  static const int CONSENT_MODE_BOTTOMSHEET = 4096;
 }

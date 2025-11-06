@@ -56,6 +56,8 @@ class TcSdk {
   /// [buttonShapeOption] to set login button shape
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
+  /// [dismissOption] to set additional dismiss options for consent screen
+  /// [consentMode] to set the consent screen UI mode
   static initializeSDK(
           {required int sdkOption,
           int consentHeadingOption = TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO,
@@ -64,8 +66,8 @@ class TcSdk {
           int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
           int? buttonColor,
           int? buttonTextColor,
-          int dismissOption =
-              TcSdkOptions.DISMISS_OPTION_CROSS_BUTTON}) async =>
+          int? dismissOption,
+          int consentMode = TcSdkOptions.CONSENT_MODE_BOTTOMSHEET}) async =>
       await _methodChannel.invokeMethod('initializeSDK', {
         "sdkOption": sdkOption,
         "consentHeadingOption": consentHeadingOption,
@@ -75,6 +77,7 @@ class TcSdk {
         "buttonColor": buttonColor,
         "buttonTextColor": buttonTextColor,
         "dismissOption": dismissOption,
+        "consentMode": consentMode
       });
 
   /// Once you initialise the Truecaller SDK using the [initializeSDK] method, and if you are using

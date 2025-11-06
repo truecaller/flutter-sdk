@@ -46,6 +46,7 @@ class Constants {
         const val LOCALE = "locale";
         const val THEME = "theme";
         const val DISMISS_OPTION = "dismissOption";
+        const val CONSENT_MODE = "consentMode";
 
         //oauth customization
         const val SCOPES = "scopes";

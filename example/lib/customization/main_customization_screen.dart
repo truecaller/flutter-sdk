@@ -66,7 +66,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int selectedFooter;
-  late bool rectangularBtn, verifyAllUsers, enableDarkTheme;
+  late bool rectangularBtn, verifyAllUsers, enableDarkTheme, showPopupUI;
   late String? codeVerifier;
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
@@ -85,6 +85,7 @@ class _HomePageState extends State<HomePage> {
     rectangularBtn = false;
     verifyAllUsers = false;
     enableDarkTheme = false;
+    showPopupUI = false;
     ctaColor = Colors.blue.toARGB32();
     ctaTextColor = Colors.white.toARGB32();
     ctaPrefixOption = 0;
@@ -277,6 +278,21 @@ class _HomePageState extends State<HomePage> {
         color: Colors.transparent,
         height: 10.0,
       ),
+      SwitchListTile(
+        title: Text("Show Popup UI"),
+        value: showPopupUI,
+        onChanged: (value) {
+          setState(() {
+            showPopupUI = value;
+          });
+        },
+        selected: showPopupUI,
+        activeThumbColor: Colors.green,
+      ),
+      Divider(
+        color: Colors.transparent,
+        height: 10.0,
+      ),
       Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         child: DropdownButtonFormField<int>(
@@ -395,7 +411,10 @@ class _HomePageState extends State<HomePage> {
             : TcSdkOptions.BUTTON_SHAPE_ROUNDED,
         buttonColor: ctaColor,
         buttonTextColor: ctaTextColor,
-        dismissOption: dismissOption);
+        dismissOption: dismissOption,
+        consentMode: showPopupUI
+            ? TcSdkOptions.CONSENT_MODE_POPUP
+            : TcSdkOptions.CONSENT_MODE_BOTTOMSHEET);
 
     TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
       if (isOAuthFlowUsable) {

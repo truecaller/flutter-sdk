@@ -227,7 +227,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
     private fun getTcSdkOptions(call: MethodCall): TcSdkOptions? {
         return activity?.let {
-            TcSdkOptions.Builder(it, oAuthCallback)
+            val builder = TcSdkOptions.Builder(it, oAuthCallback)
                 .sdkOptions(
                     call.argument<Int>(Constants.SDK_OPTION)
                         ?: TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS
@@ -252,11 +252,15 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 )
                 .buttonColor(call.argument<Long>(Constants.BTN_CLR)?.toInt() ?: 0)
                 .buttonTextColor(call.argument<Long>(Constants.BTN_TXT_CLR)?.toInt() ?: 0)
-                .dismissOptions(
-                    call.argument<Int>(Constants.DISMISS_OPTION)
-                        ?: 0
+                .consentMode(
+                    call.argument<Int>(Constants.CONSENT_MODE)
+                        ?: TcSdkOptions.CONSENT_MODE_BOTTOMSHEET
                 )
-                .build()
+
+            call.argument<Int>(Constants.DISMISS_OPTION)?.let { dismissOption ->
+                builder.dismissOptions(dismissOption)
+            }
+            builder.build()
         }
     }
 
