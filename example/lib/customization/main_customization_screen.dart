@@ -66,7 +66,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int selectedFooter;
-  late bool rectangularBtn, verifyAllUsers;
+  late bool rectangularBtn, verifyAllUsers, enableDarkTheme;
   late String? codeVerifier;
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
@@ -84,6 +84,7 @@ class _HomePageState extends State<HomePage> {
     selectedFooter = FooterOption.getFooterOptionsMap().keys.first;
     rectangularBtn = false;
     verifyAllUsers = false;
+    enableDarkTheme = false;
     ctaColor = Colors.blue.toARGB32();
     ctaTextColor = Colors.white.toARGB32();
     ctaPrefixOption = 0;
@@ -203,6 +204,21 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.green,
                             fontSize: 14.0)),
                   ),
+                ),
+                SwitchListTile(
+                  title: Text("Enable Dark theme"),
+                  value: enableDarkTheme,
+                  onChanged: (value) {
+                    setState(() {
+                      enableDarkTheme = value;
+                    });
+                  },
+                  selected: enableDarkTheme,
+                  activeThumbColor: Colors.green,
+                ),
+                Divider(
+                  color: Colors.transparent,
+                  height: 20.0,
                 ),
                 SwitchListTile(
                   title: Text("Verify all users"),
@@ -387,6 +403,11 @@ class _HomePageState extends State<HomePage> {
         TcSdk.setOAuthScopes(['profile', 'phone', 'openid', 'offline_access']);
         if (localeController.text.isNotEmpty) {
           TcSdk.setLocale(localeController.text);
+        }
+        if (enableDarkTheme) {
+          TcSdk.setTheme(TcSdkOptions.THEME_DARK);
+        } else {
+          TcSdk.setTheme(TcSdkOptions.THEME_LIGHT);
         }
         TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
           TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {

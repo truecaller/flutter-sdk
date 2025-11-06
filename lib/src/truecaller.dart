@@ -253,6 +253,11 @@ class TcSdk {
   static setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
 
+  /// Set the theme of the consent screen dialog by supplying [theme] to the method.
+  /// NOTE: Default value is 0 (Light theme)
+  static setTheme(int theme) async =>
+      await _methodChannel.invokeMethod('setTheme', {"theme": theme});
+
   /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
   /// numbers only so that's why default countryISO is set to "IN".
   /// The result will be returned asynchronously via [streamCallbackData] stream

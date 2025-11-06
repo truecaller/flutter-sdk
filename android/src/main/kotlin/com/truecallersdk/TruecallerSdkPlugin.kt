@@ -41,6 +41,7 @@ import com.truecaller.android.sdk.common.VerificationCallback
 import com.truecaller.android.sdk.common.VerificationDataBundle
 import com.truecaller.android.sdk.common.models.TrueProfile
 import com.truecaller.android.sdk.oAuth.CodeVerifierUtil
+import com.truecaller.android.sdk.oAuth.OAuthThemeOptions
 import com.truecaller.android.sdk.oAuth.TcOAuthCallback
 import com.truecaller.android.sdk.oAuth.TcOAuthData
 import com.truecaller.android.sdk.oAuth.TcOAuthError
@@ -61,6 +62,7 @@ import java.util.Locale
 const val INITIALIZE_SDK = "initializeSDK"
 const val IS_OAUTH_FLOW_USABLE = "isOAuthFlowUsable"
 const val SET_LOCALE = "setLocale"
+const val SET_THEME = "setTheme"
 const val GENERATE_RANDOM_CODE_VERIFIER = "generateRandomCodeVerifier"
 const val GENERATE_CODE_CHALLENGE = "generateCodeChallenge"
 const val SET_CODE_CHALLENGE = "setCodeChallenge"
@@ -117,6 +119,16 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             SET_LOCALE -> {
                 call.argument<String>(Constants.LOCALE)?.let {
                     TcSdk.getInstance().setLocale(Locale(it))
+                }
+            }
+
+            SET_THEME -> {
+                call.argument<Int>(Constants.THEME)?.let {
+                    val theme = when (it) {
+                        1 -> OAuthThemeOptions.DARK
+                        else -> OAuthThemeOptions.LIGHT
+                    }
+                    TcSdk.getInstance().setTheme(theme)
                 }
             }
 

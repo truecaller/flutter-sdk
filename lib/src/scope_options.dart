@@ -102,4 +102,8 @@ class TcSdkOptions {
   static const int CTA_TEXT_USE = 4;
   static const int CTA_TEXT_CONTINUE_WITH = 5;
   static const int CTA_TEXT_PROCEED_WITH = 6;
+
+  /// theme options
+  static const int THEME_LIGHT = 0;
+  static const int THEME_DARK = 1;
 }
