@@ -104,12 +104,17 @@ class TcOAuthData {
   late String authorizationCode;
   late String state;
   late List<dynamic> scopesGranted;
+  late String simState;
+  late String deviceCode;
 
   /// get the [TcOAuthData] values from Json
   TcOAuthData.fromJson(Map<String, dynamic> map) {
     authorizationCode = map['authorizationCode'];
     state = map['state'];
     scopesGranted = map['scopesGranted'];
+    Map<String, dynamic> properties = map['properties'];
+    simState = properties['SIM_STATUS'];
+    deviceCode = properties['DEVICE_CODE'];
   }
 }
 
