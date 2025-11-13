@@ -96,6 +96,24 @@ class _MyAppState extends State<OAuthResultScreen> {
                       color: Colors.transparent,
                       height: 20.0,
                     ),
+                    SelectableText(
+                      "SIM State: ${accessTokenHelper.tcOAuthData.simState}",
+                      style: TextStyle(fontSize: 14.0),
+                      textAlign: TextAlign.left,
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
+                    SelectableText(
+                      "Device Code: ${accessTokenHelper.tcOAuthData.deviceCode}",
+                      style: TextStyle(fontSize: 14.0),
+                      textAlign: TextAlign.left,
+                    ),
+                    Divider(
+                      color: Colors.transparent,
+                      height: 20.0,
+                    ),
                     MaterialButton(
                       height: 45.0,
                       child: Text(

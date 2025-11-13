@@ -363,7 +363,7 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  _navigateToResult(String firstName) {
+  void _navigateToResult(String firstName) {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(

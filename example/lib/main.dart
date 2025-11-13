@@ -161,8 +161,9 @@ class _MyAppState extends State<MyApp> {
                           default:
                             return Text("Invalid result");
                         }
-                      } else
+                      } else {
                         return Text("");
+                      }
                     }),
               ],
             ),

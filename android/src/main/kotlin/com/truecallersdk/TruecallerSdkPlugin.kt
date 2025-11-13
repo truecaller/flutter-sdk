@@ -30,8 +30,9 @@
 
 package com.truecallersdk
 
-import android.app.Activity
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
@@ -40,6 +41,7 @@ import com.truecaller.android.sdk.common.VerificationCallback
 import com.truecaller.android.sdk.common.VerificationDataBundle
 import com.truecaller.android.sdk.common.models.TrueProfile
 import com.truecaller.android.sdk.oAuth.CodeVerifierUtil
+import com.truecaller.android.sdk.oAuth.OAuthThemeOptions
 import com.truecaller.android.sdk.oAuth.TcOAuthCallback
 import com.truecaller.android.sdk.oAuth.TcOAuthData
 import com.truecaller.android.sdk.oAuth.TcOAuthError
@@ -57,9 +59,11 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 import java.util.Locale
 
+const val TAG = "TruecallerSdkPlugin"
 const val INITIALIZE_SDK = "initializeSDK"
 const val IS_OAUTH_FLOW_USABLE = "isOAuthFlowUsable"
 const val SET_LOCALE = "setLocale"
+const val SET_THEME = "setTheme"
 const val GENERATE_RANDOM_CODE_VERIFIER = "generateRandomCodeVerifier"
 const val GENERATE_CODE_CHALLENGE = "generateCodeChallenge"
 const val SET_CODE_CHALLENGE = "setCodeChallenge"
@@ -83,7 +87,9 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     private var methodChannel: MethodChannel? = null
     private var eventChannel: EventChannel? = null
     private var eventSink: EventChannel.EventSink? = null
-    private var activity: Activity? = null
+    private var activity: FragmentActivity? = null
+    private var binding: ActivityPluginBinding? = null
+    private var launcher: ActivityResultLauncher<Intent>? = null
     private val gson = Gson()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -117,6 +123,16 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 }
             }
 
+            SET_THEME -> {
+                call.argument<Int>(Constants.THEME)?.let {
+                    val theme = when (it) {
+                        1 -> OAuthThemeOptions.DARK
+                        else -> OAuthThemeOptions.LIGHT
+                    }
+                    TcSdk.getInstance().setTheme(theme)
+                }
+            }
+
             GENERATE_RANDOM_CODE_VERIFIER -> {
                 result.success(CodeVerifierUtil.generateRandomCodeVerifier())
             }
@@ -146,12 +162,18 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
             }
 
             GET_AUTHORIZATION_CODE -> {
-                activity?.let { TcSdk.getInstance().getAuthorizationCode(it as FragmentActivity) }
-                    ?: result.error(
-                        "UNAVAILABLE",
-                        "Activity not available.",
-                        null
-                    )
+                launcher?.let { launcher ->
+                    activity?.let { TcSdk.getInstance().getAuthorizationCode(it, launcher) }
+                        ?: result.error(
+                            "UNAVAILABLE",
+                            "Activity not available.",
+                            null
+                        )
+                } ?: result.error(
+                    "UNAVAILABLE",
+                    "Launcher not initialized.",
+                    null
+                )
             }
 
             REQUEST_VERIFICATION -> {
@@ -166,7 +188,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                                 countryISO,
                                 phoneNumber,
                                 verificationCallback,
-                                it as FragmentActivity
+                                it
                             )
                     } catch (e: RuntimeException) {
                         result.error(e.message ?: "UNAVAILABLE", e.message ?: "UNAVAILABLE", null)
@@ -210,7 +232,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
     private fun getTcSdkOptions(call: MethodCall): TcSdkOptions? {
         return activity?.let {
-            TcSdkOptions.Builder(it, oAuthCallback)
+            val builder = TcSdkOptions.Builder(it, oAuthCallback)
                 .sdkOptions(
                     call.argument<Int>(Constants.SDK_OPTION)
                         ?: TcSdkOptions.OPTION_VERIFY_ONLY_TC_USERS
@@ -235,11 +257,15 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 )
                 .buttonColor(call.argument<Long>(Constants.BTN_CLR)?.toInt() ?: 0)
                 .buttonTextColor(call.argument<Long>(Constants.BTN_TXT_CLR)?.toInt() ?: 0)
-                .dismissOptions(
-                    call.argument<Int>(Constants.DISMISS_OPTION)
-                        ?: 0
+                .consentMode(
+                    call.argument<Int>(Constants.CONSENT_MODE)
+                        ?: TcSdkOptions.CONSENT_MODE_BOTTOMSHEET
                 )
-                .build()
+
+            call.argument<Int>(Constants.DISMISS_OPTION)?.let { dismissOption ->
+                builder.dismissOptions(dismissOption)
+            }
+            builder.build()
         }
     }
 
@@ -403,24 +429,34 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener(this)
+        if (binding.activity is FragmentActivity) {
+            this.binding = binding
+            this.activity = binding.activity as FragmentActivity
+            binding.addActivityResultListener(this)
+
+            activity?.let {
+                launcher = it.registerForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    TcSdk.getInstance()
+                        .onActivityResultObtained(it, result.resultCode, result.data)
+                }
+            }
+        } else {
+            android.util.Log.w(
+                TAG,
+                "Activity is not a FragmentActivity. Truecaller SDK requires FragmentActivity" +
+                        " to function properly. Plugin will not be initialized."
+            )
+        }
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        this.activity = binding.activity
-        binding.addActivityResultListener(this)
+        onAttachedToActivity(binding)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return if (requestCode == TcSdk.SHARE_PROFILE_REQUEST_CODE) {
-            TcSdk.getInstance().onActivityResultObtained(
-                activity as FragmentActivity,
-                requestCode,
-                resultCode,
-                data
-            )
-        } else false
+        return false
     }
 
     override fun onDetachedFromActivity() {
@@ -433,6 +469,9 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
     private fun cleanUp() {
         TcSdk.clear()
+        launcher = null
+        binding?.removeActivityResultListener(this)
+        binding = null
         activity = null
         methodChannel?.setMethodCallHandler(null)
         methodChannel = null
