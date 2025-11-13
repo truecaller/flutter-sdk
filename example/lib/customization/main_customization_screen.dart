@@ -66,7 +66,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int selectedFooter;
-  late bool rectangularBtn, verifyAllUsers;
+  late bool rectangularBtn, verifyAllUsers, enableDarkTheme, showPopupUI;
   late String? codeVerifier;
   List<DropdownMenuItem<int>> colorMenuItemList = [];
   List<DropdownMenuItem<int>> ctaPrefixMenuItemList = [];
@@ -84,6 +84,8 @@ class _HomePageState extends State<HomePage> {
     selectedFooter = FooterOption.getFooterOptionsMap().keys.first;
     rectangularBtn = false;
     verifyAllUsers = false;
+    enableDarkTheme = false;
+    showPopupUI = false;
     ctaColor = Colors.blue.toARGB32();
     ctaTextColor = Colors.white.toARGB32();
     ctaPrefixOption = 0;
@@ -138,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  setSelectedFooter(int option) {
+  void setSelectedFooter(int option) {
     setState(() {
       selectedFooter = option;
     });
@@ -205,6 +207,21 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SwitchListTile(
+                  title: Text("Enable Dark theme"),
+                  value: enableDarkTheme,
+                  onChanged: (value) {
+                    setState(() {
+                      enableDarkTheme = value;
+                    });
+                  },
+                  selected: enableDarkTheme,
+                  activeThumbColor: Colors.green,
+                ),
+                Divider(
+                  color: Colors.transparent,
+                  height: 20.0,
+                ),
+                SwitchListTile(
                   title: Text("Verify all users"),
                   value: verifyAllUsers,
                   onChanged: (value) {
@@ -240,7 +257,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  createConfigOptions() {
+  List<Widget> createConfigOptions() {
     return [
       Divider(
         color: Colors.transparent,
@@ -255,6 +272,21 @@ class _HomePageState extends State<HomePage> {
           });
         },
         selected: rectangularBtn,
+        activeThumbColor: Colors.green,
+      ),
+      Divider(
+        color: Colors.transparent,
+        height: 10.0,
+      ),
+      SwitchListTile(
+        title: Text("Show Popup UI"),
+        value: showPopupUI,
+        onChanged: (value) {
+          setState(() {
+            showPopupUI = value;
+          });
+        },
+        selected: showPopupUI,
         activeThumbColor: Colors.green,
       ),
       Divider(
@@ -379,7 +411,10 @@ class _HomePageState extends State<HomePage> {
             : TcSdkOptions.BUTTON_SHAPE_ROUNDED,
         buttonColor: ctaColor,
         buttonTextColor: ctaTextColor,
-        dismissOption: dismissOption);
+        dismissOption: dismissOption,
+        consentMode: showPopupUI
+            ? TcSdkOptions.CONSENT_MODE_POPUP
+            : TcSdkOptions.CONSENT_MODE_BOTTOMSHEET);
 
     TcSdk.isOAuthFlowUsable.then((isOAuthFlowUsable) {
       if (isOAuthFlowUsable) {
@@ -387,6 +422,11 @@ class _HomePageState extends State<HomePage> {
         TcSdk.setOAuthScopes(['profile', 'phone', 'openid', 'offline_access']);
         if (localeController.text.isNotEmpty) {
           TcSdk.setLocale(localeController.text);
+        }
+        if (enableDarkTheme) {
+          TcSdk.setTheme(TcSdkOptions.THEME_DARK);
+        } else {
+          TcSdk.setTheme(TcSdkOptions.THEME_LIGHT);
         }
         TcSdk.generateRandomCodeVerifier.then((codeVerifier) {
           TcSdk.generateCodeChallenge(codeVerifier).then((codeChallenge) {
@@ -441,7 +481,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  _hideKeyboard() {
+  void _hideKeyboard() {
     FocusManager.instance.primaryFocus!.unfocus();
   }
 
