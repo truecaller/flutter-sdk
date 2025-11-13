@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  setSelectedFooter(int option) {
+  void setSelectedFooter(int option) {
     setState(() {
       selectedFooter = option;
     });
@@ -257,7 +257,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  createConfigOptions() {
+  List<Widget> createConfigOptions() {
     return [
       Divider(
         color: Colors.transparent,
@@ -481,7 +481,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  _hideKeyboard() {
+  void _hideKeyboard() {
     FocusManager.instance.primaryFocus!.unfocus();
   }
 

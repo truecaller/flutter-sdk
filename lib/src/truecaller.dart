@@ -58,7 +58,7 @@ class TcSdk {
   /// [buttonTextColor] to set login button text color
   /// [dismissOption] to set additional dismiss options for consent screen
   /// [consentMode] to set the consent screen UI mode
-  static initializeSDK(
+  static Future initializeSDK(
           {required int sdkOption,
           int consentHeadingOption = TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO,
           int footerType = TcSdkOptions.FOOTER_TYPE_ANOTHER_MOBILE_NO,
@@ -91,7 +91,7 @@ class TcSdk {
   /// After checking [isUsable], you can invoke Truecaller's OAuth consent screen dialog
   /// in your app flow by calling the following method
   /// The result will be returned asynchronously via [streamCallbackData] stream
-  static get getAuthorizationCode async =>
+  static Future get getAuthorizationCode async =>
       await _methodChannel.invokeMethod('getAuthorizationCode');
 
   /// Once you call [getAuthorizationCode], you can listen to this stream to determine the result of the
@@ -187,21 +187,21 @@ class TcSdk {
     return CallbackData.fromJson(dataMap as Map<String, dynamic>);
   }
 
-  static _insertOAuthData(TcSdkCallback callback, String data) {
+  static void _insertOAuthData(TcSdkCallback callback, String data) {
     Map oAuthDataMap = jsonDecode(data);
     TcOAuthData tcOAuthData =
         TcOAuthData.fromJson(oAuthDataMap as Map<String, dynamic>);
     callback.tcOAuthData = tcOAuthData;
   }
 
-  static _insertProfile(TcSdkCallback callback, String data) {
+  static void _insertProfile(TcSdkCallback callback, String data) {
     Map profileMap = jsonDecode(data);
     TruecallerUserProfile profile =
         TruecallerUserProfile.fromJson(profileMap as Map<String, dynamic>);
     callback.profile = profile;
   }
 
-  static _insertError(TcSdkCallback callback, String? data) {
+  static void _insertError(TcSdkCallback callback, String? data) {
     // onVerificationRequired has nullable error, hence null check
     if (data != null &&
         data.trim().isNotEmpty &&
@@ -234,31 +234,31 @@ class TcSdk {
   /// Set your own code challenge or use the utility method [generateRandomCodeVerifier] to generate
   /// one for you and set it via [codeChallenge] to this method
   /// Set it before calling [getAuthorizationCode]
-  static setCodeChallenge(String codeChallenge) async => await _methodChannel
+  static Future setCodeChallenge(String codeChallenge) async => await _methodChannel
       .invokeMethod('setCodeChallenge', {"codeChallenge": codeChallenge});
 
   /// Set the list of scopes to be requested using [scopes].
   /// Set it before calling [getAuthorizationCode]
-  static setOAuthScopes(List<String> scopes) async =>
+  static Future setOAuthScopes(List<String> scopes) async =>
       await _methodChannel.invokeMethod('setOAuthScopes', {"scopes": scopes});
 
   /// Set a unique state parameter [oAuthState] & store it in the current session to use it later in the
   /// onSuccess() callback method of the [TcOAuthCallback] to match if the state received from the
   /// authorization server is the same as set here to prevent request forgery attacks.
   /// Set it before calling [getAuthorizationCode]
-  static setOAuthState(String oAuthState) async => await _methodChannel
+  static Future setOAuthState(String oAuthState) async => await _methodChannel
       .invokeMethod('setOAuthState', {"oAuthState": oAuthState});
 
   /// Customise the consent screen dialog in any of the supported Indian languages by supplying
   /// [locale] to the method.
   /// NOTE: Default value is en
   /// Set it before calling [getAuthorizationCode]
-  static setLocale(String locale) async =>
+  static Future setLocale(String locale) async =>
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
 
   /// Set the theme of the consent screen dialog by supplying [theme] to the method.
   /// NOTE: Default value is 0 (Light theme)
-  static setTheme(int theme) async =>
+  static Future setTheme(int theme) async =>
       await _methodChannel.invokeMethod('setTheme', {"theme": theme});
 
   /// This method will initiate manual verification of [phoneNumber] asynchronously for Indian
@@ -268,7 +268,7 @@ class TcSdk {
   /// This method may lead to verification with a SMS Code (OTP) or verification with a CALL,
   /// or if the user is already verified on the device, will get the call back as
   /// [TcSdkCallbackResult.verifiedBefore] in [streamCallbackData]
-  static requestVerification(
+  static Future requestVerification(
           {required String phoneNumber, String countryISO = "IN"}) async =>
       await _methodChannel.invokeMethod(
           'requestVerification', {"ph": phoneNumber, "ci": countryISO});
@@ -278,7 +278,7 @@ class TcSdk {
   /// i.e call this method only when you receive [TcSdkCallbackResult.missedCallReceived]
   /// in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
-  static verifyMissedCall(
+  static Future verifyMissedCall(
           {required String firstName, required String lastName}) async =>
       await _methodChannel.invokeMethod(
           'verifyMissedCall', {"fname": firstName, "lname": lastName});
@@ -289,7 +289,7 @@ class TcSdk {
   /// [TcSdkCallbackResult.otpReceived] in [streamCallbackData].
   /// To complete verification, it is mandatory to pass [firstName] and [lastName] of the user
   /// with the [otp] code received over SMS
-  static verifyOtp(
+  static Future verifyOtp(
           {required String firstName,
           required String lastName,
           required String otp}) async =>
