@@ -112,9 +112,9 @@ class TcOAuthData {
     authorizationCode = map['authorizationCode'];
     state = map['state'];
     scopesGranted = map['scopesGranted'];
-    Map<String, dynamic> properties = map['properties'];
-    simState = properties['SIM_STATUS'];
-    deviceCode = properties['DEVICE_CODE'];
+    Map<String, dynamic>? properties = map['properties'];
+    simState = properties?['SIM_STATUS'] ?? '-1';
+    deviceCode = properties?['DEVICE_CODE'] ?? '-1';
   }
 }
 

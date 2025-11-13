@@ -257,7 +257,9 @@ class TcSdk {
       await _methodChannel.invokeMethod('setLocale', {"locale": locale});
 
   /// Set the theme of the consent screen dialog by supplying [theme] to the method.
-  /// NOTE: Default value is 0 (Light theme)
+  /// Use [TcSdkOptions.THEME_LIGHT] for light theme or [TcSdkOptions.THEME_DARK] for dark theme
+  /// NOTE: Default value is TcSdkOptions.THEME_LIGHT
+  /// Set it before calling [getAuthorizationCode]
   static Future setTheme(int theme) async =>
       await _methodChannel.invokeMethod('setTheme', {"theme": theme});
 

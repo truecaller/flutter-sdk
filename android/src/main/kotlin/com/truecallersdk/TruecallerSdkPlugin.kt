@@ -59,6 +59,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 import java.util.Locale
 
+const val TAG = "TruecallerSdkPlugin"
 const val INITIALIZE_SDK = "initializeSDK"
 const val IS_OAUTH_FLOW_USABLE = "isOAuthFlowUsable"
 const val SET_LOCALE = "setLocale"
@@ -168,7 +169,11 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                             "Activity not available.",
                             null
                         )
-                }
+                } ?: result.error(
+                    "UNAVAILABLE",
+                    "Launcher not initialized.",
+                    null
+                )
             }
 
             REQUEST_VERIFICATION -> {
@@ -437,6 +442,12 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                         .onActivityResultObtained(it, result.resultCode, result.data)
                 }
             }
+        } else {
+            android.util.Log.w(
+                TAG,
+                "Activity is not a FragmentActivity. Truecaller SDK requires FragmentActivity" +
+                        " to function properly. Plugin will not be initialized."
+            )
         }
     }
 
