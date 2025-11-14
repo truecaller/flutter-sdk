@@ -234,8 +234,9 @@ class TcSdk {
   /// Set your own code challenge or use the utility method [generateRandomCodeVerifier] to generate
   /// one for you and set it via [codeChallenge] to this method
   /// Set it before calling [getAuthorizationCode]
-  static Future setCodeChallenge(String codeChallenge) async => await _methodChannel
-      .invokeMethod('setCodeChallenge', {"codeChallenge": codeChallenge});
+  static Future setCodeChallenge(String codeChallenge) async =>
+      await _methodChannel
+          .invokeMethod('setCodeChallenge', {"codeChallenge": codeChallenge});
 
   /// Set the list of scopes to be requested using [scopes].
   /// Set it before calling [getAuthorizationCode]

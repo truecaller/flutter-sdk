@@ -15,7 +15,7 @@ Include the latest truecaller_sdk in your `pubspec.yaml`
 ```yaml
 dependencies:
   ...
-  truecaller_sdk: ^1.1.0
+  truecaller_sdk: ^1.2.0
   ...
 ```
 ### 2. Generate Client Id and add it to `AndroidManifest.xml`:
@@ -132,6 +132,8 @@ StreamSubscription streamSubscription = TcSdk.streamCallbackData.listen((tcSdkCa
       TcOAuthData tcOAuthData = tcSdkCallback.tcOAuthData!;
       String authorizationCode = tcOAuthData.authorizationCode; //use this along with codeVerifier generated in step 3.3 to generate an access token
       String stateReceivedFromServer = tcOAuthData.state; //match it with what you set in step 3.1
+      String simState = tcOAuthData.simState; // optional parameter to help you know the SIM status on the device
+      String deviceCode = tcOAuthData.deviceCode; // optional parameter to help you identify the device
       List<dynamic> scopesGranted = tcOAuthData.scopesGranted; //list of scopes granted by the user
       break;
     case TcSdkCallbackResult.failure:
@@ -182,6 +184,8 @@ StreamSubscription streamSubscription = TcSdk.streamCallbackData.listen((tcSdkCa
       TcOAuthData tcOAuthData = tcSdkCallback.tcOAuthData!;
       String authorizationCode = tcOAuthData.authorizationCode; // use this along with codeVerifier generated in step 3.3 to generate an access token
       String stateReceivedFromServer = tcOAuthData.state; // match it with what you set in step 3.1
+      String simState = tcOAuthData.simState; // optional parameter to help you know the SIM status on the device
+      String deviceCode = tcOAuthData.deviceCode; // optional parameter to help you identify the device
       List<dynamic> scopesGranted = tcOAuthData.scopesGranted;
       break;
     case TcSdkCallbackResult.failure:
@@ -319,6 +323,13 @@ To customise the consent screen in any of the supported Indian languages, add th
 TcSdk.setLocale("hi") // this sets the language to Hindi
 ```
 
+### Theme
+To set the consent screen theme to Dark mode, add the following line before calling `TcSdk.getAuthorizationCode`:
+```dart
+/// Default value is TcSdkOptions.THEME_LIGHT i.e Light mode
+TcSdk.setTheme(TcSdkOptions.THEME_DARK)
+```
+
 ### Consent screen UI
 You can customize the consent screen UI using the options available in class `TcSdkOptions` under `scope_options.dart` and pass them while initializing the SDK.
 
@@ -332,6 +343,7 @@ You can customize the consent screen UI using the options available in class `Tc
   /// [buttonShapeOption] to set login button shape
   /// [buttonColor] to set login button color
   /// [buttonTextColor] to set login button text color
+  /// [consentMode] to set the consent screen UI mode
   static initializeSDK(
             {required int sdkOption,
             int consentHeadingOption = TcSdkOptions.SDK_CONSENT_HEADING_LOG_IN_TO,
@@ -339,7 +351,8 @@ You can customize the consent screen UI using the options available in class `Tc
             int ctaText = TcSdkOptions.CTA_TEXT_PROCEED,
             int buttonShapeOption = TcSdkOptions.BUTTON_SHAPE_ROUNDED,
             int? buttonColor,
-            int? buttonTextColor})
+            int? buttonTextColor,
+            int consentMode = TcSdkOptions.CONSENT_MODE_BOTTOMSHEET})
 ```
 
 By default, `initializeSDK()` has default argument values for all the arguments except the `sdkOption` which is a required argument, so if you
