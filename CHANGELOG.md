@@ -1,6 +1,15 @@
+## 1.2.0
+
+* Bump OAuth SDK version to 3.2.1
+* Add Dark mode support.
+* Add support for configuring the consent screen mode - Popup or Bottomsheet.
+* Update deprecated OnActivityResult method with ActivityResultLauncher.
+* Expose two new optional parameters - SIM state and Device code in the success callback.
+* Fix sequence of installation issue.
+
 ## 1.1.0
 
-* Bump oauth sdk version to 3.1.0
+* Bump OAuth SDK version to 3.1.0
 * Add Im otp support.
 * Bump kotlin plugin and jdk to 17
 
