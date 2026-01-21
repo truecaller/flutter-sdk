@@ -46,7 +46,7 @@ extension TCTrueProfile {
 extension TCError {
     var toDict: [String: AnyHashable] {
         var dict = [String: AnyHashable]()
-        dict["code"] = getCode()
+        dict["code"] = getCode().rawValue
         dict["message"] = description
         return dict
     }
