@@ -58,6 +58,8 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 const val TAG = "TruecallerSdkPlugin"
 const val INITIALIZE_SDK = "initializeSDK"
@@ -91,6 +93,8 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     private var binding: ActivityPluginBinding? = null
     private var launcher: ActivityResultLauncher<Intent>? = null
     private val gson = Gson()
+    private val ioExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         onAttachedToEngine(flutterPluginBinding.binaryMessenger)
@@ -106,7 +110,21 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             INITIALIZE_SDK -> {
-                getTcSdkOptions(call)?.let { TcSdk.init(it) } ?: result.error(
+                getTcSdkOptions(call)?.let { options ->
+                    // Run TcSdk.init() on a background thread to avoid ANR.
+                    // During init, ContentResolver.query() to the Truecaller app's
+                    // ContentProvider can block for seconds. Running on a background
+                    // thread prevents main-thread ANR.
+                    ioExecutor.execute {
+                        try {
+                            TcSdk.init(options)
+                            mainHandler.post { result.success(true) }
+                        } catch (e: Exception) {
+                            android.util.Log.e(TAG, "TcSdk.init failed", e)
+                            mainHandler.post { result.success(false) }
+                        }
+                    }
+                } ?: result.error(
                     "UNAVAILABLE",
                     "Activity not available.",
                     null
@@ -468,6 +486,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     private fun cleanUp() {
+        ioExecutor.shutdownNow()
         TcSdk.clear()
         launcher = null
         binding?.removeActivityResultListener(this)
