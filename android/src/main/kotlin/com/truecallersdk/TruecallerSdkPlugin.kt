@@ -120,22 +120,28 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                     // ContentProvider can block for seconds. Running on a background
                     // thread prevents main-thread ANR.
                     val resultConsumed = AtomicBoolean(false)
-                    ioExecutor.execute {
-                        try {
-                            TcSdk.init(options)
-                            mainHandler.post {
-                                if (!isCleanedUp.get() && resultConsumed.compareAndSet(false, true)) {
-                                    result.success(true)
+                    try {
+                        ioExecutor.execute {
+                            try {
+                                TcSdk.init(options)
+                                mainHandler.post {
+                                    if (!isCleanedUp.get() && resultConsumed.compareAndSet(false, true)) {
+                                        result.success(true)
+                                    }
                                 }
-                            }
-                        } catch (e: Exception) {
-                            android.util.Log.e(TAG, "TcSdk.init failed", e)
-                            mainHandler.post {
-                                if (!isCleanedUp.get() && resultConsumed.compareAndSet(false, true)) {
-                                    result.success(false)
+                            } catch (e: Exception) {
+                                android.util.Log.e(TAG, "TcSdk.init failed", e)
+                                mainHandler.post {
+                                    if (!isCleanedUp.get() && resultConsumed.compareAndSet(false, true)) {
+                                        result.success(false)
+                                    }
                                 }
                             }
                         }
+                    } catch (e: java.util.concurrent.RejectedExecutionException) {
+                        // Executor was shut down (rapid detach-reattach during config change)
+                        android.util.Log.w(TAG, "Executor shut down, cannot init SDK", e)
+                        result.success(false)
                     }
                 } ?: result.error(
                     "UNAVAILABLE",
@@ -505,11 +511,17 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
 
     private fun cleanUp() {
         isCleanedUp.set(true)
-        // Use shutdown() instead of shutdownNow() to let any in-flight TcSdk.init()
-        // finish gracefully. shutdownNow() interrupts the thread mid-execution which
-        // could leave the TcSdk singleton in a half-initialized state.
+        // Submit TcSdk.clear() to the executor so it runs after any in-flight
+        // TcSdk.init() completes — prevents clearing a half-initialized singleton.
+        // RejectedExecutionException means executor already shut down (no in-flight
+        // task), so we clear directly on the main thread as a fallback.
+        try {
+            ioExecutor.execute { TcSdk.clear() }
+        } catch (e: java.util.concurrent.RejectedExecutionException) {
+            TcSdk.clear()
+        }
+        // shutdown() lets the queued clear() task finish before the thread terminates.
         ioExecutor.shutdown()
-        TcSdk.clear()
         launcher = null
         binding?.removeActivityResultListener(this)
         binding = null
